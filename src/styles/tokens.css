@@ -1,0 +1,30 @@
+/* Aryan OS design tokens. Dark desk, cream windows, one accent. */
+@font-face {
+  font-family: 'Departure Mono';
+  src: url('../assets/fonts/DepartureMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --color-desk: #111113;
+  --color-desk-2: #1a1b1f;
+  --color-window: #ece7dc;
+  --color-ink: #16171a;
+  --color-muted: #8a8d96;
+  --color-accent: #ff4a2b;
+  --color-navy: #1a2b55;
+  --color-chrome-1: #09090b;
+  --color-chrome-2: #52525b;
+  --color-chrome-3: #d4d4d8;
+  --color-chrome-4: #ffffff;
+  --color-hairline: #2a2b31;
+
+  --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --radius-window: 10px;
+  --shadow-window: 0 1px 2px rgb(0 0 0 / 0.35), 0 18px 40px -12px rgb(0 0 0 / 0.55);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
