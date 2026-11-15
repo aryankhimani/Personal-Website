@@ -2,6 +2,17 @@
 (function($) {
     "use strict";
 
+    // Unused template plugins are no longer loaded; make their calls no-ops
+    // so the setup code below doesn't throw.
+    ["niceSelect", "easyPieChart", "fullpage", "ajaxChimp", "magnificPopup",
+        "mCustomScrollbar", "justifiedGallery", "multiscroll", "countdown",
+        "stickySidebar", "smoothScroll", "lightSlider"
+    ].forEach(function(name) {
+        if (!$.fn[name]) {
+            $.fn[name] = function() { return this; };
+        }
+    });
+
     /*===============================
         ----- JS Index -----
 
@@ -74,29 +85,6 @@
             removeClasses: true,
             closedSymbol: '<i class="icon-arrows-plus"></i>',
             openedSymbol: '<i class="icon-arrows-minus"></i>'
-        });
-
-        /*------------------------
-            05. Search Box  JS
-         -------------------------*/
-        const wrapper = $(".search-box-wrapper");
-        $(".btn-search").on('click', function() {
-            wrapper.addClass('show').fadeIn();
-            $("body").addClass("fix");
-            $("#search-input").focus();
-        });
-
-        $(".search-close").on('click', function() {
-            wrapper.removeClass('show').fadeOut();
-            $("body").removeClass("fix");
-        });
-
-        // Esc Key Close
-        $(document).on('keyup', function(event) {
-            if (event.keyCode === 27) {
-                wrapper.removeClass('show').fadeOut();
-                $("body").removeClass("fix");
-            }
         });
 
         /*------------------------
@@ -437,8 +425,7 @@
                 maxZoom: 14,
                 minZoom: 2,
                 id: 'mapbox.streets',
-                scrollWheelZoom: false,
-                accessToken: 'sk.eyJ1IjoicmFqdWh0IiwiYSI6ImNqdHk5dGdpYzJqM3A0NGxsYmI3NmhnN3EifQ.kNdHkgfVGmSz6XPmmfG02A'
+                scrollWheelZoom: false
             }).addTo(mymap);
 
             const marker = L.marker([$lat, $lng]).addTo(mymap);
