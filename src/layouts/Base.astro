@@ -1,5 +1,8 @@
 ---
 import '../styles/global.css';
+import Dock from '../components/os/Dock';
+import MenuBar from '../components/os/MenuBar';
+import WindowManager from '../components/os/WindowManager';
 
 interface Props {
   title?: string;
@@ -20,8 +23,53 @@ const {
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+
+    <!-- Decide Lite mode before first paint so the heavy version never flashes.
+         Keep the storage key in sync with LITE_STORAGE_KEY in src/lib/device-tier.ts. -->
+    <script is:inline>
+      (function () {
+        var lite = false;
+        var saved = null;
+        try {
+          saved = localStorage.getItem('aryan-os:lite');
+        } catch (e) {}
+        if (saved === 'on' || saved === 'off') {
+          lite = saved === 'on';
+        } else {
+          var gl = null;
+          try {
+            var canvas = document.createElement('canvas');
+            gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+          } catch (e) {}
+          var conn = navigator.connection;
+          lite =
+            matchMedia('(prefers-reduced-motion: reduce)').matches ||
+            !!(conn && conn.saveData) ||
+            (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4) ||
+            (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4) ||
+            !gl;
+        }
+        document.documentElement.dataset.lite = String(lite);
+      })();
+    </script>
   </head>
   <body>
-    <slot />
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:rounded focus:bg-window focus:px-3 focus:py-2 focus:text-sm focus:text-ink"
+    >
+      Skip to content
+    </a>
+    <MenuBar client:idle />
+    <main id="main" class="pt-(--menubar-h) pb-24">
+      <slot />
+    </main>
+    <WindowManager client:idle />
+    <Dock client:idle />
+
+    <script>
+      import { initScroll } from '../lib/scroll';
+      initScroll();
+    </script>
   </body>
 </html>

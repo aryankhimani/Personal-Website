@@ -1,0 +1,235 @@
+/* Styles for the OS shell: windows, menus, the Lite switch, desktop icons. */
+
+/* ---------- Windows ---------- */
+
+.os-titlebar {
+  background: var(--color-titlebar);
+  color: var(--color-ink-2);
+}
+
+/* The window in front gets a brushed-chrome title bar. */
+.os-window[data-focused] .os-titlebar {
+  background: linear-gradient(180deg, #fafafa 0%, #d9d9dd 46%, #c3c3c9 54%, #e6e6e9 100%);
+  color: var(--color-ink);
+}
+
+.os-light {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #b9b3a6;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.18);
+}
+
+/* 12px is the classic size; the hit area is 24px. */
+.os-light::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.os-light svg {
+  width: 8px;
+  height: 8px;
+  fill: none;
+  stroke: rgb(0 0 0 / 0.6);
+  stroke-width: 1.6;
+  stroke-linecap: square;
+  opacity: 0;
+}
+
+.os-lights:hover .os-light svg,
+.os-light:focus-visible svg {
+  opacity: 1;
+}
+
+.os-window[data-focused] .os-light-close {
+  background: #f0563b;
+}
+.os-window[data-focused] .os-light-minimize {
+  background: #e3ae22;
+}
+.os-window[data-focused] .os-light-zoom {
+  background: #4faa5a;
+}
+
+.os-light:focus-visible {
+  outline: 2px solid var(--color-navy);
+  outline-offset: 2px;
+}
+
+/* On cream, the focus ring is navy: the accent is too light there to pass contrast. */
+.os-window :focus-visible {
+  outline-color: var(--color-navy);
+}
+
+.os-prose {
+  max-width: 62ch;
+  padding: 1.25rem 1.5rem 1.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+.os-prose h3 {
+  margin-top: 1.5rem;
+  font-size: 0.9375rem;
+  color: var(--color-ink);
+}
+
+.os-prose h3:first-child {
+  margin-top: 0;
+}
+
+.os-prose p,
+.os-prose ul {
+  margin-top: 0.5rem;
+  color: var(--color-ink-2);
+}
+
+.os-prose li {
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.os-prose li::before {
+  content: '-';
+  position: absolute;
+  left: 0.25rem;
+}
+
+.os-prose a {
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.os-prose a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ---------- Menus ---------- */
+
+.os-menu-trigger:hover {
+  color: var(--color-chrome-4);
+}
+
+.os-menu-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  height: 1.75rem;
+  padding: 0 0.625rem 0 0.375rem;
+  border-radius: 4px;
+  color: var(--color-chrome-3);
+  white-space: nowrap;
+}
+
+.os-menu-item:hover,
+.os-menu-item:focus-visible {
+  background: var(--color-navy);
+  color: var(--color-chrome-4);
+  outline: none;
+}
+
+.os-menu-item[aria-disabled] {
+  color: var(--color-muted);
+  cursor: default;
+}
+
+.os-menu-item[aria-disabled]:hover {
+  background: none;
+  color: var(--color-muted);
+}
+
+/* ---------- Lite switch ---------- */
+
+.os-switch {
+  color: var(--color-chrome-3);
+}
+
+.os-switch-track {
+  position: relative;
+  width: 26px;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--color-chrome-2);
+  transition: background-color 150ms var(--ease-out);
+}
+
+.os-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-chrome-4);
+  transition: transform 150ms var(--ease-out);
+}
+
+.os-switch[aria-checked='true'] .os-switch-track {
+  background: var(--color-accent);
+}
+
+.os-switch[aria-checked='true'] .os-switch-knob {
+  transform: translateX(12px);
+}
+
+.os-switch-on-cream {
+  color: var(--color-ink);
+}
+
+.os-switch-on-cream .os-switch-track {
+  background: #a9a59b;
+}
+
+.os-switch-on-cream[aria-checked='true'] .os-switch-track {
+  background: var(--color-navy);
+}
+
+.os-clock-on-cream,
+.os-clock-on-cream abbr {
+  color: var(--color-ink-2);
+}
+
+/* ---------- Desktop icons ---------- */
+
+.os-file-tile {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: var(--color-desk-2);
+  box-shadow: inset 0 0 0 1px var(--color-hairline);
+  color: var(--color-window);
+  transition: transform 150ms var(--ease-out);
+}
+
+.os-desktop-icon:hover .os-file-tile {
+  transform: translateY(-2px);
+}
+
+.os-desktop-icon:active .os-file-tile {
+  transform: translateY(0);
+}
+
+/* ---------- Lite mode and reduced motion ---------- */
+
+[data-lite='true'] .os-file-tile,
+[data-lite='true'] .os-switch-track,
+[data-lite='true'] .os-switch-knob {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os-file-tile,
+  .os-switch-track,
+  .os-switch-knob {
+    transition: none;
+  }
+}

@@ -1,5 +1,17 @@
 @import 'tailwindcss';
+@import 'lenis/dist/lenis.css';
 @import './tokens.css';
+@import './os.css';
+
+:root {
+  --menubar-h: 2.75rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --menubar-h: 2rem;
+  }
+}
 
 @layer base {
   html {
@@ -7,6 +19,7 @@
     color: var(--color-chrome-3);
     font-family: var(--font-mono);
     -webkit-font-smoothing: antialiased;
+    scroll-padding-top: var(--menubar-h);
   }
 
   body {
@@ -21,5 +34,9 @@
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+  }
+
+  button {
+    cursor: pointer;
   }
 }
