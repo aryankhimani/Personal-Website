@@ -23,10 +23,12 @@ async function newPage(viewport) {
   const ctx = await browser.createBrowserContext();
   const page = await ctx.newPage();
   await page.setViewport(viewport);
+  // Skip the boot sequence: it has its own test.
+  await page.evaluateOnNewDocument(() => sessionStorage.setItem('aryan-os:booted', '1'));
   page.on('pageerror', (e) => problems.push('pageerror: ' + e.message));
   page.on('console', (m) => m.type() === 'error' && problems.push('console: ' + m.text()));
   await page.goto(base, { waitUntil: 'networkidle2' });
-  await sleep(1200);
+  await sleep(2500); // hero visuals load after idle
   return page;
 }
 const has = (page, sel) => page.$(sel).then(Boolean);
@@ -46,7 +48,7 @@ const rectOf = (page, sel) =>
 
   await page.click('.os-desktop-icon');
   await page.waitForSelector('[data-window="readme"]', { timeout: 4000 }).catch(() => {});
-  await sleep(500);
+  await sleep(1200); // let the open animation finish before measuring
   check('clicking readme.md opens its window', await has(page, '[data-window="readme"]'));
   check('URL gets the window hash', page.url().endsWith('#readme'), page.url());
   check('focus moved into the window', await page.evaluate(() => !!document.activeElement?.closest('[data-window="readme"]')));

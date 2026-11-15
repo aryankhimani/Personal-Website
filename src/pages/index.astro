@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import DesktopIcon from '../components/os/DesktopIcon';
+import Hero from '../components/hero/Hero';
 
 // Sections still to be built. Each keeps its place on the page so the dock has somewhere to go.
 const upcoming = [
@@ -12,16 +13,13 @@ const upcoming = [
 ];
 ---
 
-<Base>
-  <section id="home" class="relative flex min-h-[calc(100dvh-var(--menubar-h))] flex-col p-4 sm:p-6">
-    <h1 class="sr-only">Aryan Khimani</h1>
-    <ul class="flex gap-1 sm:flex-col sm:gap-2">
+<Base boot>
+  <section id="home" class="relative">
+    <ul class="absolute top-4 left-2 z-10 flex gap-1 md:top-6 md:left-4 md:flex-col md:gap-2">
       <li><DesktopIcon id="readme" client:idle /></li>
       <li><DesktopIcon id="about-this-site" client:idle /></li>
     </ul>
-    <p class="mt-auto mb-24 max-w-sm text-sm leading-relaxed text-muted">
-      Open readme.md to try the windows. The hero goes here next.
-    </p>
+    <Hero client:load />
   </section>
 
   {

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { setLite, useLite } from '../../lib/device-tier';
+import { HEROES, setHero, useHero } from '../../lib/hero';
 import { scrollToSection } from '../../lib/scroll';
 import { openWindow } from '../../lib/windows';
 import Clock from './Clock';
@@ -15,6 +16,8 @@ type Entry = {
   onSelect?: (trigger: HTMLElement | null) => void;
   href?: string;
   checked?: boolean;
+  /** One of a group where exactly one is checked. */
+  radio?: boolean;
   disabled?: boolean;
 };
 
@@ -41,6 +44,7 @@ function Brand() {
 
 export default function MenuBar() {
   const lite = useLite();
+  const hero = useHero();
   const [open, setOpen] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
@@ -57,7 +61,15 @@ export default function MenuBar() {
     {
       id: 'view',
       label: 'View',
-      entries: [{ label: 'Lite mode', checked: lite, onSelect: () => setLite(!lite) }],
+      entries: [
+        ...HEROES.map((h) => ({
+          label: `Hero: ${h.label}`,
+          checked: hero === h.id,
+          radio: true,
+          onSelect: () => setHero(h.id),
+        })),
+        { label: 'Lite mode', checked: lite, onSelect: () => setLite(!lite) },
+      ],
     },
     {
       id: 'work',
@@ -217,7 +229,7 @@ export default function MenuBar() {
                     onKeyDown={(e) => onMenuKey(e, menu.id)}
                   >
                     {menu.entries.map((entry) => {
-                      const role = entry.checked === undefined ? 'menuitem' : 'menuitemcheckbox';
+                      const role = entry.radio ? 'menuitemradio' : entry.checked === undefined ? 'menuitem' : 'menuitemcheckbox';
                       const shared = {
                         role,
                         tabIndex: -1,

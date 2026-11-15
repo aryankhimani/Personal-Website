@@ -1,0 +1,285 @@
+/* The hero ("desktop wallpaper") and the boot screen. */
+
+.hero {
+  position: relative;
+  display: grid;
+  gap: 1.5rem;
+  min-height: calc(100dvh - var(--menubar-h));
+  padding: 7.5rem 1rem 8.5rem;
+  isolation: isolate;
+}
+
+.hero-visual {
+  position: relative;
+  pointer-events: none;
+}
+
+.hero-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+  align-self: end;
+  max-width: 40rem;
+}
+
+.hero-name {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 7.2vw, 7rem);
+  font-variation-settings: 'wght' 300, 'wdth' 100;
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+  color: var(--color-chrome-4);
+}
+
+.hero-line {
+  margin-top: 1.25rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+  line-height: 1.35;
+  color: var(--color-chrome-3);
+}
+
+.hero-roles {
+  display: inline-flex;
+  vertical-align: bottom;
+  color: var(--color-window);
+}
+
+.hero-sub {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1.75rem;
+  font-size: 0.875rem;
+}
+
+/* Chrome button in CSS rather than WebGL: the hero already runs one canvas. */
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  height: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: 8px;
+  color: var(--color-ink);
+  background: linear-gradient(180deg, #fff 0%, #d9d9dd 42%, #a9a9b1 52%, #e9e9ec 100%);
+  background-size: 100% 200%;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.6),
+    0 0 0 1px rgb(0 0 0 / 0.6),
+    0 8px 18px -8px rgb(0 0 0 / 0.8);
+  transition: background-position 250ms var(--ease-out);
+}
+
+.hero-cta:hover {
+  background-position: 0 60%;
+}
+
+.hero-cta:active {
+  background-position: 0 100%;
+}
+
+.hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  color: var(--color-chrome-4);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.hero-link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.hero-socials {
+  display: inline-flex;
+  font-size: 1.375rem;
+}
+
+.hero-socials a {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 6px;
+  color: var(--color-chrome-3);
+}
+
+.hero-socials a:hover {
+  color: var(--color-chrome-4);
+  background: var(--color-desk-2);
+}
+
+.hero-switch {
+  position: absolute;
+  top: 1.25rem;
+  right: 1rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: 1rem;
+  background: var(--color-desk-2);
+  box-shadow: inset 0 0 0 1px var(--color-hairline);
+  font-size: 0.75rem;
+  color: var(--color-chrome-3);
+}
+
+.hero-switch:hover {
+  color: var(--color-chrome-4);
+}
+
+/* ---------- Per-hero layout ---------- */
+
+.hero[data-hero='liquid-metal'] .hero-visual {
+  height: min(38dvh, 20rem);
+}
+
+.hero[data-hero='ascii'] .hero-visual {
+  height: clamp(10rem, 36dvh, 24rem);
+}
+
+.hero[data-hero='terminal'] .hero-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero[data-hero='terminal'] .hero-visual img {
+  object-fit: cover;
+}
+
+/* Darken the terminal towards the bottom-left so the name stays readable. */
+.hero[data-hero='terminal'] .hero-visual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top right, rgb(17 17 19 / 0.92) 0%, rgb(17 17 19 / 0.55) 45%, transparent 80%);
+}
+
+.hero-terminal-lines {
+  position: absolute;
+  top: 8rem;
+  left: 1rem;
+  z-index: 1;
+  max-width: calc(100% - 2rem);
+  font-size: 0.75rem;
+  line-height: 1.7;
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding: 1.5rem 1.5rem 7.5rem;
+  }
+
+  .hero-switch {
+    top: auto;
+    right: 1.5rem;
+    bottom: 1.75rem;
+  }
+
+  .hero[data-hero='liquid-metal'] {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .hero[data-hero='liquid-metal'] .hero-visual {
+    justify-self: center;
+    width: min(100%, 36rem);
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .hero[data-hero='liquid-metal'] .hero-copy {
+    align-self: center;
+  }
+
+  .hero[data-hero='ascii'] .hero-visual {
+    margin-left: 7rem;
+    height: clamp(10rem, 36dvh, 22rem);
+  }
+
+  .hero-terminal-lines {
+    top: 2rem;
+    left: auto;
+    right: 2rem;
+    font-size: 0.8125rem;
+  }
+}
+
+[data-lite='true'] .hero-cta {
+  transition: none;
+}
+
+/* ---------- Boot screen ---------- */
+
+#boot {
+  display: none;
+}
+
+[data-boot] #boot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--color-desk);
+  font-size: 0.8125rem;
+  line-height: 1.8;
+  color: var(--color-chrome-3);
+  cursor: pointer;
+  transition: opacity 280ms ease-out;
+}
+
+#boot.boot-out {
+  opacity: 0;
+}
+
+#boot-log {
+  min-height: 9em;
+  white-space: pre-wrap;
+}
+
+#boot-ascii {
+  font-size: clamp(0.5rem, 2.4vw, 1.125rem);
+  line-height: 1.05;
+  color: var(--color-window);
+}
+
+.boot-skip {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  color: var(--color-muted);
+}
+
+@media (min-width: 768px) {
+  [data-boot] #boot {
+    padding: 3rem;
+  }
+  .boot-skip {
+    left: 3rem;
+    bottom: 2.5rem;
+  }
+}

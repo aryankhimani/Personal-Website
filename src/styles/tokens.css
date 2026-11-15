@@ -24,9 +24,16 @@
   --color-titlebar: #ddd7ca;
 
   --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: 'Anybody Variable', 'Arial Narrow', sans-serif;
+  --font-body: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
 
   --radius-window: 10px;
   --shadow-window: 0 1px 2px rgb(0 0 0 / 0.35), 0 18px 40px -12px rgb(0 0 0 / 0.55);
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Type pairing B, for comparison on /lab and with ?type=b. */
+[data-type='b'] {
+  --font-display: 'Bricolage Grotesque Variable', sans-serif;
 }

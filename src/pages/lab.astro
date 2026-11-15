@@ -1,0 +1,57 @@
+---
+// A scratch page for choosing the logo and typefaces. Not linked from the site; delete after picking.
+import Base from '../layouts/Base.astro';
+
+const logos = [
+  { n: 1, file: 'ak-1-shared-stem', name: 'Shared stem', note: 'The A leans on the K: one shape.' },
+  { n: 2, file: 'ak-2-pixel', name: 'Pixel', note: 'Built on the same grid as the site typeface.' },
+  { n: 3, file: 'ak-3-keycap', name: 'Keycap', note: 'A keyboard key with AK cut out.' },
+  { n: 4, file: 'ak-4-orbit', name: 'Orbit', note: 'The Aryan OS ring with AK inside.' },
+];
+const pairings = [
+  { id: 'a', name: 'A: Anybody + Atkinson Hyperlegible', font: "'Anybody Variable'", settings: "'wght' 300, 'wdth' 100", href: '/' },
+  { id: 'b', name: 'B: Bricolage Grotesque + Atkinson Hyperlegible', font: "'Bricolage Grotesque Variable'", settings: "'wght' 300", href: '/?type=b' },
+];
+---
+
+<Base title="Lab: logo and type options" noindex>
+  <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <h1 class="text-xl text-chrome-4">Pick a logo</h1>
+    <ul class="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+      {
+        logos.map((l) => (
+          <li>
+            <div class="rounded-window bg-window p-6">
+              <img src={`/logos/${l.file}.svg`} alt={`Logo option ${l.n}: ${l.name}`} width="240" height="240" class="w-full" />
+            </div>
+            <p class="mt-3 text-sm text-chrome-4">{l.n}. {l.name}</p>
+            <p class="mt-1 text-xs leading-relaxed text-muted">{l.note}</p>
+            <a class="mt-2 inline-block text-xs text-chrome-3 underline underline-offset-4" href={`/?hero=liquid-metal&logo=${l.n}`}>
+              See it as liquid metal
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 class="mt-16 text-xl text-chrome-4">Pick a type pairing</h2>
+    <ul class="mt-6 grid gap-6 md:grid-cols-2">
+      {
+        pairings.map((p) => (
+          <li class="rounded-window border border-hairline p-6">
+            <p class="text-xs text-muted">{p.name}</p>
+            <p class="mt-4 text-6xl leading-none text-chrome-4" style={`font-family:${p.font};font-variation-settings:${p.settings}`}>
+              Aryan Khimani
+            </p>
+            <p class="mt-4 text-lg text-chrome-3" style="font-family:var(--font-body)">
+              I research gene editing, build AI tools and start ventures.
+            </p>
+            <a class="mt-4 inline-block text-xs text-chrome-3 underline underline-offset-4" href={p.href}>
+              See it on the homepage
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>

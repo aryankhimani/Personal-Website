@@ -9,6 +9,9 @@ import compass from 'pixelarticons/svg/compass.svg?raw';
 import expand from 'pixelarticons/svg/expand.svg?raw';
 import externalLink from 'pixelarticons/svg/external-link.svg?raw';
 import fileText from 'pixelarticons/svg/file-text.svg?raw';
+import github from 'pixelarticons/svg/github.svg?raw';
+import linkedin from 'pixelarticons/svg/linkedin.svg?raw';
+import reload from 'pixelarticons/svg/reload.svg?raw';
 import folder from 'pixelarticons/svg/folder.svg?raw';
 import home from 'pixelarticons/svg/home.svg?raw';
 import mail from 'pixelarticons/svg/mail.svg?raw';
@@ -26,6 +29,9 @@ const ICONS = {
   'external-link': externalLink,
   'file-text': fileText,
   folder,
+  github,
+  linkedin,
+  reload,
   home,
   mail,
   minus,

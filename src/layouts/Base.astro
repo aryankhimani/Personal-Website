@@ -3,25 +3,44 @@ import '../styles/global.css';
 import Dock from '../components/os/Dock';
 import MenuBar from '../components/os/MenuBar';
 import WindowManager from '../components/os/WindowManager';
+import heroFont from '@fontsource-variable/anybody/files/anybody-latin-wdth-normal.woff2?url';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Show the boot sequence on a visitor's first page of the session. */
+  boot?: boolean;
+  noindex?: boolean;
 }
 
 const {
   title = 'Aryan Khimani — research, AI & ventures',
   description = 'Aryan Khimani: student researcher and builder working across gene editing, AI and ventures.',
+  boot = false,
+  noindex = false,
 } = Astro.props;
+
+// ARYAN in block letters for the end of the boot sequence.
+const GLYPHS: Record<string, string[]> = {
+  A: [' ### ', '#   #', '#####', '#   #', '#   #'],
+  R: ['#### ', '#   #', '#### ', '#  # ', '#   #'],
+  Y: ['#   #', ' # # ', '  #  ', '  #  ', '  #  '],
+  N: ['#   #', '##  #', '# # #', '#  ##', '#   #'],
+};
+const banner = [0, 1, 2, 3, 4]
+  .map((row) => [...'ARYAN'].map((ch) => GLYPHS[ch][row].replaceAll('#', '##').replaceAll(' ', '  ')).join('   '))
+  .join('\n');
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-wants-boot={boot ? '' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" as="font" type="font/woff2" href={heroFont} crossorigin />
     <title>{title}</title>
 
     <!-- Decide Lite mode before first paint so the heavy version never flashes.
@@ -49,11 +68,38 @@ const {
             (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4) ||
             !gl;
         }
-        document.documentElement.dataset.lite = String(lite);
+        var root = document.documentElement;
+        root.dataset.lite = String(lite);
+
+        // Type pairing preview: ?type=b
+        if (/[?&]type=b\b/.test(location.search)) root.dataset.type = 'b';
+
+        // Boot sequence: first page of the session only, never in Lite mode, never on a
+        // shared window link. The timer is a hard cap so it can't block the page.
+        if (root.hasAttribute('data-wants-boot') && !lite && !location.hash) {
+          try {
+            if (!sessionStorage.getItem('aryan-os:booted')) {
+              sessionStorage.setItem('aryan-os:booted', '1');
+              root.dataset.boot = '1';
+              setTimeout(function () {
+                delete root.dataset.boot;
+              }, 2500);
+            }
+          } catch (e) {}
+        }
       })();
     </script>
   </head>
   <body>
+    {
+      boot && (
+        <div id="boot" aria-hidden="true">
+          <pre id="boot-log" />
+          <pre id="boot-ascii" hidden>{banner}</pre>
+          <p class="boot-skip">Press any key or click to skip</p>
+        </div>
+      )
+    }
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:rounded focus:bg-window focus:px-3 focus:py-2 focus:text-sm focus:text-ink"
@@ -69,7 +115,9 @@ const {
 
     <script>
       import { initScroll } from '../lib/scroll';
+      import { runBoot } from '../lib/boot';
       initScroll();
+      runBoot();
     </script>
   </body>
 </html>

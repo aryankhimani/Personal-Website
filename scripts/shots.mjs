@@ -15,13 +15,14 @@ const browser = await puppeteer.launch({
 let errors = 0;
 for (const [label, [width, height]] of Object.entries(sizes)) {
   const page = await browser.newPage();
+  await page.evaluateOnNewDocument(() => sessionStorage.setItem('aryan-os:booted', '1'));
   await page.setViewport({ width, height, deviceScaleFactor: label === 'mobile' ? 2 : 1, isMobile: label === 'mobile' });
   const log = (kind, text) => { errors++; console.log(`[${label}] ${kind}: ${text}`); };
   page.on('pageerror', (e) => log('pageerror', e.message));
   page.on('console', (m) => m.type() === 'error' && log('console', m.text()));
   page.on('response', (r) => r.status() >= 400 && log('http ' + r.status(), r.url()));
   await page.goto(url, { waitUntil: 'networkidle2' });
-  await new Promise((r) => setTimeout(r, 1200));
+  await new Promise((r) => setTimeout(r, 3500));
   await page.screenshot({ path: `.shots/${name}-${label}.png` });
   await page.close();
 }
