@@ -1,11 +1,10 @@
 ---
 // One static page per project: the same content as its window, for sharing and search.
-import { Picture } from 'astro:assets';
+import { getImage, Picture } from 'astro:assets';
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { Icon } from '../../components/os/Icon';
-import { getProjects, type Project } from '../../lib/projects';
-import { formatWhen } from '../../lib/work';
+import { getProjects, whenOf, type Project } from '../../lib/projects';
 
 export async function getStaticPaths() {
   const all = await getProjects();
@@ -24,7 +23,8 @@ interface Props {
 const { project, newer, older } = Astro.props;
 const d = project.data;
 const { Content } = await render(project);
-const when = formatWhen(d.start, d.end);
+const when = whenOf(project);
+const poster = d.clip && d.cover ? (await getImage({ src: d.cover, width: 1100, format: 'webp' })).src : undefined;
 ---
 
 <Base title={`${d.title} — Aryan Khimani`} description={d.summary}>
@@ -43,6 +43,9 @@ const when = formatWhen(d.start, d.end);
       {
         d.cover && (
           <div class:list={['wp-cover', `pw-cover-${d.coverFit}`]}>
+            {d.clip ? (
+              <video src={d.clip} poster={poster} controls muted loop playsinline preload="none" aria-label={d.coverAlt} />
+            ) : (
             <Picture
               src={d.cover}
               alt={d.coverAlt ?? ''}
@@ -52,6 +55,7 @@ const when = formatWhen(d.start, d.end);
               formats={['avif', 'webp']} fallbackFormat="jpg"
               loading="eager"
             />
+            )}
           </div>
         )
       }

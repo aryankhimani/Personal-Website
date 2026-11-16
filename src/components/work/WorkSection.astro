@@ -3,8 +3,8 @@
 // folders, then a plain list of everything (also what search engines and no-JS visitors use).
 import { Picture } from 'astro:assets';
 import { Icon } from '../os/Icon';
-import { getFeatured, getProjects } from '../../lib/projects';
-import { FOLDERS, formatWhen } from '../../lib/work';
+import { getFeatured, getProjects, whenOf } from '../../lib/projects';
+import { FOLDERS } from '../../lib/work';
 
 const featured = await getFeatured();
 const all = await getProjects();
@@ -37,7 +37,7 @@ const countIn = (id: string) => all.filter((p) => p.data.folder === id || p.data
                 <div class="fcard-text">
                   <p class="pw-meta">
                     <span class="work-folder">{d.folder}/</span>
-                    <time>{formatWhen(d.start, d.end)}</time>
+                    <time>{whenOf(p)}</time>
                   </p>
                   <h3 id={`f-${p.id}`} class="fcard-title">
                     {d.title}
@@ -126,7 +126,7 @@ const countIn = (id: string) => all.filter((p) => p.data.folder === id || p.data
                   </a>
                 </td>
                 <td>{p.data.folder}/</td>
-                <td>{formatWhen(p.data.start, p.data.end) || '—'}</td>
+                <td>{whenOf(p) || '—'}</td>
               </tr>
             ))
           }

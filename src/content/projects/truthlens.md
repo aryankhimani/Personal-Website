@@ -1,6 +1,6 @@
 ---
 # Sources: resume (Nov 2026, both versions).
-# TODO(aryan): add a screenshot for the cover, and a repo or demo link if either is public.
+# TODO(aryan): add a screenshot for the cover (Aryan will send one), and the demo link once it's live.
 title: TruthLens
 folder: code
 start: '2025-09'
@@ -10,6 +10,9 @@ summary: A Chrome extension and web app that flags misinformation and explains i
 result: The team raised backtest accuracy from 40% to 90%.
 tags: [React, TypeScript, FastAPI, PyTorch, MongoDB]
 featured: 1
+links:
+  - label: Code
+    href: https://github.com/Western-Artificial-Intelligence/explainable-misinfo-ai
 ---
 
 ## What it is

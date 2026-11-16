@@ -24,12 +24,15 @@ export async function getFeatured(): Promise<Project[]> {
     .sort((a, b) => (a.data.featured ?? 0) - (b.data.featured ?? 0));
 }
 
+/** The dates to show for a project: its own label if it has one, else computed. */
+export const whenOf = (p: Project) => p.data.whenLabel ?? formatWhen(p.data.start, p.data.end);
+
 export function toIndexEntry(p: Project): IndexEntry {
   return {
     id: p.id,
     title: p.data.title,
     folders: [p.data.folder, ...p.data.alsoIn],
-    when: formatWhen(p.data.start, p.data.end),
+    when: whenOf(p),
     featured: p.data.featured,
   };
 }
@@ -53,6 +56,7 @@ export async function toDetail(p: Project): Promise<ProjectDetail> {
     cover: d.cover
       ? { ...(await img(d.cover, d.coverAlt ?? '', [480, 760, 1100])), fit: d.coverFit }
       : undefined,
+    clip: d.clip,
     photos: await Promise.all(
       d.photos.map(async (ph) => ({ ...(await img(ph.src, ph.alt, [320, 560])), caption: ph.caption })),
     ),

@@ -17,6 +17,8 @@ const projects = defineCollection({
       alsoIn: z.array(z.enum(FOLDER_IDS)).default([]),
       start: when.optional(),
       end: z.union([when, z.literal('present')]).optional(),
+      /** Shown instead of the computed dates, e.g. 'Summer 2023'. */
+      whenLabel: z.string().optional(),
       role: z.string().optional(),
       /** One line: what it is. */
       summary: z.string(),
@@ -29,6 +31,8 @@ const projects = defineCollection({
       coverAlt: z.string().optional(),
       /** 'contain' for logos and documents, so they aren't cropped. */
       coverFit: z.enum(['cover', 'contain']).default('cover'),
+      /** A short silent clip under /public (click to play). The cover is its poster. */
+      clip: z.string().startsWith('/').optional(),
       photos: z.array(z.object({ src: image(), alt: z.string(), caption: z.string().optional() })).default([]),
       links: z.array(z.object({ label: z.string(), href: z.string().url() })).default([]),
     }),

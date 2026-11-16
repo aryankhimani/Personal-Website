@@ -101,6 +101,9 @@ function ProjectWindow({ id }: { id: string }) {
     <article className="pw">
       {d.cover && (
         <div className={`pw-cover pw-cover-${d.cover.fit}`}>
+          {d.clip ? (
+            <video src={d.clip} poster={d.cover.src} controls muted loop playsInline preload="none" aria-label={d.cover.alt} />
+          ) : (
           <img
             src={d.cover.src}
             srcSet={d.cover.srcset}
@@ -110,6 +113,7 @@ function ProjectWindow({ id }: { id: string }) {
             alt={d.cover.alt}
             decoding="async"
           />
+          )}
         </div>
       )}
       <div className="pw-body">

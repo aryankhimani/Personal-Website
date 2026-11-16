@@ -2,8 +2,8 @@
 # Sources: old site page, resume.
 title: PREVENT Project
 folder: research
-start: '2022'
-end: '2024'
+start: '2022-09'
+end: '2024-09'
 role: Research Intern, Tech Team Lead
 summary: A gamified medical record app that helps people with pre-diabetes stay healthy.
 result: Led the tech team and coded the app's frontend.

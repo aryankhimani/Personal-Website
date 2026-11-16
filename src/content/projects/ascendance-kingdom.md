@@ -7,6 +7,7 @@ summary: A 2D open-world adventure game in Java, with 1v1 fights inspired by Mor
 tags: [Java, Game]
 cover: ../../assets/photos/ascendance-kingdom.jpg
 coverAlt: The opening screen of Ascendance Kingdom
+clip: /media/ascendance-kingdom.mp4
 links:
   - label: Code
     href: https://github.com/aryankhimani/Ascendance-Kingdom

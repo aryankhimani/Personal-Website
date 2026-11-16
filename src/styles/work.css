@@ -633,6 +633,8 @@
 }
 
 .pw-cover img,
+.pw-cover video,
+.wp-cover video,
 .wp-cover img {
   display: block;
   width: 100%;

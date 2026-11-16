@@ -31,6 +31,7 @@ export type ProjectDetail = IndexEntry & {
   result?: string;
   tags: string[];
   cover?: Img & { fit: 'cover' | 'contain' };
+  clip?: string;
   photos: (Img & { caption?: string })[];
   links: { label: string; href: string }[];
   html: string;

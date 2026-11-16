@@ -33,11 +33,20 @@ export function scrollToSection(id: string): void {
     location.assign(`/#${id}`);
     return;
   }
-  if (lenis) {
-    lenis.scrollTo(target, { duration: 1.1 });
-  } else {
+  if (!lenis) {
     target.scrollIntoView({ behavior: 'auto', block: 'start' });
+    return;
   }
+  // The page can get longer mid-jump (the Journey scene adds its scroll length when it
+  // loads), so check where we landed and correct, a couple of times at most.
+  const settle = (triesLeft: number) => {
+    window.setTimeout(() => {
+      const wanted = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      if (!lenis || Math.abs(target.getBoundingClientRect().top - wanted) < 4) return;
+      lenis.scrollTo(target, { duration: 0.4, onComplete: () => triesLeft > 1 && settle(triesLeft - 1) });
+    }, 120);
+  };
+  lenis.scrollTo(target, { duration: 1.1, onComplete: () => settle(2) });
 }
 
 /** Stops page scrolling while a full-screen sheet is open. Calls nest. */

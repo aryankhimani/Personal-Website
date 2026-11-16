@@ -34,7 +34,7 @@ const text = (page, sel) => page.$eval(sel, (el) => el.textContent.trim()).catch
 const scrollTo = (page, sel) => page.$eval(sel, (el) => el.scrollIntoView({ block: 'center' }));
 
 const index = await (await fetch(base + '/work/index.json')).json();
-check('project data has every project', index.length === 22, `${index.length} projects`);
+check('project data has every project', index.length === 21, `${index.length} projects`);
 
 // ---------- Desktop ----------
 {
@@ -90,7 +90,7 @@ check('project data has every project', index.length === 22, `${index.length} pr
   await scrollTo(page, '.work-all summary');
   await page.click('.work-all summary');
   await sleep(200);
-  check('the full list shows all 22 projects', (await page.$$('.work-all tbody tr')).length === 22);
+  check('the full list shows all 21 projects', (await page.$$('.work-all tbody tr')).length === 21);
   await page.close();
 }
 

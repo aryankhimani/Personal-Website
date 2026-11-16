@@ -1,6 +1,7 @@
 ---
 # Sources: LinkedIn, old site link.
-# TODO(aryan): what you did as PM intern, and one result.
+# Sources also: Aryan (Nov 2026) for what he did.
+# TODO(aryan): one real result, if you have a number.
 title: Jobby
 folder: ventures
 start: '2022-07'
@@ -22,4 +23,5 @@ Job descriptions and career pages are boring, and they don't show what working s
 
 ## What I did
 
-I joined as a project manager intern.
+- Ran networking and digital marketing.
+- Built project plans and kept the dev team on deadline.

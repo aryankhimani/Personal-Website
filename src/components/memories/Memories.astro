@@ -1,0 +1,69 @@
+---
+// memories.mov: the clips from the old site's 51 MB hero video, re-cut to 1.8 MB and played
+// on request inside an old TV. Nothing downloads until Play is pressed.
+// Made with: ffmpeg -i Website_Video.mp4 -t 19 -vf "scale=-2:720,fps=30" -c:v libx264
+//            -preset slow -crf 28 -pix_fmt yuv420p -an -movflags +faststart memories.mp4
+---
+
+<section id="memories" class="memories" aria-labelledby="memories-title">
+  <div class="memories-inner">
+    <header>
+      <p class="os-path">memories.mov</p>
+      <h2 id="memories-title" class="memories-heading">Nineteen seconds I keep replaying.</h2>
+      <p class="memories-lede">Clips from TED-Ed, Elevate, SHAD and a few rooms in between. No sound.</p>
+    </header>
+
+    <div class="crt">
+      <div class="wp-bar">
+        <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="wp-file">memories.mov</span>
+      </div>
+      <div class="crt-set">
+        <div class="crt-screen">
+          <video
+            data-memories-video
+            src="/media/memories.mp4"
+            poster="/media/memories-poster.jpg"
+            preload="none"
+            muted
+            playsinline
+            width="1280"
+            height="720"
+            aria-label="Short clips: a TED-Ed stage, an interview at Elevate, a panel, a classroom and a dance at SHAD"
+          ></video>
+          <button type="button" class="crt-play" data-memories-play>
+            <span class="crt-play-label">Play memories.mov</span>
+          </button>
+        </div>
+        <p class="crt-foot">
+          <span>0:19, no sound</span>
+          <span>1.8 MB</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const video = document.querySelector<HTMLVideoElement>('[data-memories-video]');
+  const play = document.querySelector<HTMLButtonElement>('[data-memories-play]');
+  const label = play?.querySelector('.crt-play-label');
+
+  if (video && play && label) {
+    play.addEventListener('click', () => {
+      play.hidden = true;
+      video.controls = true;
+      void video.play().catch(() => {
+        play.hidden = false; // couldn't start: give the button back
+      });
+      video.focus();
+    });
+    video.addEventListener('ended', () => {
+      video.controls = false;
+      label.textContent = 'Play it again';
+      play.hidden = false;
+    });
+    // Don't keep playing off-screen.
+    new IntersectionObserver(([entry]) => !entry.isIntersecting && !video.paused && video.pause()).observe(video);
+  }
+</script>

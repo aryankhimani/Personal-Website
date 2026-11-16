@@ -3,7 +3,7 @@
 title: SickKids Summer Mentorship
 folder: research
 start: '2023-08'
-end: '2023-09'
+whenLabel: Summer 2023
 role: Summer student
 summary: A summer inside SickKids research, with experts from oncology to psychology.
 tags: [Healthcare, Research, Mentorship]
