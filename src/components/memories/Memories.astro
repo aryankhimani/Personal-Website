@@ -1,4 +1,5 @@
 ---
+import TechLabel from '../os/TechLabel';
 // memories.mov: the clips from the old site's 51 MB hero video, re-cut to 1.8 MB and played
 // on request inside an old TV. Nothing downloads until Play is pressed.
 // Made with: ffmpeg -i Website_Video.mp4 -t 19 -vf "scale=-2:720,fps=30" -c:v libx264
@@ -8,7 +9,7 @@
 <section id="memories" class="memories" aria-labelledby="memories-title">
   <div class="memories-inner">
     <header>
-      <p class="os-path">memories.mov</p>
+      <div class="os-path-row"><TechLabel client:visible text="memories.mov" tone="cream" /></div>
       <h2 id="memories-title" class="memories-heading">Nineteen seconds I keep replaying.</h2>
       <p class="memories-lede">Clips from TED-Ed, Elevate, SHAD and a few rooms in between. No sound.</p>
     </header>

@@ -17,6 +17,16 @@ const browser = await puppeteer.launch({
   headless: true,
 });
 
+/** A click that reports which selector failed, instead of crashing the run. */
+async function click(page, sel) {
+  try {
+    await page.$eval(sel, (el) => el.scrollIntoView({ block: 'center' }));
+    await page.click(sel);
+  } catch (e) {
+    problems.push(`click failed: ${sel} (${e.message})`);
+  }
+}
+
 async function newPage(viewport, { lite = false } = {}) {
   const ctx = await browser.createBrowserContext();
   const page = await ctx.newPage();
@@ -32,6 +42,9 @@ async function newPage(viewport, { lite = false } = {}) {
   });
   page.on('response', (r) => r.status() >= 400 && problems.push(`http ${r.status()}: ${r.url()}`));
   await page.goto(base + '/', { waitUntil: 'networkidle2' });
+  // These checks are about what things do, not how they arrive: skip the section entrances
+  // so a click never lands on a block that's still sliding in.
+  await page.addStyleTag({ content: '[data-motion] .reveal{opacity:1!important;transform:none!important;transition:none!important}' });
   await sleep(1200);
   return page;
 }
@@ -65,7 +78,7 @@ const insideCanvas = (page) =>
   const before = await state(page);
   check('the finished card is there before any animation', before.heading === 'hi, I’m Aryan' && before.filled && !before.playing);
 
-  await goTo(page, '#playground', 260);
+  await goTo(page, '[data-fig]', -80);
   await sleep(400);
   const mid = await state(page);
   check('the build starts when the canvas is on screen', mid.playing && mid.heading.length < 13, JSON.stringify(mid));
@@ -76,7 +89,7 @@ const insideCanvas = (page) =>
   const layers = await page.$$eval('[data-layer]:not([hidden])', (els) => els.length);
   check('all four layers are listed', layers === 4, `${layers}`);
 
-  await page.click('[data-replay]');
+  await click(page, '[data-replay]');
   await sleep(500);
   check('Replay builds it again', (await state(page)).playing);
 
@@ -104,7 +117,7 @@ const insideCanvas = (page) =>
 // ---------- Playground in Lite, and on a phone ----------
 {
   const page = await newPage({ width: 1440, height: 900 }, { lite: true });
-  await goTo(page, '#playground', 260);
+  await goTo(page, '[data-fig]', -80);
   await sleep(1200);
   const s = await state(page);
   check('Lite: no animation, finished card, no Replay', !s.playing && s.heading === 'hi, I’m Aryan' && !s.replay, JSON.stringify(s));
@@ -114,7 +127,7 @@ const insideCanvas = (page) =>
   await page.close();
 
   const phone = await newPage({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
-  await goTo(phone, '#playground', 230);
+  await goTo(phone, '[data-fig]', -60);
   await sleep(11500);
   check('phone: cursors rest inside the canvas', await insideCanvas(phone));
   const overflow = await phone.evaluate(() => document.documentElement.scrollWidth - innerWidth);
@@ -129,13 +142,13 @@ const insideCanvas = (page) =>
   check('writing lists all 23 pieces', (await rows()) === 23);
   const counts = {};
   for (const k of ['article', 'newsletter', 'talk']) {
-    await page.click(`[data-filter="${k}"]`);
+    await click(page, `[data-filter="${k}"]`);
     counts[k] = await rows();
   }
   check('filters show 12 articles, 9 newsletters, 2 talks', counts.article === 12 && counts.newsletter === 9 && counts.talk === 2, JSON.stringify(counts));
   check('the status line follows the filter', (await page.$eval('[data-writing-status]', (e) => e.textContent)) === '2 items');
   check('only the chosen chip is pressed', (await page.$$eval('[data-filter][aria-pressed="true"]', (els) => els.map((e) => e.dataset.filter))).join() === 'talk');
-  await page.click('[data-filter="all"]');
+  await click(page, '[data-filter="all"]');
   const dates = await page.$$eval('[data-writing] time', (els) => els.map((e) => e.getAttribute('datetime')));
   check('newest first', dates.every((d, i) => i === 0 || dates[i - 1] >= d));
   const ext = await page.$$eval('[data-writing] a', (els) => els.every((a) => a.target === '_blank' && a.rel.includes('noopener')));
@@ -147,7 +160,7 @@ const insideCanvas = (page) =>
   await goTo(page, '#contact');
   await page.type('[data-compose] input[name="subject"]', 'Coffee chat?');
   await page.type('[data-compose] textarea', 'Hi Aryan, loved the site.');
-  await page.click('[data-send]');
+  await click(page, '[data-send]');
   await sleep(150);
   const mailto = await page.$eval('[data-compose]', (f) => f.dataset.mailto);
   check('Send makes a mailto with subject and message', mailto === 'mailto:khimani.aryan@gmail.com?subject=Coffee%20chat%3F&body=Hi%20Aryan%2C%20loved%20the%20site.', mailto);

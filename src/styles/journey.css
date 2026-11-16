@@ -392,3 +392,23 @@
   font-size: 0.75rem;
   color: var(--color-muted);
 }
+
+/* Topography behind the stage (JourneyBackdrop). */
+.journey-stage {
+  isolation: isolate;
+}
+
+.journey-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.journey-backdrop > * {
+  pointer-events: auto;
+}
+
+[data-lite='true'] .journey-backdrop {
+  display: none;
+}

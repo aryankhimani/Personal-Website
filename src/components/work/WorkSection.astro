@@ -1,19 +1,29 @@
 ---
+import TechLabel from '../os/TechLabel';
 // ~/work on the homepage: four featured windows that stack as you scroll, then the desk of
 // folders, then a plain list of everything (also what search engines and no-JS visitors use).
 import { Picture } from 'astro:assets';
 import { Icon } from '../os/Icon';
 import { getFeatured, getProjects, whenOf } from '../../lib/projects';
 import { FOLDERS } from '../../lib/work';
+import FlipCover from './FlipCover';
+import FolderDesk from './FolderDesk';
+import WorkCursor from './WorkCursor';
 
 const featured = await getFeatured();
 const all = await getProjects();
-const countIn = (id: string) => all.filter((p) => p.data.folder === id || p.data.alsoIn.includes(id as never)).length;
+const inFolder = (id: string) => all.filter((p) => p.data.folder === id || p.data.alsoIn.includes(id as never));
+const folders = FOLDERS.map((f) => ({
+  id: f.id,
+  note: f.note,
+  items: inFolder(f.id).map((p) => ({ label: p.data.title, value: p.id })),
+}));
 ---
 
 <section id="work" class="work" aria-labelledby="work-title">
+  <WorkCursor client:idle />
   <header class="work-head">
-    <p class="os-path">~/work</p>
+    <div class="os-path-row"><TechLabel client:visible text="~/work" tone="cream" /></div>
     <h2 id="work-title" class="work-heading">Labs, startups and things I built.</h2>
     <p class="work-lede">Four I&rsquo;d show you first. Everything else is in the folders below.</p>
   </header>
@@ -52,22 +62,37 @@ const countIn = (id: string) => all.filter((p) => p.data.folder === id || p.data
                   </div>
                 </div>
                 <div class:list={['fcard-cover', d.cover ? `pw-cover-${d.coverFit}` : 'fcard-cover-empty']}>
-                  {d.cover ? (
-                    <Picture
-                      src={d.cover}
-                      alt={d.coverAlt ?? ''}
-                      widths={[420, 640, 900]}
-                      width={900}
-                      sizes="(max-width: 767px) 100vw, 560px"
-                      formats={['avif', 'webp']} fallbackFormat="jpg"
-                    />
-                  ) : (
-                    <ul class="fcard-tags-big" aria-label="Built with">
-                      {d.tags.map((t) => (
-                        <li>{t}</li>
-                      ))}
-                    </ul>
-                  )}
+                  <FlipCover client:visible title={d.title}>
+                    <div slot="front" class="fcard-face">
+                      {d.cover ? (
+                        <Picture
+                          src={d.cover}
+                          alt={d.coverAlt ?? ''}
+                          widths={[420, 640, 900]}
+                          width={900}
+                          sizes="(max-width: 767px) 100vw, 560px"
+                          formats={['avif', 'webp']}
+                          fallbackFormat="jpg"
+                        />
+                      ) : (
+                        <ul class="fcard-tags-big" aria-label="Built with">
+                          {d.tags.map((t) => (
+                            <li>{t}</li>
+                          ))}
+                        </ul>
+                      )}
+                      <span class="fcard-flip-hint" aria-hidden="true">flip for facts ↻</span>
+                    </div>
+                    <div slot="back" class="fcard-face fcard-back">
+                      <p class="fcard-back-path">{p.id}.md · quick facts</p>
+                      <dl>
+                        {whenOf(p) && (<div><dt>when</dt><dd>{whenOf(p)}</dd></div>)}
+                        {d.role && (<div><dt>role</dt><dd>{d.role}</dd></div>)}
+                        {d.result && (<div><dt>result</dt><dd>{d.result}</dd></div>)}
+                        <div><dt>built with</dt><dd>{d.tags.join(' · ')}</dd></div>
+                      </dl>
+                    </div>
+                  </FlipCover>
                 </div>
               </div>
             </article>
@@ -79,26 +104,7 @@ const countIn = (id: string) => all.filter((p) => p.data.folder === id || p.data
 
   <div class="desk" aria-labelledby="desk-title">
     <h3 id="desk-title" class="os-path">~/work/ <span class="desk-count">{FOLDERS.length} folders, {all.length} files</span></h3>
-    <ul class="folders">
-      {
-        FOLDERS.map((f) => (
-          <li>
-            <a href={`#${f.id}`} data-open-window={f.id} class="folder" aria-haspopup="dialog">
-              <span class="folder-art" aria-hidden="true">
-                <span class="folder-back" />
-                <span class="folder-paper" />
-                <span class="folder-paper" />
-                <span class="folder-front" />
-              </span>
-              <span class="folder-name">{f.id}/</span>
-              <span class="folder-note">
-                {countIn(f.id)} files. {f.note}.
-              </span>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+    <FolderDesk client:visible folders={folders} />
 
     <details class="work-all">
       <summary>

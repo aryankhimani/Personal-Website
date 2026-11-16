@@ -42,7 +42,8 @@ const rectOf = (page, sel) =>
 {
   const page = await newPage({ width: 1440, height: 900 });
   check('lite is off by default on a capable desktop', (await page.$eval('html', (h) => h.dataset.lite)) === 'false');
-  const clock = await page.$eval('.os-menubar time', (t) => t.textContent);
+  // The clock is on split-flap tiles; its text is in a screen-reader span.
+  const clock = await page.$eval('.os-menubar .clock-flap .split-flap-text__sr, .os-menubar time', (t) => t.textContent.trim());
   check('clock shows a time', /^\d\d:\d\d$/.test(clock), clock);
   await page.screenshot({ path: '.shots/p1-desk.png' });
 
@@ -124,7 +125,7 @@ const rectOf = (page, sel) =>
 
   // Dock scroll.
   await page.click('.os-dock button[aria-label="Writing"]');
-  await sleep(1800);
+  await sleep(2600);
   const top = await page.$eval('#writing', (el) => Math.round(el.getBoundingClientRect().top));
   check('dock scrolls to a section', Math.abs(top - 32) < 8, `top=${top}`);
 
@@ -157,7 +158,7 @@ const rectOf = (page, sel) =>
 {
   const page = await newPage({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
   await page.screenshot({ path: '.shots/p1-phone.png' });
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, window.innerWidth) - document.documentElement.clientWidth);
   check('no sideways scroll on phone', overflow <= 0, `overflow=${overflow}`);
 
   await page.tap('.os-desktop-icon');

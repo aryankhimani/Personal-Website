@@ -1,4 +1,8 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { useLite } from '../../lib/device-tier';
+
+// The split-flap tiles only load on desktop and outside Lite mode.
+const Flap = lazy(() => import('./ClockFlap'));
 
 const ZONES = [
   { code: 'TOR', name: 'Toronto', tz: 'America/Toronto' },
@@ -14,9 +18,10 @@ function timeIn(tz: string, now: Date): string {
   }
 }
 
-/** The time-zone ticker in the menu bar. Blank on the server so hydration always matches. */
-export default function Clock({ className = '' }: { className?: string }) {
+/** The time-zone ticker in the menu bar, on split-flap tiles. Blank on the server so hydration matches. */
+export default function Clock({ className = '', flaps = true }: { className?: string; flaps?: boolean }) {
   const [now, setNow] = useState<Date | null>(null);
+  const lite = useLite();
 
   useEffect(() => {
     setNow(new Date());
@@ -35,14 +40,23 @@ export default function Clock({ className = '' }: { className?: string }) {
 
   return (
     <p className={`flex gap-3 tabular-nums ${className}`}>
-      {ZONES.map((zone) => (
-        <span key={zone.code} className="whitespace-nowrap">
-          <abbr title={zone.name} className="text-muted no-underline">
-            {zone.code}
-          </abbr>{' '}
-          <time>{now ? timeIn(zone.tz, now) : '--:--'}</time>
-        </span>
-      ))}
+      {ZONES.map((zone) => {
+        const t = now ? timeIn(zone.tz, now) : '--:--';
+        return (
+          <span key={zone.code} className="flex items-center gap-1 whitespace-nowrap">
+            <abbr title={zone.name} className="text-muted no-underline">
+              {zone.code}
+            </abbr>{' '}
+            {flaps && !lite && now ? (
+              <Suspense fallback={<time>{t}</time>}>
+                <Flap text={t} />
+              </Suspense>
+            ) : (
+              <time>{t}</time>
+            )}
+          </span>
+        );
+      })}
     </p>
   );
 }

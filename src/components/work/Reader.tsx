@@ -7,9 +7,18 @@
 // doesn't move underneath). The address is #work/<slug>, so it can be shared.
 // On phones it's a full-screen sheet that slides up. Lite mode: a plain fade.
 
-import { useEffect, useId, useRef } from 'react';
+import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react';
 import { animate, motion, useMotionValue, usePresence } from 'motion/react';
-import { closeWindow, focusWindow, minimizeWindow, openerRect, replaceWindow, type WindowState } from '../../lib/windows';
+import {
+  closeWindow,
+  focusWindow,
+  minimizeWindow,
+  openerRect,
+  replaceWindow,
+  type WindowState,
+} from '../../lib/windows';
+import { cream, ember, navy } from '../../lib/palette';
+import GlGate from '../os/GlGate';
 import { Icon } from '../os/Icon';
 import type { WindowMeta } from '../os/window-list';
 import { WORK_INDEX, workEntry } from '../os/window-list';
@@ -17,8 +26,11 @@ import { demoteHeadings, useDetail } from './WorkWindows';
 
 type Props = { meta: WindowMeta; win: WindowState; mobile: boolean; lite: boolean };
 
+const DitherVeil = lazy(() => import('../rb/DitherVeil'));
+
 const EASE = [0.22, 1, 0.36, 1] as const;
-const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, video[controls], [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input, select, textarea, video[controls], [tabindex]:not([tabindex="-1"])';
 
 export default function Reader({ meta, win, mobile, lite }: Props) {
   const titleId = useId();
@@ -28,6 +40,9 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
   const id = meta.id;
   const entry = workEntry(id);
   const { detail, failed } = useDetail(id);
+  // The cover gets a dither veil (React Bits' Dither Veil) that your cursor wipes away.
+  const [veilOk, setVeilOk] = useState(false);
+  useEffect(() => setVeilOk(!lite && !mobile && window.matchMedia('(pointer: fine)').matches), [lite, mobile]);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -173,7 +188,12 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
       >
         <div className="reader-bar os-titlebar">
           <div className="os-lights flex items-center gap-2">
-            <button type="button" aria-label={`Close ${meta.file}`} className="os-light os-light-close" onClick={() => closeWindow(id)}>
+            <button
+              type="button"
+              aria-label={`Close ${meta.file}`}
+              className="os-light os-light-close"
+              onClick={() => closeWindow(id)}
+            >
               <svg viewBox="0 0 12 12" aria-hidden="true">
                 <path d="M3 3l6 6M9 3l-6 6" />
               </svg>
@@ -232,8 +252,18 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
               {d.cover && (
                 <div className={`reader-cover pw-cover-${d.cover.fit}`}>
                   {d.clip ? (
-                    <video src={d.clip} poster={d.cover.src} controls muted loop playsInline preload="none" aria-label={d.cover.alt} />
+                    <video
+                      src={d.clip}
+                      poster={d.cover.src}
+                      controls
+                      muted
+                      loop
+                      playsInline
+                      preload="none"
+                      aria-label={d.cover.alt}
+                    />
                   ) : (
+                    <>
                     <img
                       src={d.cover.src}
                       srcSet={d.cover.srcset}
@@ -243,6 +273,27 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
                       alt={d.cover.alt}
                       decoding="async"
                     />
+                      {veilOk && (
+                        <div className="reader-veil-fx" aria-hidden="true">
+                          <GlGate priority>
+                            <Suspense fallback={null}>
+                              <DitherVeil
+                                key={d.cover.src}
+                                src={d.cover.src}
+                                fit={d.cover.fit === 'contain' ? 'contain' : 'cover'}
+                                inkColor={navy['950']}
+                                paperColor={cream['100']}
+                                rimColor={ember['500']}
+                                rim={0.5}
+                                revealRadius={180}
+                                linger={1.4}
+                                pixelSize={2}
+                              />
+                            </Suspense>
+                          </GlGate>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               )}

@@ -148,7 +148,7 @@ const activeTick = (page) => page.$$eval('[data-journey-rail] li', (els) => els.
   check('phone: the scene runs and shows chapter 3', ch.join() === '3', ch.join());
   const fits = await page.$eval('[data-chapter]:nth-child(3) .chapter-link', (e) => e.getBoundingClientRect().bottom < innerHeight - 96);
   check('phone: the chapter fits above the dock', fits);
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, window.innerWidth) - document.documentElement.clientWidth);
   check('phone: no sideways scroll', overflow <= 0, `overflow=${overflow}`);
   await page.screenshot({ path: '.shots/p4-journey-phone.png' });
   await page.close();

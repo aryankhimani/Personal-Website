@@ -3,6 +3,7 @@
 // The markup is a plain timeline. Outside Lite mode, journey.css stacks the chapters into one
 // screen-high stage and lib/journey.ts pins it and scrubs through them as you scroll.
 import { Picture } from 'astro:assets';
+import JourneyBackdrop from './JourneyBackdrop';
 import type { ImageMetadata } from 'astro';
 import tks from '../../assets/photos/TKS_Hackathon.jpg';
 import joeyhelps from '../../assets/photos/joeyhelps/image013.jpg';
@@ -70,6 +71,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 <section id="journey" class="journey" aria-labelledby="journey-title">
   <div class="journey-stage" data-journey-stage>
+    <JourneyBackdrop client:visible />
     <header class="journey-head">
       <p class="os-path">~/journey</p>
       <h2 id="journey-title" class="journey-heading">How I got here</h2>

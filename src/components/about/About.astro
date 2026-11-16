@@ -1,8 +1,28 @@
 ---
+import TechLabel from '../os/TechLabel';
 // me.md: a short bio, a photo, skills as plain tags and a few honours.
 // Facts from Aryan's resume, LinkedIn and his answers (see memory notes); nothing invented.
-import { Picture } from 'astro:assets';
+import { getImage, Picture } from 'astro:assets';
 import portrait from '../../assets/photos/shad/IMG_3240.jpg';
+import tks from '../../assets/photos/TKS_Hackathon.jpg';
+import joeyhelps from '../../assets/photos/joeyhelps/image013.jpg';
+import shad from '../../assets/photos/shad/IMG_3861.jpg';
+import teded from '../../assets/photos/teded/IMG_8389.jpg';
+import okamoto from '../../assets/photos/Okamoto.jpg';
+import AboutDesk from './AboutDesk';
+
+// Same photos and alt text as ~/journey.
+const PHOTOS = [
+  { src: teded, alt: 'Me on stage giving my TED-Ed talk, with my slide behind me', title: 'TED-Ed, 2024' },
+  { src: okamoto, alt: 'Me at a lab bench in a white coat and gloves', title: 'Mount Sinai, 2024' },
+  { src: shad, alt: 'My SHAD team in suits and dresses outside a brick building', title: 'SHAD, 2023' },
+  { src: joeyhelps, alt: 'The JoeyHelps team in front of the Google sign at the Google office', title: 'JoeyHelps, 2022' },
+  { src: tks, alt: 'A group selfie at my first TKS hackathon', title: 'TKS, 2020' },
+];
+const photos = await Promise.all(
+  PHOTOS.map(async (p) => ({ ...p, src: (await getImage({ src: p.src, width: 640, format: 'webp' })).src })),
+);
+const badgePhoto = (await getImage({ src: portrait, width: 600, format: 'jpg' })).src;
 
 const SKILLS: { group: string; items: string[] }[] = [
   { group: 'Code', items: ['Python', 'TypeScript', 'Java', 'SQL', 'Swift', 'R'] },
@@ -42,7 +62,7 @@ const HONOURS = [
       </figure>
 
       <div class="me-text">
-        <p class="os-path me-path">~/me.md</p>
+        <div class="os-path-row"><TechLabel client:visible text="~/me.md" tone="navy" /></div>
         <h2 id="about-title" class="section-heading me-heading">Hi, I&rsquo;m Aryan.</h2>
 
         <div class="me-prose">
@@ -87,4 +107,6 @@ const HONOURS = [
       </div>
     </div>
   </article>
+
+  <AboutDesk client:visible portrait={badgePhoto} photos={photos} />
 </section>

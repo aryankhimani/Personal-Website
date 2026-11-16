@@ -75,16 +75,33 @@ export function scrollToSection(id: string): void {
     target.scrollIntoView({ behavior: 'auto', block: 'start' });
     return;
   }
-  // The page can get longer mid-jump (the Journey scene adds its scroll length when it
-  // loads), so check where we landed and correct, a couple of times at most.
-  const settle = (triesLeft: number) => {
+  // The page can change height mid-jump (the Journey scene sizes itself when it loads, and
+  // lazy islands hydrate as they come near), so keep checking where we landed and nudge,
+  // until the target has stayed put for a few checks (or ~3s have passed).
+  let checks = 0;
+  let still = 0;
+  // The moment the visitor scrolls themselves, stop correcting.
+  let userMoved = false;
+  const stopIt = () => (userMoved = true);
+  for (const ev of ['wheel', 'touchstart', 'keydown'] as const) window.addEventListener(ev, stopIt, { once: true, passive: true });
+  const settle = () => {
     window.setTimeout(() => {
+      if (!lenis || userMoved) return;
+      checks += 1;
       const wanted = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
-      if (!lenis || Math.abs(target.getBoundingClientRect().top - wanted) < 4) return;
-      lenis.scrollTo(target, { duration: 0.4, onComplete: () => triesLeft > 1 && settle(triesLeft - 1) });
+      const off = target.getBoundingClientRect().top - wanted;
+      if (Math.abs(off) < 2) {
+        still += 1;
+        if (still >= 3 || checks > 20) return;
+        settle();
+        return;
+      }
+      still = 0;
+      if (checks > 20) return;
+      lenis.scrollTo(target, { duration: 0.25, onComplete: settle });
     }, 120);
   };
-  lenis.scrollTo(target, { duration: 1.1, onComplete: () => settle(2) });
+  lenis.scrollTo(target, { duration: 1.1, onComplete: settle });
 }
 
 /** Stops page scrolling while a full-screen sheet is open. Calls nest. */

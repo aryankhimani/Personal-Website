@@ -102,17 +102,26 @@ function ProjectWindow({ id }: { id: string }) {
       {d.cover && (
         <div className={`pw-cover pw-cover-${d.cover.fit}`}>
           {d.clip ? (
-            <video src={d.clip} poster={d.cover.src} controls muted loop playsInline preload="none" aria-label={d.cover.alt} />
+            <video
+              src={d.clip}
+              poster={d.cover.src}
+              controls
+              muted
+              loop
+              playsInline
+              preload="none"
+              aria-label={d.cover.alt}
+            />
           ) : (
-          <img
-            src={d.cover.src}
-            srcSet={d.cover.srcset}
-            sizes="(max-width: 767px) 100vw, 720px"
-            width={d.cover.width}
-            height={d.cover.height}
-            alt={d.cover.alt}
-            decoding="async"
-          />
+            <img
+              src={d.cover.src}
+              srcSet={d.cover.srcset}
+              sizes="(max-width: 767px) 100vw, 720px"
+              width={d.cover.width}
+              height={d.cover.height}
+              alt={d.cover.alt}
+              decoding="async"
+            />
           )}
         </div>
       )}

@@ -61,9 +61,9 @@ check('project data has every project', index.length === 21, `${index.length} pr
   check('Esc closes the project window', !(await has(page, '[data-window="okamoto-lab"]')));
 
   // Folder, then Finder, then a project.
-  await scrollTo(page, 'a.folder[data-open-window="ventures"]');
+  await scrollTo(page, 'a.folder-open[data-open-window="ventures"]');
   await sleep(600);
-  await page.click('a.folder[data-open-window="ventures"]');
+  await page.click('a.folder-open[data-open-window="ventures"]');
   await page.waitForSelector('[data-window="ventures"] .finder-row', { timeout: 4000 }).catch(() => {});
   const rows = await page.$$eval('[data-window="ventures"] .finder-file', (els) => els.map((e) => e.textContent));
   check('ventures/ lists its projects, newest first', rows.join(',') === 'craftnova.md,joeyhelps.md,jobby.md', rows.join(','));
@@ -130,13 +130,13 @@ check('project data has every project', index.length === 21, `${index.length} pr
 // ---------- Phone ----------
 {
   const page = await newPage({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, window.innerWidth) - document.documentElement.clientWidth);
   check('no sideways scroll on phone', overflow <= 0, `overflow=${overflow}`);
   const tallest = await page.$$eval('.fcard', (els) => Math.max(...els.map((e) => e.getBoundingClientRect().height)));
   check('featured cards fit between the menu bar and the dock', tallest < 844 - 44 - 96, `tallest=${Math.round(tallest)}`);
-  await scrollTo(page, 'a.folder[data-open-window="code"]');
+  await scrollTo(page, 'a.folder-open[data-open-window="code"]');
   await sleep(500);
-  await page.tap('a.folder[data-open-window="code"]');
+  await page.tap('a.folder-open[data-open-window="code"]');
   await page.waitForSelector('[data-window="code"]', { timeout: 4000 }).catch(() => {});
   await sleep(500);
   const r = await page.$eval('[data-window="code"]', (w) => w.getBoundingClientRect().toJSON()).catch(() => ({}));
