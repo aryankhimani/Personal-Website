@@ -1002,3 +1002,283 @@ figcaption {
 .fcard-cover.pw-cover-cover img {
   object-position: 50% 50%;
 }
+
+/* ---------- Reader (focus mode) ---------- */
+
+.reader-veil {
+  position: absolute;
+  inset: 0;
+  background: rgb(5 9 26 / 0.62);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  backdrop-filter: blur(6px) saturate(120%);
+}
+
+.reader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(92vw, 1100px);
+  height: min(90%, 60rem);
+  margin: auto;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--color-window);
+  color: var(--color-ink);
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgb(11 20 48 / 0.5),
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 40px 90px -30px rgb(5 9 26 / 0.85);
+  transform-origin: 50% 50%;
+}
+
+.reader-sheet {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.reader-bar {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 1rem;
+  height: 2.5rem;
+  padding: 0 0.875rem;
+  border-bottom: 1px solid rgb(11 20 48 / 0.18);
+  font-size: 0.75rem;
+}
+
+.reader .os-titlebar {
+  background: linear-gradient(180deg, var(--color-slate-50) 0%, var(--color-slate-200) 46%, var(--color-slate-300) 54%, var(--color-slate-100) 100%);
+  color: var(--color-ink);
+}
+
+.reader .os-light-close {
+  background: var(--color-ember-500);
+}
+.reader .os-light-minimize {
+  background: var(--color-tag-amber);
+}
+.reader .os-light-zoom {
+  background: #5fa86c;
+}
+
+.reader-file {
+  position: absolute;
+  inset-inline: 6rem;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.reader-file strong {
+  font-weight: 400;
+}
+
+.reader-count {
+  margin-left: auto;
+  color: var(--color-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.reader-close-text {
+  min-height: 2.5rem;
+  padding: 0 0.25rem;
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.reader-sheet .reader-bar {
+  height: 3rem;
+}
+
+.reader-sheet .reader-count {
+  display: none;
+}
+
+.reader-sheet .reader-close-text {
+  margin-left: auto;
+}
+
+.reader-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.reader-cover {
+  height: clamp(14rem, 46vh, 30rem);
+  overflow: hidden;
+  background: var(--color-titlebar);
+}
+
+.reader-cover img,
+.reader-cover video {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.reader-col {
+  width: min(100% - 2.5rem, 42rem);
+  margin-inline: auto;
+}
+
+.reader-meta {
+  margin-top: 2.25rem;
+}
+
+.reader-title {
+  margin-top: 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-variation-settings: 'wght' 350;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.reader-summary {
+  margin-top: 1rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.1875rem, 1.6vw, 1.375rem);
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+.reader-facts {
+  margin-top: 1.75rem;
+}
+
+.reader-facts dd {
+  font-size: 1.0625rem;
+}
+
+.reader-prose {
+  margin-top: 2rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.125rem, 1.25vw, 1.25rem);
+  line-height: 1.7;
+  color: var(--color-ink);
+}
+
+.reader-prose p + p,
+.reader-prose ul,
+.reader-prose ol,
+.reader-prose p + ul {
+  margin-top: 1em;
+}
+
+.reader-prose h4 {
+  margin-top: 2.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-accent-ink);
+}
+
+.reader-prose ul li {
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.reader-prose ul li::before {
+  content: '-';
+  position: absolute;
+  left: 0.25rem;
+}
+
+.reader-prose li + li {
+  margin-top: 0.5rem;
+}
+
+.reader-prose a {
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reader-photos {
+  margin-top: 2.75rem;
+}
+
+.reader-photos ul {
+  display: flex;
+  gap: 1rem;
+  padding: 0 max(1.25rem, calc((100% - 42rem) / 2)) 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: max(1.25rem, calc((100% - 42rem) / 2));
+}
+
+.reader-photos li {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.reader-photos img {
+  display: block;
+  width: auto;
+  height: clamp(14rem, 34vh, 22rem);
+  border-radius: 8px;
+  background: var(--color-titlebar);
+}
+
+.reader-links {
+  margin-top: 2.25rem;
+}
+
+.reader-links h3 {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.reader-links a {
+  font-size: 1.0625rem;
+}
+
+.reader-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  width: min(100% - 2.5rem, 42rem);
+  margin: 3.5rem auto 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(11 20 48 / 0.15);
+}
+
+.reader-step {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.reader-step:hover {
+  background: rgb(44 59 107 / 0.07);
+}
+
+.reader-step-next {
+  text-align: right;
+}
+
+.reader-step-dir {
+  font-size: 0.75rem;
+  color: var(--color-accent-ink);
+}
+
+.reader-step-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-variation-settings: 'wght' 400;
+  line-height: 1.2;
+}

@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useLite } from '../../lib/device-tier';
 import { lockScroll, unlockScroll } from '../../lib/scroll';
-import { closeWindow, startWindowManager, useWindows } from '../../lib/windows';
+import { closeWindow, isProject, startWindowManager, useWindows } from '../../lib/windows';
 import type { Bounds } from './Window';
 import './window-list'; // registers window ids, so shared links like /#tks open on load
 
@@ -55,7 +55,8 @@ export default function WindowManager() {
   }, [focused]);
 
   // On phones a window is a full-screen sheet, so the page behind it shouldn't scroll.
-  const sheetOpen = mobile && windows.some((w) => !w.minimized);
+  // The reader is modal everywhere, so it locks the page too (and keeps your place in it).
+  const sheetOpen = windows.some((w) => !w.minimized && (mobile || isProject(w.id)));
   useEffect(() => {
     if (!sheetOpen) return;
     lockScroll();

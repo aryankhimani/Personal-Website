@@ -3,7 +3,9 @@
 
 import { AnimatePresence } from 'motion/react';
 import type { WindowState } from '../../lib/windows';
+import Reader from '../work/Reader';
 import WorkWindow from '../work/WorkWindows';
+import { isProject } from '../../lib/windows';
 import Window, { type Bounds } from './Window';
 import { WINDOW_CONTENT } from './window-content';
 import { windowMeta } from './window-list';
@@ -17,6 +19,8 @@ type Props = {
 };
 
 export default function WindowLayer({ windows, focused, bounds, mobile, lite }: Props) {
+  const readers = windows.filter((w) => !w.minimized && isProject(w.id));
+  const topReader = readers.length ? readers.reduce((a, b) => (a.z > b.z ? a : b)).id : null;
   return (
     <AnimatePresence>
       {windows
@@ -26,6 +30,12 @@ export default function WindowLayer({ windows, focused, bounds, mobile, lite }: 
           if (!meta) return null;
           // Fixed windows have their own content; everything else is a work folder or project.
           const Fixed = WINDOW_CONTENT[win.id];
+          // Projects open in the reader (focus mode); everything else is a small window.
+          // One reader at a time, kept mounted while it switches project (prev / next).
+          if (!Fixed && isProject(win.id)) {
+            if (win.id !== topReader) return null;
+            return <Reader key={`reader-${mobile ? 'sheet' : 'desk'}`} meta={meta} win={win} mobile={mobile} lite={lite} />;
+          }
           return (
             <Window
               key={`${win.id}-${mobile ? 'sheet' : 'window'}`}

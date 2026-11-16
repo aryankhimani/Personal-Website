@@ -6,7 +6,7 @@
 // Base.astro puts on every page.
 
 import type { IconName } from './Icon';
-import { registerWindowIds } from '../../lib/windows';
+import { registerProjectIds, registerWindowIds } from '../../lib/windows';
 import { FOLDERS, INDEX_ELEMENT_ID, isFolderId, type IndexEntry } from '../../lib/work';
 
 export type WindowMeta = {
@@ -46,3 +46,4 @@ export function windowMeta(id: string): WindowMeta | undefined {
 }
 
 registerWindowIds([...WINDOWS.map((w) => w.id), ...FOLDERS.map((f) => f.id), ...WORK_INDEX.map((p) => p.id)]);
+registerProjectIds(WORK_INDEX.map((p) => p.id));

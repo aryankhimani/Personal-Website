@@ -50,10 +50,10 @@ check('project data has every project', index.length === 21, `${index.length} pr
   await scrollTo(page, '.fcard a[data-open-window="okamoto-lab"]');
   await sleep(800);
   await page.click('.fcard a[data-open-window="okamoto-lab"]');
-  await page.waitForSelector('[data-window="okamoto-lab"] .pw-title', { timeout: 5000 }).catch(() => {});
-  check('featured card opens its project window', (await text(page, '[data-window="okamoto-lab"] .pw-title')) === "Dr. Okamoto's Lab, Mount Sinai");
-  check('URL hash follows the project window', page.url().endsWith('#okamoto-lab'), page.url());
-  const photos = (await page.$$('[data-window="okamoto-lab"] .pw-photos img')).length;
+  await page.waitForSelector('[data-window="okamoto-lab"] .reader-title', { timeout: 5000 }).catch(() => {});
+  check('featured card opens its project window', (await text(page, '[data-window="okamoto-lab"] .reader-title')) === "Dr. Okamoto's Lab, Mount Sinai");
+  check('URL hash follows the project window', page.url().endsWith('#work/okamoto-lab'), page.url());
+  const photos = (await page.$$('[data-window="okamoto-lab"] .reader-photos img')).length;
   const links = (await page.$$('[data-window="okamoto-lab"] .work-links a')).length;
   check('project window shows photos and links', photos === 6 && links === 3, `photos=${photos} links=${links}`);
   await page.keyboard.press('Escape');
@@ -68,8 +68,8 @@ check('project data has every project', index.length === 21, `${index.length} pr
   const rows = await page.$$eval('[data-window="ventures"] .finder-file', (els) => els.map((e) => e.textContent));
   check('ventures/ lists its projects, newest first', rows.join(',') === 'craftnova.md,joeyhelps.md,jobby.md', rows.join(','));
   await page.click('[data-window="ventures"] a[data-open-window="craftnova"]');
-  await page.waitForSelector('[data-window="craftnova"] .pw-title', { timeout: 4000 }).catch(() => {});
-  check('clicking a Finder row opens the project', (await text(page, '[data-window="craftnova"] .pw-title')) === 'CraftNova');
+  await page.waitForSelector('[data-window="craftnova"] .reader-title', { timeout: 4000 }).catch(() => {});
+  check('clicking a Finder row opens the project', (await text(page, '[data-window="craftnova"] .reader-title')) === 'CraftNova');
   check(
     'both windows stay open, project in front',
     (await has(page, '[data-window="ventures"]')) &&
@@ -97,8 +97,9 @@ check('project data has every project', index.length === 21, `${index.length} pr
 // ---------- A shared link opens its window on load ----------
 {
   const page = await newPage({ width: 1440, height: 900 }, base + '/#tks');
-  await page.waitForSelector('[data-window="tks"] .pw-title', { timeout: 5000 }).catch(() => {});
-  check('a shared link (/#tks) opens that project', (await text(page, '[data-window="tks"] .pw-title')) === 'The Knowledge Society');
+  await page.waitForSelector('[data-window="tks"] .reader-title', { timeout: 5000 }).catch(() => {});
+  check('an old shared link (/#tks) opens that project in the reader', (await text(page, '[data-window="tks"] .reader-title')) === 'The Knowledge Society');
+  check('old #tks link is rewritten to #work/tks', page.url().endsWith('#work/tks'), page.url());
   await page.close();
 }
 
@@ -161,8 +162,8 @@ check('project data has every project', index.length === 21, `${index.length} pr
   check('Lite: cards stack without scaling', transforms.length === 0, transforms.join(','));
   await scrollTo(page, '.fcard a[data-open-window="youreka"]');
   await page.click('.fcard a[data-open-window="youreka"]');
-  await page.waitForSelector('[data-window="youreka"] .pw-title', { timeout: 4000 }).catch(() => {});
-  check('Lite: project windows still open', await has(page, '[data-window="youreka"] .pw-title'));
+  await page.waitForSelector('[data-window="youreka"] .reader-title', { timeout: 4000 }).catch(() => {});
+  check('Lite: project windows still open', await has(page, '[data-window="youreka"] .reader-title'));
   await page.close();
 }
 

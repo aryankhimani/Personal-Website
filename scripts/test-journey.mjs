@@ -86,8 +86,8 @@ const activeTick = (page) => page.$$eval('[data-journey-rail] li', (els) => els.
 
   // The link in the visible chapter opens its project window.
   await page.click('[data-chapter]:nth-child(4) .chapter-link');
-  await page.waitForSelector('[data-window="shad"] .pw-title', { timeout: 5000 }).catch(() => {});
-  check('a chapter link opens its project window', await page.$('[data-window="shad"] .pw-title').then(Boolean));
+  await page.waitForSelector('[data-window="shad"] .reader-title', { timeout: 5000 }).catch(() => {});
+  check('a chapter link opens its project window', await page.$('[data-window="shad"] .reader-title').then(Boolean));
   await page.keyboard.press('Escape');
   await sleep(400);
 

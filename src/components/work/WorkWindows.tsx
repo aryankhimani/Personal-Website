@@ -55,7 +55,7 @@ function Finder({ folder }: { folder: FolderId }) {
 
 type Loaded = { detail?: ProjectDetail; failed?: boolean };
 
-function useDetail(id: string): Loaded {
+export function useDetail(id: string): Loaded {
   const [state, setState] = useState<Loaded>({});
   useEffect(() => {
     let alive = true;
@@ -70,7 +70,7 @@ function useDetail(id: string): Loaded {
 }
 
 /** The window's own h2 is the file name, so the article's headings start one level down. */
-const demoteHeadings = (html: string) => html.replace(/<(\/?)h2\b/g, '<$1h4');
+export const demoteHeadings = (html: string) => html.replace(/<(\/?)h2\b/g, '<$1h4');
 
 function ProjectWindow({ id }: { id: string }) {
   const entry = workEntry(id);

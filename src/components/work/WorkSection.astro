@@ -49,9 +49,6 @@ const countIn = (id: string) => all.filter((p) => p.data.folder === id || p.data
                     <a href={`/work/${p.id}/`} data-open-window={p.id} class="btn-ink" aria-haspopup="dialog">
                       Open {p.id}.md
                     </a>
-                    <a href={`/work/${p.id}/`} class="btn-quiet">
-                      Full page
-                    </a>
                   </div>
                 </div>
                 <div class:list={['fcard-cover', d.cover ? `pw-cover-${d.coverFit}` : 'fcard-cover-empty']}>

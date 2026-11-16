@@ -26,6 +26,13 @@ let zCounter = 10;
 const listeners = new Set<() => void>();
 const openers = new Map<string, HTMLElement>();
 let knownIds = new Set<string>();
+/** Projects open in the reader and live at #work/<slug> (old #<slug> links still work). */
+let projectIds = new Set<string>();
+const hashFor = (id: string) => (projectIds.has(id) ? `work/${id}` : id);
+const idFromHash = (hash: string) => {
+  const raw = decodeURIComponent(hash.replace(/^#/, ''));
+  return raw.startsWith('work/') ? raw.slice(5) : raw;
+};
 /** The window id currently reflected in the URL hash by us, if any. */
 let hashed: string | null = null;
 
@@ -40,6 +47,16 @@ function topVisible(windows: WindowState[], except?: string): string | null {
   return visible.reduce((a, b) => (a.z > b.z ? a : b)).id;
 }
 
+/** The opener's box on screen, for the reader to grow out of. */
+export function openerRect(id: string): DOMRect | null {
+  const el = openers.get(id);
+  if (!el?.isConnected) return null;
+  const r = el.getBoundingClientRect();
+  return r.width || r.height ? r : null;
+}
+
+export const isProject = (id: string) => projectIds.has(id);
+
 function centreOf(el: Element | null | undefined): Point | null {
   if (!el) return null;
   const r = el.getBoundingClientRect();
@@ -48,16 +65,17 @@ function centreOf(el: Element | null | undefined): Point | null {
 }
 
 function pushHash(id: string) {
-  if (location.hash === `#${id}`) {
+  const want = `#${hashFor(id)}`;
+  if (location.hash === want) {
     hashed = id;
     return;
   }
   // Only one history entry is ever a window. Opening a second window replaces it, so the
   // back button always returns to the plain page instead of replaying old windows.
   if (history.state?.aryanOsWindow) {
-    history.replaceState({ aryanOsWindow: id }, '', `#${id}`);
+    history.replaceState({ aryanOsWindow: id }, '', want);
   } else {
-    history.pushState({ aryanOsWindow: id }, '', `#${id}`);
+    history.pushState({ aryanOsWindow: id }, '', want);
   }
   hashed = id;
 }
@@ -126,8 +144,12 @@ function restoreFocus(id: string) {
 }
 
 function syncFromHash() {
-  const id = decodeURIComponent(location.hash.slice(1));
+  const id = idFromHash(location.hash);
   if (knownIds.has(id)) {
+    // An old-style #<slug> link: show the new #work/<slug> address.
+    if (projectIds.has(id) && !location.hash.startsWith('#work/')) {
+      history.replaceState(history.state, '', `#work/${id}`);
+    }
     hashed = id;
     const existing = state.windows.find((w) => w.id === id);
     if (!existing || existing.minimized || state.focused !== id) {
@@ -170,6 +192,27 @@ let started = false;
 /** Tells the store which ids are windows, so URL hashes like #readme can open them. */
 export function registerWindowIds(ids: string[]): void {
   knownIds = new Set([...knownIds, ...ids]);
+}
+
+export function registerProjectIds(ids: string[]): void {
+  projectIds = new Set([...projectIds, ...ids]);
+}
+
+/** Swap the open reader to another project without stacking history entries. */
+export function replaceWindow(from: string, to: string, opener?: HTMLElement | null): void {
+  if (!knownIds.has(to)) return;
+  if (opener) openers.set(to, opener);
+  else if (openers.has(from)) openers.set(to, openers.get(from)!);
+  zCounter += 1;
+  const windows = [
+    ...state.windows.filter((w) => w.id !== from && w.id !== to),
+    { id: to, z: zCounter, minimized: false, zoomed: false, origin: null },
+  ];
+  set({ windows, focused: to });
+  hashed = to;
+  const want = `#${hashFor(to)}`;
+  if (history.state?.aryanOsWindow) history.replaceState({ aryanOsWindow: to }, '', want);
+  else history.pushState({ aryanOsWindow: to }, '', want);
 }
 
 /** Called once when the WindowManager mounts: starts listening to the URL. */
