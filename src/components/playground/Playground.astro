@@ -1,7 +1,9 @@
 ---
+import TechLabel from '../os/TechLabel';
 // ~/playground.fig: a design canvas where four cursors build a card (lib/playground.ts),
 // then a row of toys to play with (Toys.tsx).
 import Toys from './Toys';
+import Rebuild from './Rebuild.astro';
 import { ember, tags } from '../../lib/palette';
 
 const CURSORS = [
@@ -20,10 +22,12 @@ const LAYERS = [
 
 <section id="playground" class="playground" aria-labelledby="playground-title">
   <header class="section-head">
-    <p class="os-path">~/playground.fig</p>
+    <div class="os-path-row"><TechLabel client:visible text="~/playground.fig" tone="cream" /></div>
     <h2 id="playground-title" class="section-heading">I design in Figma before I code.</h2>
     <p class="section-lede">Here&rsquo;s what that looks like when all four of me are in the file.</p>
   </header>
+
+  <Rebuild />
 
   <div class="fig" data-fig>
     <div class="wp-bar">

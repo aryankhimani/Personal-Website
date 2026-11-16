@@ -1,0 +1,118 @@
+---
+// ~/rebuild: a panel that gets wiped and rebuilt by a swarm of named cursors (lib/swarm.ts).
+// The effect is written from scratch for this site, inspired by Joel Califa's Swarm and
+// Dhvanil Patel's swarm-cursors. Everything here is the real page: the panel is plain HTML,
+// and the cursors only hide it and then draw it back, piece by piece, in page order.
+// Facts only: the colours, typefaces and counts are this site's own.
+import { getProjects } from '../../lib/projects';
+import { FOLDERS } from '../../lib/work';
+import palette from '../../data/palette.json';
+import SwarmFinale from './SwarmFinale';
+
+const count = (await getProjects()).length;
+const S = palette.scales;
+const SWATCHES = [
+  { name: 'navy-950', hex: S.navy['950'], share: '60%' },
+  { name: 'cream-100', hex: S.cream['100'], share: '30%' },
+  { name: 'ember-500', hex: S.ember['500'], share: '10%' },
+];
+const CURSORS = [
+  { id: 'designer', color: S.ember['500'] },
+  { id: 'researcher', color: palette.tags.sky },
+  { id: 'engineer', color: palette.tags.teal },
+  { id: 'founder', color: palette.tags.violet },
+  { id: 'writer', color: palette.tags.amber },
+];
+---
+
+<div class="rebuild" data-rebuild>
+  <div class="rebuild-bar">
+    <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="wp-file">this-site.fig</span>
+    <ul class="rebuild-people" aria-hidden="true">
+      {CURSORS.map((c) => <li style={`--c:${c.color}`} title={c.id}>{c.id[0].toUpperCase()}</li>)}
+    </ul>
+  </div>
+
+  <div class="rebuild-canvas" data-rebuild-canvas>
+    <SwarmFinale client:visible />
+
+    <div class="rb-panel" data-build="box">
+      <p class="rb-kicker" data-build="text">How this site is made</p>
+      <h3 class="rb-title" data-build="text">One navy desk, one cream window, one red-orange accent.</h3>
+
+      <div class="rb-grid">
+        <div class="rb-card" data-build="box">
+          <p class="rb-label" data-build="text">colour</p>
+          <ul class="rb-swatches">
+            {
+              SWATCHES.map((s) => (
+                <li>
+                  <span class="rb-swatch" data-build="fill" style={`--fill:${s.hex}`} />
+                  <span class="rb-swatch-name" data-build="text">{`${s.name} · ${s.share}`}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="rb-card" data-build="box">
+          <p class="rb-label" data-build="text">type</p>
+          <p class="rb-type rb-type-display" data-build="text">Bricolage Grotesque</p>
+          <p class="rb-type rb-type-body" data-build="text">Atkinson Hyperlegible Next</p>
+          <p class="rb-type rb-type-mono" data-build="text">Departure Mono</p>
+        </div>
+
+        <div class="rb-card rb-card-logo" data-build="box">
+          <img src="/logo.svg" alt="The AK logo" width="96" height="96" data-build="image" />
+          <p class="rb-label" data-build="text">logo.svg</p>
+        </div>
+      </div>
+
+      <ul class="rb-stats">
+        <li data-build="box"><strong data-build="text">{count}</strong><span data-build="text">projects</span></li>
+        <li data-build="box"><strong data-build="text">{FOLDERS.length}</strong><span data-build="text">folders</span></li>
+        <li data-build="box"><strong data-build="text">1</strong><span data-build="text">canvas at a time</span></li>
+      </ul>
+    </div>
+
+    <div class="rb-layer" data-rebuild-layer aria-hidden="true">
+      {
+        CURSORS.map((c) => (
+          <div class="rb-cursor" data-swarm-cursor={c.id} style={`--c:${c.color}`}>
+            <svg viewBox="0 0 16 16" width="18" height="18">
+              <path d="M1 1l5.5 14 2-6 6-2z" />
+            </svg>
+            <span>{c.id}</span>
+          </div>
+        ))
+      }
+    </div>
+
+    <video
+      class="rebuild-video"
+      data-rebuild-video
+      src="/media/rebuild.mp4"
+      preload="none"
+      muted
+      loop
+      playsinline
+      width="1100"
+      height="620"
+      aria-label="A recording of five cursors rebuilding this panel"
+      hidden></video>
+  </div>
+
+  <div class="rebuild-foot">
+    <p class="fig-caption" data-rebuild-status role="status">
+      Five cursors wipe this panel and draw it back: boxes, then text, then colour.
+    </p>
+    <button type="button" class="toy-button" data-rebuild-run>Rebuild this section</button>
+  </div>
+</div>
+
+<script>
+  import { initRebuild } from '../../lib/swarm';
+  const root = document.querySelector<HTMLElement>('[data-rebuild]');
+  if (root) initRebuild(root);
+</script>
