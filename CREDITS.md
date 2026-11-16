@@ -18,3 +18,5 @@ Third-party work used on this site, with licenses.
 | [Atkinson Hyperlegible Next](https://www.brailleinstitute.org/freefont/) by Braille Institute | Body typeface | SIL OFL 1.1 |
 | [Bricolage Grotesque](https://github.com/ateliertriay/bricolage) by Mathieu Triay | Display typeface | SIL OFL 1.1 |
 | React Bits: Variable Proximity, Rotating Text, ASCII Text, Faulty Terminal, Decrypted Text | Hero, copied into `src/components/rb/` | MIT + Commons Clause |
+| React Bits: Split Flap Text, Electric Logo | Boot title, ticker, logo flash; copied into `src/components/rb/` | MIT + Commons Clause |
+| [ogl](https://github.com/oframe/ogl) | Small WebGL library used by Electric Logo | Unlicense |

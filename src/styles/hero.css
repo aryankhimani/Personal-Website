@@ -243,47 +243,236 @@
   position: fixed;
   inset: 0;
   z-index: 100;
+  display: block;
+  background: #05091a;
+  color: var(--color-cream-100);
+  cursor: pointer;
+}
+
+/* The CRT tube: everything inside powers on and off together. */
+.boot-crt {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 1.75rem;
   padding: 1.5rem;
-  background: var(--color-desk);
-  font-size: 0.8125rem;
-  line-height: 1.8;
-  color: var(--color-chrome-3);
-  cursor: pointer;
-  transition: opacity 280ms ease-out;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 45%, var(--color-navy-900) 0%, var(--color-navy-950) 60%, #05091a 100%);
+  font-size: 0.75rem;
+  line-height: 1.55;
+  transform-origin: 50% 50%;
+  animation: crt-on 460ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
-#boot.boot-out {
+/* Scanlines and a vignette, CSS only. */
+.boot-crt::before,
+.boot-crt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.boot-crt::before {
+  background: repeating-linear-gradient(0deg, rgb(5 9 26 / 0.35) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+}
+
+.boot-crt::after {
+  background: radial-gradient(ellipse at center, transparent 55%, rgb(5 9 26 / 0.75) 100%);
+}
+
+@keyframes crt-on {
+  0% {
+    transform: scale(0, 0.004);
+    filter: brightness(6);
+  }
+  40% {
+    transform: scale(1, 0.004);
+    filter: brightness(6);
+  }
+  70% {
+    transform: scale(1, 1.04);
+    filter: brightness(1.8);
+  }
+  100% {
+    transform: scale(1, 1);
+    filter: brightness(1);
+  }
+}
+
+#boot.boot-off .boot-crt {
+  animation: crt-off 340ms cubic-bezier(0.6, 0, 0.8, 0.4) forwards;
+}
+
+@keyframes crt-off {
+  0% {
+    transform: scale(1, 1);
+    filter: brightness(1);
+  }
+  45% {
+    transform: scale(1, 0.004);
+    filter: brightness(5);
+  }
+  100% {
+    transform: scale(0, 0.004);
+    filter: brightness(8);
+    opacity: 0.6;
+  }
+}
+
+#boot.boot-off {
+  background: transparent;
+  transition: background-color 300ms ease-in 150ms;
+}
+
+#boot.boot-skip-out {
   opacity: 0;
+  transition: opacity 200ms ease-out;
 }
 
 #boot-log {
-  min-height: 9em;
-  white-space: pre-wrap;
+  position: relative;
+  z-index: 1;
+  min-height: 15.5em;
+  white-space: pre;
+  color: var(--color-navy-300);
+  text-shadow: 0 0 6px rgb(169 179 204 / 0.35);
 }
 
-#boot-ascii {
-  font-size: clamp(0.5rem, 2.4vw, 1.125rem);
-  line-height: 1.05;
-  color: var(--color-window);
+.boot-title {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-height: 5rem;
+}
+
+.boot-logo {
+  position: relative;
+  flex: none;
+  width: clamp(56px, 12vw, 96px);
+  aspect-ratio: 1;
+}
+
+.boot-logo img {
+  width: 100%;
+  height: 100%;
+  filter: invert(94%) sepia(9%) saturate(300%) hue-rotate(5deg);
+  opacity: 0.18;
+}
+
+.boot-flash .boot-logo img {
+  opacity: 0;
+  transition: opacity 150ms;
+}
+
+.boot-electric {
+  position: absolute;
+  inset: -30%;
+  animation: boot-electric 850ms ease-out forwards;
+}
+
+@keyframes boot-electric {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+
+.boot-flap .split-flap-text__tile {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+}
+
+.boot-progress {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 34rem;
+}
+
+.boot-progress-track {
+  flex: 1;
+  height: 10px;
+  padding: 2px;
+  border: 1px solid var(--color-navy-700);
+}
+
+.boot-progress-track i {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--color-ember-500) 0 8px, transparent 8px 10px);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+#boot-pct {
+  width: 3.5ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-cream-100);
 }
 
 .boot-skip {
   position: absolute;
   bottom: 1.5rem;
   left: 1.5rem;
-  color: var(--color-muted);
+  z-index: 1;
+  color: var(--color-navy-300);
+}
+
+/* Lite / reduced motion: no sequence, just the logo fading out over 0.5s. */
+[data-boot='lite'] .boot-crt {
+  align-items: center;
+  animation: boot-fade 500ms ease-in forwards;
+}
+
+[data-boot='lite'] #boot-log,
+[data-boot='lite'] .boot-progress,
+[data-boot='lite'] .boot-skip {
+  display: none;
+}
+
+[data-boot='lite'] .boot-logo img {
+  opacity: 0.9;
+}
+
+@keyframes boot-fade {
+  0%,
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+[data-boot='lite'] #boot {
+  animation: boot-fade 500ms ease-in forwards;
 }
 
 @media (min-width: 768px) {
-  [data-boot] #boot {
-    padding: 3rem;
+  .boot-crt {
+    padding: 3rem 4rem;
+    font-size: 0.8125rem;
   }
   .boot-skip {
-    left: 3rem;
+    left: 4rem;
     bottom: 2.5rem;
   }
 }

@@ -26,9 +26,17 @@ export default function Hero() {
   // Animated extras wait until the browser is idle, so text paints first.
   const [settled, setSettled] = useState(false);
 
+  // The hero's canvas also waits for the boot screen to finish, so only one WebGL context
+  // (the boot logo's) runs at a time.
   useEffect(() => {
     const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 600));
-    idle(() => setSettled(true));
+    const go = () => idle(() => setSettled(true));
+    if (!document.documentElement.dataset.boot) {
+      go();
+      return;
+    }
+    window.addEventListener('aryan-os:boot-done', go, { once: true });
+    return () => window.removeEventListener('aryan-os:boot-done', go);
   }, []);
 
   // H switches hero, unless the visitor is typing somewhere.

@@ -34,15 +34,16 @@ const canvases = (page) => page.$$eval('.hero-visual canvas', (c) => c.length);
 {
   const page = await open(base, { booted: false });
   const started = Date.now();
-  check('boot screen shows on first visit', await page.evaluate(() => document.documentElement.dataset.boot === '1'));
+  check('boot screen shows on first visit', await page.evaluate(() => document.documentElement.dataset.boot === 'full'));
   check('name is in the page behind the boot screen', (await page.$eval('h1', (h) => h.textContent)).includes('Aryan Khimani'));
-  await sleep(900);
+  await sleep(1400);
   const log = await page.$eval('#boot-log', (l) => l.textContent);
-  check('boot lines are typing', log.includes('booting aryan.os'), JSON.stringify(log.slice(0, 40)));
+  check('POST log is typing', log.includes('ARYAN-OS v2.0') && /MEM: \d+ projects/.test(log), JSON.stringify(log.slice(0, 60)));
+  check('hero canvas waits for the boot to finish', (await page.$$eval('.hero-visual canvas', (c) => c.length)) === 0);
   await page.screenshot({ path: '.shots/p2-boot.png' });
-  await page.waitForFunction(() => !document.documentElement.dataset.boot, { timeout: 4000 }).catch(() => {});
+  await page.waitForFunction(() => !document.documentElement.dataset.boot, { timeout: 7000 }).catch(() => {});
   const took = Date.now() - started;
-  check('boot ends by itself within 2.5s', !(await page.evaluate(() => document.documentElement.dataset.boot)) && took < 2700, `${took}ms`);
+  check('boot ends by itself within 5s', !(await page.evaluate(() => document.documentElement.dataset.boot)) && took < 5300, `${took}ms`);
   await page.reload({ waitUntil: 'domcontentloaded' });
   check('boot is skipped on the next page load', !(await page.evaluate(() => document.documentElement.dataset.boot)));
   await page.close();
@@ -55,7 +56,9 @@ const canvases = (page) => page.$$eval('.hero-visual canvas', (c) => c.length);
   await skip.close();
 
   const reduced = await open(base, { booted: false, media: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
-  check('no boot screen with reduced motion', !(await reduced.evaluate(() => document.documentElement.dataset.boot)));
+  check('reduced motion gets the short fade, not the sequence', (await reduced.evaluate(() => document.documentElement.dataset.boot)) === 'lite');
+  await sleep(700);
+  check('short fade is gone by 0.7s', !(await reduced.evaluate(() => document.documentElement.dataset.boot)));
   await reduced.close();
 
   const deep = await open(base + '#readme', { booted: false });

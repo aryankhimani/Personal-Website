@@ -4,6 +4,7 @@ import Dock from '../components/os/Dock';
 import Footer from '../components/os/Footer.astro';
 import MenuBar from '../components/os/MenuBar';
 import WindowManager from '../components/os/WindowManager';
+import BootTitle from '../components/os/BootTitle';
 import { getProjects, toIndexEntry } from '../lib/projects';
 import { INDEX_ELEMENT_ID } from '../lib/work';
 import heroFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
@@ -23,20 +24,11 @@ const {
   noindex = false,
 } = Astro.props;
 
-// ARYAN in block letters for the end of the boot sequence.
-const GLYPHS: Record<string, string[]> = {
-  A: [' ### ', '#   #', '#####', '#   #', '#   #'],
-  R: ['#### ', '#   #', '#### ', '#  # ', '#   #'],
-  Y: ['#   #', ' # # ', '  #  ', '  #  ', '  #  '],
-  N: ['#   #', '##  #', '# # #', '#  ##', '#   #'],
-};
 // Every project's id, title, folders and dates (about 2 KB), so windows, menus and shared
 // links like /#tks work on any page before the full project data is fetched.
 const workIndex = JSON.stringify((await getProjects()).map(toIndexEntry)).replaceAll('<', '\\u003c');
 
-const banner = [0, 1, 2, 3, 4]
-  .map((row) => [...'ARYAN'].map((ch) => GLYPHS[ch][row].replaceAll('#', '##').replaceAll(' ', '  ')).join('   '))
-  .join('\n');
+const projectCount = (await getProjects()).length;
 ---
 
 <!doctype html>
@@ -78,16 +70,20 @@ const banner = [0, 1, 2, 3, 4]
         var root = document.documentElement;
         root.dataset.lite = String(lite);
 
-        // Boot sequence: first page of the session only, never in Lite mode, never on a
-        // shared window link. The timer is a hard cap so it can't block the page.
-        if (root.hasAttribute('data-wants-boot') && !lite && !location.hash) {
+        // Boot sequence: first page of the session only, never on a shared window link.
+        // Full sequence ~4.5s; Lite / reduced motion get a 0.5s fade. The timers are hard
+        // caps so it can never block the page, even if the boot script fails to run.
+        if (root.hasAttribute('data-wants-boot') && !location.hash) {
           try {
             if (!sessionStorage.getItem('aryan-os:booted')) {
               sessionStorage.setItem('aryan-os:booted', '1');
-              root.dataset.boot = '1';
+              var quick = lite || matchMedia('(prefers-reduced-motion: reduce)').matches;
+              root.dataset.boot = quick ? 'lite' : 'full';
               setTimeout(function () {
+                if (!root.dataset.boot) return;
                 delete root.dataset.boot;
-              }, 2500);
+                window.dispatchEvent(new Event('aryan-os:boot-done'));
+              }, quick ? 500 : 5000);
             }
           } catch (e) {}
         }
@@ -98,9 +94,20 @@ const banner = [0, 1, 2, 3, 4]
     {
       boot && (
         <div id="boot" aria-hidden="true">
-          <pre id="boot-log" />
-          <pre id="boot-ascii" hidden>{banner}</pre>
-          <p class="boot-skip">Press any key or click to skip</p>
+          <div class="boot-crt">
+            <pre id="boot-log" data-projects={projectCount} />
+            <div class="boot-title">
+              <div class="boot-logo" id="boot-logo">
+                <img src="/logo.svg" alt="" width="96" height="96" />
+              </div>
+              <BootTitle client:load />
+            </div>
+            <div class="boot-progress">
+              <span class="boot-progress-track"><i id="boot-bar" /></span>
+              <span id="boot-pct">0%</span>
+            </div>
+            <p class="boot-skip">Press any key or click to skip</p>
+          </div>
         </div>
       )
     }
