@@ -2,12 +2,13 @@
 // ~/playground.fig: a design canvas where four cursors build a card (lib/playground.ts),
 // then a row of toys to play with (Toys.tsx).
 import Toys from './Toys';
+import { ember, tags } from '../../lib/palette';
 
 const CURSORS = [
-  { id: 'designer', color: '#ff4a2b' },
-  { id: 'researcher', color: '#3f6fd8' },
-  { id: 'engineer', color: '#2f9e6a' },
-  { id: 'founder', color: '#b05cc8' },
+  { id: 'designer', color: ember['500'] },
+  { id: 'researcher', color: tags.sky },
+  { id: 'engineer', color: tags.teal },
+  { id: 'founder', color: tags.violet },
 ];
 const LAYERS = [
   { id: 'frame', label: 'hi-card', depth: 0 },
@@ -86,7 +87,7 @@ const LAYERS = [
           <dt>Frame</dt>
           <dd>hi-card</dd>
           <dt>Fill</dt>
-          <dd>#ECE7DC</dd>
+          <dd>#F2EBDD</dd>
           <dt>Button</dt>
           <dd>#FF4A2B</dd>
         </dl>

@@ -5,6 +5,7 @@
 import { lazy, Suspense } from 'react';
 import { useLite } from '../../lib/device-tier';
 import TearTicket from '../rb/TearTicket';
+import { cream, ember, navy } from '../../lib/palette';
 
 const StickerPeel = lazy(() => import('../rb/StickerPeel'));
 
@@ -21,10 +22,10 @@ export default function Toys() {
             height={170}
             stubSize={104}
             rotate={-3}
-            background="#ece7dc"
-            color="#16171a"
-            stubBackground="#ff4a2b"
-            borderColor="rgba(0,0,0,0.25)"
+            background={cream['100']}
+            color={navy['950']}
+            stubBackground={ember['500']}
+            borderColor="rgba(11,20,48,0.25)"
             holes={9}
             ariaLabel="Tear off the ticket stub"
             stub={

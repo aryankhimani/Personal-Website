@@ -196,7 +196,7 @@ export default function MenuBar() {
   }
 
   const mobileBar = (
-    <div className="flex h-(--menubar-h) items-center justify-between border-b border-hairline bg-desk-2 pr-3 pl-3.5 text-[13px]">
+    <div className="flex h-(--menubar-h) items-center justify-between glass pr-3 pl-3.5 text-[13px]">
       <Brand />
       <span className="px-1 text-chrome-3">Menu</span>
     </div>
@@ -207,7 +207,7 @@ export default function MenuBar() {
       {/* Desktop */}
       <div
         ref={barRef}
-        className="hidden h-(--menubar-h) items-center gap-1 border-b border-hairline bg-desk-2 px-3 md:flex"
+        className="hidden h-(--menubar-h) items-center gap-1 glass px-3 md:flex"
       >
         <div className="mr-3">
           <Brand />
@@ -234,7 +234,7 @@ export default function MenuBar() {
                     role="menu"
                     aria-label={menu.label}
                     data-menu={menu.id}
-                    className="os-menu absolute top-full left-0 mt-1 min-w-52 rounded-md border border-hairline bg-desk-2 p-1 shadow-window"
+                    className="os-menu absolute top-full left-0 mt-1 min-w-52 os-menu-glass rounded-lg p-1"
                     onKeyDown={(e) => onMenuKey(e, menu.id)}
                   >
                     {menu.entries.map((entry) => {

@@ -36,7 +36,7 @@
 .me-window,
 .compose {
   overflow: hidden;
-  border: 1px solid rgb(0 0 0 / 0.4);
+  border: 1px solid rgb(11 20 48 / 0.4);
   border-radius: var(--radius-window);
   background: var(--color-window);
   color: var(--color-ink);
@@ -62,8 +62,8 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid rgb(0 0 0 / 0.12);
-  background: #e4dfd3;
+  border-bottom: 1px solid rgb(11 20 48 / 0.12);
+  background: var(--color-cream-200);
   font-size: 0.75rem;
   color: var(--color-ink-2);
 }
@@ -93,11 +93,11 @@
   width: 1.5rem;
   height: 1.5rem;
   margin-left: -0.25rem;
-  border: 2px solid #e4dfd3;
+  border: 2px solid var(--color-cream-200);
   border-radius: 50%;
   background: var(--c);
   font-size: 0.6875rem;
-  color: #fff;
+  color: var(--color-cream-50);
 }
 
 .fig-body {
@@ -125,11 +125,11 @@
 }
 
 .fig-layers {
-  border-right: 1px solid rgb(0 0 0 / 0.12);
+  border-right: 1px solid rgb(11 20 48 / 0.12);
 }
 
 .fig-props {
-  border-left: 1px solid rgb(0 0 0 / 0.12);
+  border-left: 1px solid rgb(11 20 48 / 0.12);
 }
 
 .fig-panel-title {
@@ -160,8 +160,8 @@
   min-height: 25rem;
   padding: 3.5rem 1.25rem;
   overflow: hidden;
-  background-color: #d9d4c8;
-  background-image: radial-gradient(circle, rgb(0 0 0 / 0.16) 1px, transparent 1.5px);
+  background-color: var(--color-cream-300);
+  background-image: radial-gradient(circle, rgb(11 20 48 / 0.16) 1px, transparent 1.5px);
   background-size: 18px 18px;
 }
 
@@ -183,8 +183,8 @@
   border-radius: 10px;
   background: var(--color-window);
   box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.15),
-    0 12px 28px -14px rgb(0 0 0 / 0.4);
+    0 1px 2px rgb(11 20 48 / 0.15),
+    0 12px 28px -14px rgb(11 20 48 / 0.4);
 }
 
 .fig-h {
@@ -234,7 +234,7 @@
 
 .fig-select {
   position: absolute;
-  border: 1.5px solid #3f6fd8;
+  border: 1.5px solid var(--color-navy-600);
   pointer-events: none;
   transition: all 200ms var(--ease-out);
 }
@@ -243,8 +243,8 @@
   position: absolute;
   width: 7px;
   height: 7px;
-  border: 1.5px solid #3f6fd8;
-  background: #fff;
+  border: 1.5px solid var(--color-navy-600);
+  background: var(--color-cream-50);
 }
 
 .fig-select i:nth-child(1) {
@@ -277,7 +277,7 @@
 
 .fig-cursor svg {
   fill: var(--c);
-  stroke: #fff;
+  stroke: var(--color-cream-50);
   stroke-width: 1.2;
   stroke-linejoin: round;
 }
@@ -288,7 +288,7 @@
   border-radius: 3px 8px 8px 8px;
   background: var(--c);
   font-size: 0.6875rem;
-  color: #fff;
+  color: var(--color-cream-50);
   white-space: nowrap;
 }
 
@@ -299,7 +299,7 @@
   justify-content: space-between;
   gap: 0.75rem 1.5rem;
   padding: 0.875rem 1rem;
-  border-top: 1px solid rgb(0 0 0 / 0.12);
+  border-top: 1px solid rgb(11 20 48 / 0.12);
 }
 
 .fig-caption {
@@ -417,7 +417,7 @@
   justify-content: space-between;
   gap: 0.75rem 1rem;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgb(0 0 0 / 0.12);
+  border-bottom: 1px solid rgb(11 20 48 / 0.12);
 }
 
 .writing-chips {
@@ -432,7 +432,7 @@
   gap: 0.375rem;
   height: 2rem;
   padding-inline: 0.75rem;
-  border: 1px solid rgb(0 0 0 / 0.2);
+  border: 1px solid rgb(11 20 48 / 0.2);
   border-radius: 999px;
   font-size: 0.8125rem;
   color: var(--color-ink);
@@ -473,13 +473,13 @@
 
 .writing-list td {
   padding: 0;
-  border-top: 1px solid rgb(0 0 0 / 0.08);
+  border-top: 1px solid rgb(11 20 48 / 0.08);
   color: var(--color-ink-2);
   vertical-align: top;
 }
 
 .writing-list tbody tr:nth-child(odd of :not([hidden])) {
-  background: rgb(0 0 0 / 0.025);
+  background: rgb(11 20 48 / 0.025);
 }
 
 .writing-list tbody tr:hover {
@@ -550,7 +550,7 @@
   .me-photo {
     height: auto;
     min-height: 100%;
-    border-right: 1px solid rgb(0 0 0 / 0.15);
+    border-right: 1px solid rgb(11 20 48 / 0.15);
   }
 }
 
@@ -651,7 +651,7 @@
   gap: 0.5rem 0.75rem;
   min-height: 3rem;
   padding: 0.5rem 1rem;
-  border-bottom: 1px solid rgb(0 0 0 / 0.12);
+  border-bottom: 1px solid rgb(11 20 48 / 0.12);
 }
 
 .compose-label {
@@ -681,7 +681,7 @@
 }
 
 .compose-copy:hover {
-  background: rgb(26 43 85 / 0.08);
+  background: rgb(44 59 107 / 0.08);
 }
 
 .compose-input {
@@ -710,7 +710,7 @@
 .compose-message {
   display: flex;
   padding: 1rem;
-  border-bottom: 1px solid rgb(0 0 0 / 0.12);
+  border-bottom: 1px solid rgb(11 20 48 / 0.12);
 }
 
 .compose-message textarea {

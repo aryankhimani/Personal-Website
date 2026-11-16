@@ -198,7 +198,7 @@ export function initPlayground(root: HTMLElement): void {
     showProps([
       ['Frame', 'hi-card'],
       ['Size', `${Math.round(c.w)} × ${Math.round(c.h)}`],
-      ['Fill', '#ECE7DC'],
+      ['Fill', '#F2EBDD'],
       ['Radius', '10'],
     ]);
     await wait(300, signal);

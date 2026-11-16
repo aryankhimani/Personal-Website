@@ -72,7 +72,7 @@
   position: relative;
   transform-origin: 50% 0;
   overflow: hidden;
-  border: 1px solid rgb(0 0 0 / 0.4);
+  border: 1px solid rgb(11 20 48 / 0.4);
   border-radius: var(--radius-window);
   background: var(--color-window);
   color: var(--color-ink);
@@ -86,7 +86,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: #000;
+  background: var(--color-navy-950);
   opacity: var(--stack-dim, 0);
 }
 
@@ -97,7 +97,7 @@
   align-items: center;
   height: 2.25rem;
   padding-inline: 0.75rem;
-  border-bottom: 1px solid rgb(0 0 0 / 0.2);
+  border-bottom: 1px solid rgb(11 20 48 / 0.2);
   background: var(--color-titlebar);
   font-size: 0.75rem;
   color: var(--color-ink-2);
@@ -123,8 +123,8 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #b9b3a6;
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.18);
+  background: var(--color-cream-400);
+  box-shadow: inset 0 0 0 1px rgb(11 20 48 / 0.18);
 }
 
 .fcard-body {
@@ -249,7 +249,7 @@
   order: -1;
   height: 11rem;
   overflow: hidden;
-  border-bottom: 1px solid rgb(0 0 0 / 0.15);
+  border-bottom: 1px solid rgb(11 20 48 / 0.15);
   background: var(--color-titlebar);
 }
 
@@ -258,7 +258,7 @@
     order: 0;
     height: auto;
     border-bottom: 0;
-    border-left: 1px solid rgb(0 0 0 / 0.15);
+    border-left: 1px solid rgb(11 20 48 / 0.15);
   }
 }
 
@@ -369,7 +369,7 @@
   position: absolute;
   inset: 8px 0 0;
   border-radius: 4px 8px 6px 6px;
-  background: linear-gradient(180deg, #8b8b94, #5f5f68);
+  background: linear-gradient(180deg, var(--color-slate-400), var(--color-slate-600));
 }
 
 .folder-back::before {
@@ -380,7 +380,7 @@
   width: 42%;
   height: 12px;
   border-radius: 4px 6px 0 0;
-  background: #8b8b94;
+  background: var(--color-slate-400);
 }
 
 .folder-paper {
@@ -391,7 +391,7 @@
   height: 52px;
   border-radius: 3px;
   background: var(--color-window);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  box-shadow: 0 1px 2px rgb(11 20 48 / 0.3);
   transition: transform 200ms var(--ease-out);
 }
 
@@ -399,17 +399,17 @@
   left: 16px;
   right: 6px;
   top: 18px;
-  background: #ddd7ca;
+  background: var(--color-cream-300);
 }
 
 .folder-front {
   position: absolute;
   inset: 26px 0 0;
   border-radius: 4px 4px 6px 6px;
-  background: linear-gradient(180deg, #f4f4f5 0%, #d4d4d8 45%, #b4b4bb 55%, #dedee2 100%);
+  background: linear-gradient(180deg, var(--color-slate-50) 0%, var(--color-slate-200) 45%, var(--color-slate-300) 55%, var(--color-slate-100) 100%);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.8),
-    0 6px 14px -6px rgb(0 0 0 / 0.7);
+    0 6px 14px -6px rgb(11 20 48 / 0.7);
   transform-origin: 50% 100%;
   transition: transform 200ms var(--ease-out);
 }
@@ -528,7 +528,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.625rem 1rem;
-  border-bottom: 1px solid rgb(0 0 0 / 0.12);
+  border-bottom: 1px solid rgb(11 20 48 / 0.12);
   background: var(--color-window);
   color: var(--color-ink-2);
 }
@@ -558,11 +558,11 @@
 }
 
 .finder-list td {
-  border-top: 1px solid rgb(0 0 0 / 0.08);
+  border-top: 1px solid rgb(11 20 48 / 0.08);
 }
 
 .finder-list tbody tr:nth-child(odd) {
-  background: rgb(0 0 0 / 0.025);
+  background: rgb(11 20 48 / 0.025);
 }
 
 .finder-list tbody tr:hover {
@@ -628,7 +628,7 @@
 .pw-cover {
   height: clamp(10rem, 34vh, 17rem);
   overflow: hidden;
-  border-bottom: 1px solid rgb(0 0 0 / 0.12);
+  border-bottom: 1px solid rgb(11 20 48 / 0.12);
   background: var(--color-titlebar);
 }
 
@@ -675,7 +675,7 @@
   margin-top: 1.25rem;
   padding: 0.875rem 1rem;
   border-left: 3px solid var(--color-navy);
-  background: rgb(26 43 85 / 0.06);
+  background: rgb(44 59 107 / 0.06);
 }
 
 .work-facts dt {
@@ -813,7 +813,7 @@ figcaption {
 .wp-window {
   margin-top: 1rem;
   overflow: hidden;
-  border: 1px solid rgb(0 0 0 / 0.4);
+  border: 1px solid rgb(11 20 48 / 0.4);
   border-radius: var(--radius-window);
   background: var(--color-window);
   color: var(--color-ink);
@@ -823,7 +823,7 @@ figcaption {
 .wp-cover {
   height: clamp(13rem, 46vw, 26rem);
   overflow: hidden;
-  border-bottom: 1px solid rgb(0 0 0 / 0.12);
+  border-bottom: 1px solid rgb(11 20 48 / 0.12);
   background: var(--color-titlebar);
 }
 
@@ -882,7 +882,7 @@ figcaption {
 
 .work-tags li {
   padding: 0.25rem 0.625rem;
-  border: 1px solid rgb(0 0 0 / 0.18);
+  border: 1px solid rgb(11 20 48 / 0.18);
   border-radius: 999px;
   font-size: 0.75rem;
   color: var(--color-ink-2);

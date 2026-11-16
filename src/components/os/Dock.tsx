@@ -6,22 +6,24 @@ import RbDock, { type DockItemData } from '../rb/Dock';
 import { Icon } from './Icon';
 import { RESUME_URL, SECTIONS } from './nav';
 import { windowMeta } from './window-list';
+import { cream, ember, navy } from '../../lib/palette';
 
 // React Bits' Dock, re-skinned with the site tokens.
 const SKIN = {
-  '--dock-panel': 'rgba(26, 27, 31, 0.86)',
-  '--dock-panel-edge': 'rgba(255, 255, 255, 0.09)',
-  '--dock-panel-highlight': 'rgba(255, 255, 255, 0.06)',
-  '--dock-panel-shadow': '0 1px 2px rgba(0, 0, 0, 0.4), 0 18px 36px -16px rgba(0, 0, 0, 0.7)',
-  '--dock-tile': 'linear-gradient(180deg, #2b2c33 0%, #1d1e23 100%)',
+  // Liquid glass: a thin tinted pane, bright top edge, faint rim (see .glass in colour.css).
+  '--dock-panel': 'linear-gradient(180deg, rgba(242, 235, 221, 0.12), rgba(242, 235, 221, 0.02) 45%), rgba(22, 34, 74, 0.45)',
+  '--dock-panel-edge': 'rgba(255, 255, 255, 0.1)',
+  '--dock-panel-highlight': 'rgba(255, 255, 255, 0.26)',
+  '--dock-panel-shadow': '0 1px 2px rgba(5, 9, 26, 0.4), 0 18px 36px -16px rgba(5, 9, 26, 0.75)',
+  '--dock-tile': `linear-gradient(180deg, ${navy['800']} 0%, ${navy['900']} 100%)`,
   '--dock-tile-edge': 'rgba(255, 255, 255, 0.08)',
-  '--dock-tile-highlight': 'rgba(255, 255, 255, 0.1)',
-  '--dock-tile-shadow': '0 3px 8px -4px rgba(0, 0, 0, 0.7)',
-  '--dock-ink': '#ece7dc',
-  '--dock-label': '#ece7dc',
-  '--dock-label-ink': '#16171a',
-  '--dock-dot': '#ff4a2b',
-  '--dock-separator': 'rgba(255, 255, 255, 0.14)',
+  '--dock-tile-highlight': 'rgba(255, 255, 255, 0.14)',
+  '--dock-tile-shadow': '0 3px 8px -4px rgba(5, 9, 26, 0.7)',
+  '--dock-ink': cream['100'],
+  '--dock-label': cream['100'],
+  '--dock-label-ink': navy['950'],
+  '--dock-dot': ember['500'],
+  '--dock-separator': 'rgba(242, 235, 221, 0.16)',
 } as React.CSSProperties;
 
 export default function Dock() {
@@ -98,7 +100,7 @@ export default function Dock() {
         gap={mobile ? 6 : 8}
         roundness={0.36}
         bounce={!still}
-        accentColor="#ff4a2b"
+        accentColor={ember['500']}
         style={SKIN}
       />
     </nav>

@@ -2,12 +2,14 @@
 @import 'lenis/dist/lenis.css';
 @import '@fontsource-variable/bricolage-grotesque/wght.css';
 @import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
+@import './palette.css';
 @import './tokens.css';
 @import './os.css';
 @import './hero.css';
 @import './work.css';
 @import './journey.css';
 @import './sections.css';
+@import './colour.css';
 
 :root {
   --menubar-h: 2.75rem;

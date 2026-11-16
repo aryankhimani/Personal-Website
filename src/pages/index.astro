@@ -9,6 +9,7 @@ import Memories from '../components/memories/Memories.astro';
 import Playground from '../components/playground/Playground.astro';
 import WorkSection from '../components/work/WorkSection.astro';
 import Writing from '../components/writing/Writing.astro';
+import Ticker from '../components/ticker/Ticker.astro';
 ---
 
 <Base boot>
@@ -19,6 +20,7 @@ import Writing from '../components/writing/Writing.astro';
     </ul>
     <Hero client:load />
   </section>
+  <Ticker />
 
   <WorkSection />
   <Journey />

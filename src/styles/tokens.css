@@ -8,27 +8,38 @@
 }
 
 @theme {
-  --color-desk: #111113;
-  --color-desk-2: #1a1b1f;
-  --color-window: #ece7dc;
-  --color-ink: #16171a;
-  --color-muted: #8a8d96;
-  --color-accent: #ff4a2b;
-  --color-navy: #1a2b55;
-  --color-chrome-1: #09090b;
-  --color-chrome-2: #52525b;
-  --color-chrome-3: #d4d4d8;
-  --color-chrome-4: #ffffff;
-  --color-hairline: #2a2b31;
-  --color-ink-2: #55565c;
-  --color-titlebar: #ddd7ca;
+  /* Semantic tokens, all from the scales in palette.css (60% navy, 30% cream, 10% ember). */
+  --color-desk: var(--color-navy-950); /* the desk: deepest ground */
+  --color-desk-2: var(--color-navy-900); /* menu bar, dock, cards on navy */
+  --color-desk-3: var(--color-navy-800); /* raised / hover on navy */
+  --color-hairline: rgb(44 59 107 / 0.85); /* navy-800 borders */
+  --color-window: var(--color-cream-100); /* window bodies, reading surfaces */
+  --color-window-2: var(--color-cream-50);
+  --color-titlebar: var(--color-cream-300);
+  --color-ink: var(--color-navy-950); /* text on cream */
+  --color-ink-2: var(--color-navy-700); /* secondary text on cream */
+  --color-muted: var(--color-navy-300); /* secondary text on navy */
+  --color-accent: var(--color-ember-500);
+  --color-accent-ink: var(--color-ember-700); /* accent text on cream */
+  --color-navy: var(--color-navy-800); /* links and focus rings on cream */
+  /* Legacy names: chrome-3/4 are the light text colours on navy (never pure white). */
+  --color-chrome-1: var(--color-navy-950);
+  --color-chrome-2: var(--color-navy-600);
+  --color-chrome-3: var(--color-cream-100);
+  --color-chrome-4: var(--color-cream-50);
+  /* Liquid metal / glass is a material, not a colour. Only the shaders and glass use these. */
+  --color-metal-1: #09090b;
+  --color-metal-2: #52525b;
+  --color-metal-3: #d4d4d8;
+  --color-metal-4: #ffffff;
 
   --font-mono: 'Departure Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   --font-display: 'Bricolage Grotesque Variable', 'Arial Narrow', sans-serif;
   --font-body: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
 
   --radius-window: 10px;
-  --shadow-window: 0 1px 2px rgb(0 0 0 / 0.35), 0 18px 40px -12px rgb(0 0 0 / 0.55);
+  --shadow-window: 0 1px 2px rgb(5 9 26 / 0.4), 0 18px 40px -12px rgb(5 9 26 / 0.6);
+  --shadow-raised: inset 0 1px 0 rgb(255 255 255 / 0.06);
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }

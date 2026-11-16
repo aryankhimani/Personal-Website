@@ -88,7 +88,7 @@
 
 .chapter-photo {
   overflow: hidden;
-  border: 1px solid rgb(0 0 0 / 0.4);
+  border: 1px solid rgb(11 20 48 / 0.4);
   border-radius: var(--radius-window);
   background: var(--color-titlebar);
   box-shadow: var(--shadow-window);
@@ -300,7 +300,7 @@
 
 .crt {
   overflow: hidden;
-  border: 1px solid rgb(0 0 0 / 0.4);
+  border: 1px solid rgb(11 20 48 / 0.4);
   border-radius: var(--radius-window);
   background: var(--color-window);
   box-shadow: var(--shadow-window);
@@ -309,7 +309,7 @@
 /* The dark plastic set around the tube. */
 .crt-set {
   padding: clamp(0.75rem, 2vw, 1.25rem);
-  background: linear-gradient(180deg, #2b2c33, #1a1b1f);
+  background: linear-gradient(180deg, var(--color-navy-800), var(--color-navy-900));
 }
 
 .crt-screen {
@@ -317,9 +317,9 @@
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 1.25rem / 1.5rem;
-  background: #000;
+  background: var(--color-navy-950);
   box-shadow:
-    0 0 0 2px #0b0b0d,
+    0 0 0 2px var(--color-navy-950),
     0 0 0 3px rgb(255 255 255 / 0.08);
 }
 
@@ -343,8 +343,8 @@
   inset: 0;
   pointer-events: none;
   background:
-    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.2) 0 1px, transparent 1px 3px),
-    radial-gradient(ellipse at center, transparent 55%, rgb(0 0 0 / 0.45) 100%);
+    repeating-linear-gradient(0deg, rgb(11 20 48 / 0.2) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 55%, rgb(11 20 48 / 0.45) 100%);
 }
 
 .crt-play {
@@ -354,7 +354,7 @@
   display: grid;
   place-items: center;
   width: 100%;
-  background: rgb(0 0 0 / 0.25);
+  background: rgb(11 20 48 / 0.25);
   color: var(--color-chrome-4);
 }
 

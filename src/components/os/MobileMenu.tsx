@@ -5,6 +5,7 @@ import StaggeredMenu, { type StaggeredMenuItem } from '../rb/StaggeredMenu';
 import Clock from './Clock';
 import LiteToggle from './LiteToggle';
 import { RESUME_URL, SECTIONS } from './nav';
+import { ember, navy, cream } from '../../lib/palette';
 
 /** Phone menu bar: logo, a menu button, and a slide-in panel (React Bits' Staggered Menu). */
 export default function MobileMenu({ brand }: { brand: React.ReactNode }) {
@@ -31,13 +32,13 @@ export default function MobileMenu({ brand }: { brand: React.ReactNode }) {
       isFixed
       position="right"
       items={items}
-      colors={['#1a2b55', '#ff4a2b']}
+      colors={[navy['800'], ember['500']]}
       displaySocials={false}
       displayItemNumbering={false}
-      menuButtonColor="#d4d4d8"
-      openMenuButtonColor="#d4d4d8"
+      menuButtonColor={cream['100']}
+      openMenuButtonColor={cream['100']}
       changeMenuColorOnOpen={false}
-      accentColor="#ff4a2b"
+      accentColor={ember['500']}
       still={lite}
       logo={brand}
       onMenuOpen={lockScroll}
