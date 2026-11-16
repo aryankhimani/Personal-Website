@@ -139,7 +139,8 @@
 }
 
 [data-lite='false'] .journey-stage {
-  position: relative;
+  position: sticky;
+  top: var(--menubar-h);
   height: calc(100dvh - var(--menubar-h));
   overflow: hidden;
 }

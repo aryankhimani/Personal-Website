@@ -1,5 +1,6 @@
 import DecryptedText from '../../rb/DecryptedText';
 import FaultyTerminal from '../../rb/FaultyTerminal';
+import { navy } from '../../../lib/palette';
 
 const LINES = ['> whoami', 'aryan khimani', '> ls ~', 'research  ventures  code  programs  talks'];
 
@@ -9,7 +10,7 @@ export default function TerminalVisual() {
     <>
       <FaultyTerminal
         className="absolute inset-0"
-        tint="#8a8d96"
+        tint={navy['300']}
         brightness={0.55}
         scanlineIntensity={0.4}
         glitchAmount={1}
@@ -21,7 +22,7 @@ export default function TerminalVisual() {
       />
       <div className="hero-terminal-lines">
         {LINES.map((line, i) => (
-          <p key={line} className={i % 2 ? 'text-chrome-4' : 'text-muted'}>
+          <p key={line} className={i % 2 ? 'text-chrome-4' : 'text-accent'}>
             <DecryptedText text={line} animateOn="view" sequential speed={28} revealDirection="start" />
           </p>
         ))}

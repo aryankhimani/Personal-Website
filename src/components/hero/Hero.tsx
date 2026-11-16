@@ -15,6 +15,8 @@ const VISUALS: Record<HeroId, React.LazyExoticComponent<() => React.ReactNode>> 
   terminal: lazy(() => import('./visuals/TerminalVisual')),
 };
 
+const GlassLens = lazy(() => import('./GlassLens'));
+
 const loadMotion = () => import('./HeroMotion');
 const Name = lazy(() => loadMotion().then((m) => ({ default: m.Name })));
 const Roles = lazy(() => loadMotion().then((m) => ({ default: m.Roles })));
@@ -120,6 +122,12 @@ export default function Hero() {
           </span>
         </div>
       </div>
+
+      {animated && hero !== 'terminal' && (
+        <Suspense fallback={null}>
+          <GlassLens area={ref} />
+        </Suspense>
+      )}
 
       <button
         type="button"

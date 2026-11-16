@@ -4,8 +4,10 @@
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { syncWithGsap } from './scroll';
 
 gsap.registerPlugin(ScrollTrigger);
+syncWithGsap(gsap, ScrollTrigger);
 
 const SCREENS_PER_CHAPTER = 0.8;
 
@@ -45,6 +47,12 @@ export function createJourney(section: HTMLElement): { destroy: () => void } {
     chapters.forEach((c, n) => (c.style.pointerEvents = n === i ? 'auto' : 'none'));
   };
 
+  const sizeSection = () => {
+    section.style.height = `${stage.offsetHeight + last * SCREENS_PER_CHAPTER * window.innerHeight}px`;
+  };
+  sizeSection();
+  ScrollTrigger.addEventListener('refreshInit', sizeSection);
+
   const ctx = gsap.context(() => {
     gsap.set(chapters.slice(1), { opacity: 0, pointerEvents: 'none' });
 
@@ -55,12 +63,13 @@ export function createJourney(section: HTMLElement): { destroy: () => void } {
     intro.fromTo(words[0], { opacity: 0.12 }, { opacity: 1, stagger: 0.08, ease: 'none' }, 0);
     if (photos[0]) intro.fromTo(photos[0], { '--dot': 0 }, { '--dot': 1, ease: 'power1.in', duration: 1 }, 0);
 
-    // One unit of timeline per chapter.
+    // One unit of timeline per chapter. The stage is held in place by CSS position: sticky
+    // (the section is made tall enough to scroll through), not by a GSAP pin: a pin flips the
+    // stage to position: fixed, which Chrome counts as a layout shift.
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
-        trigger: stage,
-        pin: true,
+        trigger: section,
         start: () => `top top+=${menubarHeight()}`,
         end: () => `+=${last * SCREENS_PER_CHAPTER * window.innerHeight}`,
         scrub: true,
@@ -84,7 +93,7 @@ export function createJourney(section: HTMLElement): { destroy: () => void } {
   // Tabbing to a link in a chapter that isn't showing scrolls the scene to that chapter.
   const onFocus = (e: FocusEvent) => {
     const i = chapters.findIndex((c) => c.contains(e.target as Node));
-    const st = ScrollTrigger.getAll().find((t) => t.pin === stage);
+    const st = ScrollTrigger.getAll().find((t) => t.trigger === section && t.vars.onUpdate);
     if (i < 0 || i === active || !st) return;
     window.scrollTo({ top: st.start + ((st.end - st.start) * i) / last + 2 });
   };
@@ -106,6 +115,8 @@ export function createJourney(section: HTMLElement): { destroy: () => void } {
       observer.disconnect();
       section.removeEventListener('focusin', onFocus);
       ctx.revert();
+      ScrollTrigger.removeEventListener('refreshInit', sizeSection);
+      section.style.height = '';
       lines.forEach((line) => {
         line.textContent = line.dataset.text ?? '';
       });

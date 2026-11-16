@@ -20,3 +20,6 @@ Third-party work used on this site, with licenses.
 | React Bits: Variable Proximity, Rotating Text, Faulty Terminal, Decrypted Text | Hero, copied into `src/components/rb/` | MIT + Commons Clause |
 | React Bits: Split Flap Text, Electric Logo | Boot title, ticker, logo flash; copied into `src/components/rb/` | MIT + Commons Clause |
 | [ogl](https://github.com/oframe/ogl) | Small WebGL library used by Electric Logo | Unlicense |
+| [Bencho](https://bencho.dev) ASCII Wake by Lorenzo Cabra | Idea for the ASCII hero's cursor wake (heat grid + glyph ramp); the field itself is written from scratch in `src/components/hero/AsciiField.tsx` | MIT |
+| React Bits: Gradient ASCII, Scroll Float | Ideas for the ASCII field's drift; Scroll Float's "float" effect ported to plain DOM in `src/lib/motion.ts` | MIT + Commons Clause |
+| [matthisgarnier.com](https://www.matthisgarnier.com/) | Reference for the ASCII lettering look (nothing copied) | n/a |

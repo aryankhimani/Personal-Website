@@ -60,7 +60,14 @@ const activeTick = (page) => page.$$eval('[data-journey-rail] li', (els) => els.
   await scrollToY(page, (await topOf(page, '#journey')) - 600);
   await sleep(1200); // the scene loads as the section comes near
   const start = await topOf(page, '#journey');
-  check('the scene sets itself up', await page.$('.pin-spacer').then(Boolean));
+  check(
+    'the scene sets itself up (sticky stage, tall section)',
+    await page.evaluate(() => {
+      const s = document.getElementById('journey');
+      const st = s.querySelector('[data-journey-stage]');
+      return getComputedStyle(st).position === 'sticky' && s.offsetHeight > innerHeight * 3;
+    }),
+  );
 
   await scrollToY(page, start + 200);
   const pinnedA = await viewTop(page, '[data-journey-stage]');

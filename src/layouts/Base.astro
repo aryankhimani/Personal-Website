@@ -130,8 +130,10 @@ const projectCount = (await getProjects()).length;
       import { initScroll } from '../lib/scroll';
       import { runBoot } from '../lib/boot';
       import { bindWindowLinks } from '../lib/windows';
+      import { initMotion } from '../lib/motion';
       import '../components/os/window-list';
       initScroll();
+      initMotion();
       runBoot();
       bindWindowLinks();
     </script>

@@ -155,7 +155,34 @@
 }
 
 .hero[data-hero='ascii'] .hero-visual {
-  height: clamp(10rem, 36dvh, 24rem);
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Keep the name readable over the field: a soft navy fade behind the copy. */
+.hero[data-hero='ascii'] .hero-visual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(70% 60% at 15% 85%, rgb(11 20 48 / 0.92) 0%, rgb(11 20 48 / 0.6) 45%, transparent 75%);
+}
+
+.ascii-field,
+.ascii-field canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.ascii-hint {
+  position: absolute;
+  top: 1.25rem;
+  right: 1rem;
+  font-size: 0.6875rem;
+  color: var(--color-muted);
 }
 
 .hero[data-hero='terminal'] .hero-visual {
@@ -163,6 +190,11 @@
   inset: 0;
   z-index: 0;
   overflow: hidden;
+}
+
+.hero[data-hero='terminal'] .hero-visual canvas {
+  /* The shader draws on black; screen it onto the navy desk so the black becomes navy. */
+  mix-blend-mode: screen;
 }
 
 .hero[data-hero='terminal'] .hero-visual img {
@@ -216,9 +248,15 @@
     align-self: center;
   }
 
-  .hero[data-hero='ascii'] .hero-visual {
+  .hero[data-hero='ascii'] .hero-copy {
+    align-self: end;
     margin-left: 7rem;
-    height: clamp(10rem, 36dvh, 22rem);
+  }
+
+  .ascii-hint {
+    top: auto;
+    right: 1.5rem;
+    bottom: 4.5rem;
   }
 
   .hero-terminal-lines {
@@ -475,4 +513,54 @@
     left: 4rem;
     bottom: 2.5rem;
   }
+}
+
+/* ---------- Glass lens (follows the cursor in the hero) ---------- */
+
+.glass-lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms var(--ease-out);
+  -webkit-backdrop-filter: blur(3px) saturate(160%) brightness(1.08);
+  backdrop-filter: blur(3px) saturate(160%) brightness(1.08);
+  background:
+    radial-gradient(120% 80% at 30% 18%, rgb(255 255 255 / 0.22), transparent 42%),
+    radial-gradient(90% 60% at 70% 95%, rgb(255 242 239 / 0.1), transparent 60%);
+  box-shadow:
+    inset 0 1.5px 1px rgb(255 255 255 / 0.55),
+    inset 0 -1px 1px rgb(255 255 255 / 0.18),
+    inset 0 0 0 1px rgb(255 255 255 / 0.12),
+    inset 0 -14px 26px -14px rgb(255 74 43 / 0.25),
+    0 14px 34px -12px rgb(5 9 26 / 0.55);
+  will-change: transform;
+}
+
+.glass-lens-refract {
+  backdrop-filter: url(#glass-lens) saturate(150%) brightness(1.08);
+}
+
+.glass-lens[data-on='on'] {
+  opacity: 1;
+}
+
+.glass-lens[data-on='dim'] {
+  opacity: 0.25;
+}
+
+/* One soft ember glow, behind the hero logo only. */
+.hero[data-hero='liquid-metal'] .hero-visual::before {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 74 43 / 0.16), rgb(255 74 43 / 0.05) 55%, transparent);
+  filter: blur(20px);
 }
