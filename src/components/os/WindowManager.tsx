@@ -3,6 +3,7 @@ import { useLite } from '../../lib/device-tier';
 import { lockScroll, unlockScroll } from '../../lib/scroll';
 import { closeWindow, startWindowManager, useWindows } from '../../lib/windows';
 import type { Bounds } from './Window';
+import './window-list'; // registers window ids, so shared links like /#tks open on load
 
 const loadLayer = () => import('./WindowLayer');
 const WindowLayer = lazy(loadLayer);

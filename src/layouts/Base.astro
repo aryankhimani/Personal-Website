@@ -3,7 +3,9 @@ import '../styles/global.css';
 import Dock from '../components/os/Dock';
 import MenuBar from '../components/os/MenuBar';
 import WindowManager from '../components/os/WindowManager';
-import heroFont from '@fontsource-variable/anybody/files/anybody-latin-wdth-normal.woff2?url';
+import { getProjects, toIndexEntry } from '../lib/projects';
+import { INDEX_ELEMENT_ID } from '../lib/work';
+import heroFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
 
 interface Props {
   title?: string;
@@ -27,6 +29,10 @@ const GLYPHS: Record<string, string[]> = {
   Y: ['#   #', ' # # ', '  #  ', '  #  ', '  #  '],
   N: ['#   #', '##  #', '# # #', '#  ##', '#   #'],
 };
+// Every project's id, title, folders and dates (about 2 KB), so windows, menus and shared
+// links like /#tks work on any page before the full project data is fetched.
+const workIndex = JSON.stringify((await getProjects()).map(toIndexEntry)).replaceAll('<', '\\u003c');
+
 const banner = [0, 1, 2, 3, 4]
   .map((row) => [...'ARYAN'].map((ch) => GLYPHS[ch][row].replaceAll('#', '##').replaceAll(' ', '  ')).join('   '))
   .join('\n');
@@ -71,9 +77,6 @@ const banner = [0, 1, 2, 3, 4]
         var root = document.documentElement;
         root.dataset.lite = String(lite);
 
-        // Type pairing preview: ?type=b
-        if (/[?&]type=b\b/.test(location.search)) root.dataset.type = 'b';
-
         // Boot sequence: first page of the session only, never in Lite mode, never on a
         // shared window link. The timer is a hard cap so it can't block the page.
         if (root.hasAttribute('data-wants-boot') && !lite && !location.hash) {
@@ -112,12 +115,16 @@ const banner = [0, 1, 2, 3, 4]
     </main>
     <WindowManager client:idle />
     <Dock client:idle />
+    <script type="application/json" id={INDEX_ELEMENT_ID} set:html={workIndex} />
 
     <script>
       import { initScroll } from '../lib/scroll';
       import { runBoot } from '../lib/boot';
+      import { bindWindowLinks } from '../lib/windows';
+      import '../components/os/window-list';
       initScroll();
       runBoot();
+      bindWindowLinks();
     </script>
   </body>
 </html>

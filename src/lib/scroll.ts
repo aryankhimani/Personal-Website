@@ -28,7 +28,11 @@ export function getLenis(): Lenis | null {
 
 export function scrollToSection(id: string): void {
   const target = document.getElementById(id);
-  if (!target) return;
+  // On a project page the homepage sections aren't here, so go home to them.
+  if (!target) {
+    location.assign(`/#${id}`);
+    return;
+  }
   if (lenis) {
     lenis.scrollTo(target, { duration: 1.1 });
   } else {

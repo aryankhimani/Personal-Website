@@ -3,6 +3,7 @@
 
 import { AnimatePresence } from 'motion/react';
 import type { WindowState } from '../../lib/windows';
+import WorkWindow from '../work/WorkWindows';
 import Window, { type Bounds } from './Window';
 import { WINDOW_CONTENT } from './window-content';
 import { windowMeta } from './window-list';
@@ -22,8 +23,9 @@ export default function WindowLayer({ windows, focused, bounds, mobile, lite }: 
         .filter((w) => !w.minimized)
         .map((win) => {
           const meta = windowMeta(win.id);
-          const Content = WINDOW_CONTENT[win.id];
-          if (!meta || !Content) return null;
+          if (!meta) return null;
+          // Fixed windows have their own content; everything else is a work folder or project.
+          const Fixed = WINDOW_CONTENT[win.id];
           return (
             <Window
               key={`${win.id}-${mobile ? 'sheet' : 'window'}`}
@@ -35,7 +37,7 @@ export default function WindowLayer({ windows, focused, bounds, mobile, lite }: 
               mobile={mobile}
               lite={lite}
             >
-              <Content />
+              {Fixed ? <Fixed /> : <WorkWindow id={win.id} />}
             </Window>
           );
         })}

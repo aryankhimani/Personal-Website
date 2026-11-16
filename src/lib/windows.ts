@@ -149,6 +149,22 @@ function syncFromHash() {
   }
 }
 
+/**
+ * Links and buttons marked data-open-window="<id>" open that window instead of navigating.
+ * They stay real links (to /work/<slug>/ etc.), so a modified click, a new tab, or a visit
+ * without JavaScript still goes to the page.
+ */
+export function bindWindowLinks(): void {
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const el = (e.target as Element | null)?.closest<HTMLElement>('[data-open-window]');
+    const id = el?.dataset.openWindow;
+    if (!el || !id || !knownIds.has(id)) return;
+    e.preventDefault();
+    openWindow(id, el);
+  });
+}
+
 let started = false;
 
 /** Tells the store which ids are windows, so URL hashes like #readme can open them. */

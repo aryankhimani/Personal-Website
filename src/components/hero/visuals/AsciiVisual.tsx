@@ -8,8 +8,8 @@ export default function AsciiVisual() {
   return (
     <ASCIIText
       text="ARYAN"
-      fontFamily="'Anybody Variable', sans-serif"
-      fontWeight={900}
+      fontFamily="'Bricolage Grotesque Variable', sans-serif"
+      fontWeight={800}
       textColor="#ece7dc"
       colors={['#ece7dc', '#d4d4d8', '#ff4a2b']}
       textScale={textScale}

@@ -26,3 +26,6 @@ pnpm-debug.log*
 
 # local screenshots
 .shots/
+
+# private notes, resume, LinkedIn export (never commit)
+_private/

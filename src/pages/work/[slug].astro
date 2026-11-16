@@ -1,0 +1,157 @@
+---
+// One static page per project: the same content as its window, for sharing and search.
+import { Picture } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { Icon } from '../../components/os/Icon';
+import { getProjects, type Project } from '../../lib/projects';
+import { formatWhen } from '../../lib/work';
+
+export async function getStaticPaths() {
+  const all = await getProjects();
+  return all.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, newer: all[i - 1], older: all[i + 1] },
+  }));
+}
+
+interface Props {
+  project: Project;
+  newer?: Project;
+  older?: Project;
+}
+
+const { project, newer, older } = Astro.props;
+const d = project.data;
+const { Content } = await render(project);
+const when = formatWhen(d.start, d.end);
+---
+
+<Base title={`${d.title} — Aryan Khimani`} description={d.summary}>
+  <div class="wp">
+    <a href="/#work" class="wp-back">
+      <Icon name="chevron-right" className="wp-back-icon" />
+      Back to the desktop
+    </a>
+
+    <article class="wp-window">
+      <div class="wp-bar">
+        <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="wp-file">~/work/{d.folder}/{project.id}.md</span>
+      </div>
+
+      {
+        d.cover && (
+          <div class:list={['wp-cover', `pw-cover-${d.coverFit}`]}>
+            <Picture
+              src={d.cover}
+              alt={d.coverAlt ?? ''}
+              widths={[480, 760, 1100]}
+              width={1100}
+              sizes="(max-width: 900px) 100vw, 880px"
+              formats={['avif', 'webp']} fallbackFormat="jpg"
+              loading="eager"
+            />
+          </div>
+        )
+      }
+
+      <div class="wp-body">
+        <p class="pw-meta">
+          <span class="work-folder">{d.folder}/</span>
+          {when && <time>{when}</time>}
+        </p>
+        <h1 class="wp-title">{d.title}</h1>
+        <p class="wp-summary">{d.summary}</p>
+
+        {
+          (d.role || d.result) && (
+            <dl class="work-facts">
+              {d.role && (
+                <div>
+                  <dt>role</dt>
+                  <dd>{d.role}</dd>
+                </div>
+              )}
+              {d.result && (
+                <div>
+                  <dt>result</dt>
+                  <dd>{d.result}</dd>
+                </div>
+              )}
+            </dl>
+          )
+        }
+
+        <div class="os-prose work-prose">
+          <Content />
+        </div>
+
+        {
+          d.photos.length > 0 && (
+            <section aria-label="Photos" class="wp-photos">
+              <ul>
+                {d.photos.map((ph) => (
+                  <li>
+                    <figure>
+                      <Picture src={ph.src} alt={ph.alt} widths={[320, 560]} width={560} sizes="(max-width: 640px) 50vw, 280px" formats={['avif', 'webp']} fallbackFormat="jpg" />
+                      {ph.caption && <figcaption>{ph.caption}</figcaption>}
+                    </figure>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          d.links.length > 0 && (
+            <section aria-label="Links" class="work-links">
+              <h2>Links</h2>
+              <ul>
+                {d.links.map((l) => (
+                  <li>
+                    <a href={l.href} target="_blank" rel="noopener noreferrer">
+                      {l.label}
+                      <Icon name="external-link" className="text-sm" />
+                      <span class="sr-only">(opens in a new tab)</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          d.tags.length > 0 && (
+            <ul class="work-tags" aria-label="Tags">
+              {d.tags.map((t) => (
+                <li>{t}</li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+    </article>
+
+    <nav class="wp-next" aria-label="More work">
+      {
+        newer && (
+          <a href={`/work/${newer.id}/`}>
+            <span>Newer</span>
+            {newer.data.title}
+          </a>
+        )
+      }
+      {
+        older && (
+          <a href={`/work/${older.id}/`} class="wp-next-older">
+            <span>Older</span>
+            {older.data.title}
+          </a>
+        )
+      }
+    </nav>
+  </div>
+</Base>

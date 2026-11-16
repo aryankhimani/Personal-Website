@@ -7,6 +7,8 @@ import Clock from './Clock';
 import { Icon } from './Icon';
 import LiteToggle from './LiteToggle';
 import { RESUME_URL } from './nav';
+import { WORK_INDEX } from './window-list';
+import { FOLDERS } from '../../lib/work';
 
 // The phone menu needs GSAP, so it only loads on phones.
 const MobileMenu = lazy(() => import('./MobileMenu'));
@@ -19,6 +21,8 @@ type Entry = {
   /** One of a group where exactly one is checked. */
   radio?: boolean;
   disabled?: boolean;
+  /** Draw a line above this entry. */
+  divider?: boolean;
 };
 
 type Menu = { id: string; label: string; entries: Entry[] };
@@ -74,7 +78,12 @@ export default function MenuBar() {
     {
       id: 'work',
       label: 'Work',
-      entries: [{ label: 'No projects here yet', disabled: true }],
+      entries: [
+        ...FOLDERS.map((f) => ({ label: `${f.id}/`, onSelect: (t: HTMLElement | null) => openWindow(f.id, t) })),
+        ...WORK_INDEX.filter((p) => p.featured)
+          .sort((a, b) => (a.featured ?? 0) - (b.featured ?? 0))
+          .map((p, i) => ({ label: p.title, divider: i === 0, onSelect: (t: HTMLElement | null) => openWindow(p.id, t) })),
+      ],
     },
     {
       id: 'help',
@@ -238,7 +247,7 @@ export default function MenuBar() {
                         className: 'os-menu-item',
                       } as const;
                       return (
-                        <li key={entry.label} role="none">
+                        <li key={entry.label} role="none" className={entry.divider ? 'os-menu-divider' : undefined}>
                           {entry.href ? (
                             <a
                               {...shared}

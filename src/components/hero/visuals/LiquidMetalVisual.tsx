@@ -1,17 +1,11 @@
 import { LiquidMetal } from '@paper-design/shaders-react';
-import { DEFAULT_LOGO, LOGOS } from '../links';
-
-function logoFromUrl(): string {
-  const n = Number(new URLSearchParams(location.search).get('logo'));
-  const index = Number.isInteger(n) && n >= 1 && n <= LOGOS.length ? n - 1 : DEFAULT_LOGO;
-  return `/logos/${LOGOS[index]}.svg`;
-}
+import { LOGO_URL } from '../links';
 
 /** The AK logo as moving chrome. Paper's shader pauses itself off-screen and in hidden tabs. */
 export default function LiquidMetalVisual() {
   return (
     <LiquidMetal
-      image={logoFromUrl()}
+      image={LOGO_URL}
       colorBack="#00000000"
       colorTint="#ffffff"
       repetition={2.2}

@@ -15,7 +15,6 @@ Third-party work used on this site, with licenses.
 | [Pixelarticons](https://pixelarticons.com) by Gerrit Halfmann | Icons | MIT |
 | [React Bits](https://reactbits.dev) by David Haz | Dock and Staggered Menu, copied into `src/components/rb/` and adapted | MIT + Commons Clause |
 | [frontend-design skill](https://github.com/anthropics/skills) by Anthropic | Design guidance in `.claude/skills/` (not shipped in the site) | Apache-2.0 |
-| [Anybody](https://github.com/Etcetera-Type-Co/Anybody) by Tyler Finck | Display typeface (pairing A) | SIL OFL 1.1 |
 | [Atkinson Hyperlegible Next](https://www.brailleinstitute.org/freefont/) by Braille Institute | Body typeface | SIL OFL 1.1 |
-| [Bricolage Grotesque](https://github.com/ateliertriay/bricolage) by Mathieu Triay | Display typeface (pairing B, under review) | SIL OFL 1.1 |
+| [Bricolage Grotesque](https://github.com/ateliertriay/bricolage) by Mathieu Triay | Display typeface | SIL OFL 1.1 |
 | React Bits: Variable Proximity, Rotating Text, ASCII Text, Faulty Terminal, Decrypted Text | Hero, copied into `src/components/rb/` | MIT + Commons Clause |

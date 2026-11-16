@@ -2,10 +2,10 @@
 import Base from '../layouts/Base.astro';
 import DesktopIcon from '../components/os/DesktopIcon';
 import Hero from '../components/hero/Hero';
+import WorkSection from '../components/work/WorkSection.astro';
 
 // Sections still to be built. Each keeps its place on the page so the dock has somewhere to go.
 const upcoming = [
-  { id: 'work', file: '~/work', note: 'Featured projects and project folders.' },
   { id: 'journey', file: '~/journey', note: 'How I got here, chapter by chapter.' },
   { id: 'playground', file: '~/playground.fig', note: 'A live design canvas and a few toys.' },
   { id: 'writing', file: '~/writing', note: 'Articles, newsletters and talks.' },
@@ -21,6 +21,8 @@ const upcoming = [
     </ul>
     <Hero client:load />
   </section>
+
+  <WorkSection />
 
   {
     upcoming.map((s) => (

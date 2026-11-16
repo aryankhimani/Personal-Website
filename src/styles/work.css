@@ -1,0 +1,1002 @@
+/* ~/work: featured windows, the folder desk, Finder and project windows, project pages. */
+
+.os-path {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+/* ---------- Section ---------- */
+
+.work {
+  border-top: 1px solid var(--color-hairline);
+  padding: 5rem 1rem 6rem;
+}
+
+@media (min-width: 640px) {
+  .work {
+    padding-inline: 1.5rem;
+  }
+}
+
+.work-head,
+.stack,
+.desk {
+  max-width: 75rem;
+  margin-inline: auto;
+}
+
+.work-heading {
+  margin-top: 0.75rem;
+  max-width: 14ch;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.6vw, 4.75rem);
+  font-variation-settings: 'wght' 300;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  color: var(--color-chrome-4);
+  text-wrap: balance;
+}
+
+.work-lede {
+  margin-top: 1.25rem;
+  max-width: 38ch;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--color-chrome-3);
+}
+
+/* ---------- Featured stack ---------- */
+
+.stack {
+  --stack-top: calc(var(--menubar-h) + 1.25rem);
+  --stack-step: 14px;
+  margin-top: 3.5rem;
+  /* Room for the whole pile to sit still before the section scrolls on. */
+  padding-bottom: 4rem;
+}
+
+.stack-slot {
+  position: sticky;
+  top: calc(var(--stack-top) + var(--i) * var(--stack-step));
+  /* Each card leaves the screen in step with the ones above it. */
+  margin-bottom: calc((var(--stack-count) - 1 - var(--i)) * var(--stack-step));
+}
+
+.stack-slot + .stack-slot {
+  margin-top: 5rem;
+}
+
+.fcard {
+  position: relative;
+  transform-origin: 50% 0;
+  overflow: hidden;
+  border: 1px solid rgb(0 0 0 / 0.4);
+  border-radius: var(--radius-window);
+  background: var(--color-window);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-window);
+  will-change: transform;
+}
+
+/* Darkens a card as others pile on top (set by scroll-stack.ts). */
+.fcard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: #000;
+  opacity: var(--stack-dim, 0);
+}
+
+.fcard-bar,
+.wp-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 2.25rem;
+  padding-inline: 0.75rem;
+  border-bottom: 1px solid rgb(0 0 0 / 0.2);
+  background: var(--color-titlebar);
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.fcard-file,
+.wp-file {
+  position: absolute;
+  inset-inline: 5rem;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Decorative traffic lights for windows that are really just pages. */
+.wp-lights {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wp-lights i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #b9b3a6;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.18);
+}
+
+.fcard-body {
+  display: grid;
+}
+
+@media (min-width: 768px) {
+  .fcard-body {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    height: min(31rem, calc(100dvh - var(--stack-top) - 6rem));
+  }
+}
+
+.fcard-text {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 1.25rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .fcard-text {
+    padding: 2rem 2.25rem;
+  }
+}
+
+.pw-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.work-folder {
+  color: var(--color-navy);
+}
+
+.fcard-title {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.4vw, 3rem);
+  font-variation-settings: 'wght' 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.fcard-summary {
+  margin-top: 0.75rem;
+  max-width: 40ch;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+/* The one real result is the loudest thing on the card. */
+.fcard-result {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2vw, 1.75rem);
+  font-variation-settings: 'wght' 600;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--color-navy);
+  text-wrap: balance;
+}
+
+.fcard-role {
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+.fcard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.btn-ink {
+  display: inline-flex;
+  align-items: center;
+  height: 2.5rem;
+  padding-inline: 1rem;
+  border-radius: 6px;
+  background: var(--color-ink);
+  color: var(--color-window);
+  font-size: 0.8125rem;
+  transition: background-color 150ms var(--ease-out);
+}
+
+.btn-ink:hover {
+  background: var(--color-navy);
+}
+
+.btn-quiet {
+  font-size: 0.8125rem;
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.btn-quiet:hover {
+  text-decoration-thickness: 2px;
+}
+
+.fcard :focus-visible,
+.wp-window :focus-visible {
+  outline-color: var(--color-navy);
+}
+
+.fcard-cover {
+  position: relative;
+  order: -1;
+  height: 11rem;
+  overflow: hidden;
+  border-bottom: 1px solid rgb(0 0 0 / 0.15);
+  background: var(--color-titlebar);
+}
+
+@media (min-width: 768px) {
+  .fcard-cover {
+    order: 0;
+    height: auto;
+    border-bottom: 0;
+    border-left: 1px solid rgb(0 0 0 / 0.15);
+  }
+}
+
+.fcard-cover picture,
+.fcard-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pw-cover-cover img {
+  object-fit: cover;
+}
+
+.pw-cover-contain img {
+  object-fit: contain;
+  padding: 1.5rem;
+}
+
+/* No photo yet: the stack itself, set large on a blueprint. */
+.fcard-cover-empty {
+  display: flex;
+  align-items: flex-end;
+  padding: 1.25rem;
+  background-color: var(--color-navy);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.fcard-tags-big {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+  font-family: var(--font-mono);
+  font-size: clamp(1.25rem, 2.6vw, 2.25rem);
+  line-height: 1.25;
+  color: var(--color-window);
+}
+
+/* ---------- Folder desk ---------- */
+
+.desk {
+  margin-top: 2rem;
+  padding: 1.5rem 1rem 1rem;
+  border: 1px solid var(--color-hairline);
+  border-radius: 12px;
+  background-color: var(--color-desk-2);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size:
+    24px 24px,
+    24px 24px,
+    120px 120px,
+    120px 120px;
+}
+
+@media (min-width: 768px) {
+  .desk {
+    padding: 2rem 2rem 1.25rem;
+  }
+}
+
+.desk-count {
+  margin-left: 0.5rem;
+  color: var(--color-muted);
+}
+
+.folders {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 1rem;
+  margin-top: 1.75rem;
+}
+
+@media (min-width: 768px) {
+  .folders {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.folder {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.folder:hover .folder-name {
+  color: var(--color-chrome-4);
+}
+
+/* A brushed-chrome folder with two sheets of paper that lift on hover. */
+.folder-art {
+  position: relative;
+  width: 104px;
+  height: 80px;
+  margin-bottom: 0.5rem;
+}
+
+.folder-back {
+  position: absolute;
+  inset: 8px 0 0;
+  border-radius: 4px 8px 6px 6px;
+  background: linear-gradient(180deg, #8b8b94, #5f5f68);
+}
+
+.folder-back::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 42%;
+  height: 12px;
+  border-radius: 4px 6px 0 0;
+  background: #8b8b94;
+}
+
+.folder-paper {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 14px;
+  height: 52px;
+  border-radius: 3px;
+  background: var(--color-window);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  transition: transform 200ms var(--ease-out);
+}
+
+.folder-paper:nth-child(3) {
+  left: 16px;
+  right: 6px;
+  top: 18px;
+  background: #ddd7ca;
+}
+
+.folder-front {
+  position: absolute;
+  inset: 26px 0 0;
+  border-radius: 4px 4px 6px 6px;
+  background: linear-gradient(180deg, #f4f4f5 0%, #d4d4d8 45%, #b4b4bb 55%, #dedee2 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.8),
+    0 6px 14px -6px rgb(0 0 0 / 0.7);
+  transform-origin: 50% 100%;
+  transition: transform 200ms var(--ease-out);
+}
+
+.folder:hover .folder-paper,
+.folder:focus-visible .folder-paper {
+  transform: translateY(-10px) rotate(-2deg);
+}
+
+.folder:hover .folder-paper:nth-child(3),
+.folder:focus-visible .folder-paper:nth-child(3) {
+  transform: translateY(-6px) rotate(3deg);
+}
+
+.folder:hover .folder-front,
+.folder:focus-visible .folder-front {
+  transform: perspective(300px) rotateX(-14deg);
+}
+
+.folder-name {
+  font-size: 0.9375rem;
+  color: var(--color-chrome-3);
+}
+
+.folder-note {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+/* ---------- Everything as a list ---------- */
+
+.work-all {
+  margin-top: 2rem;
+  border-top: 1px solid var(--color-hairline);
+  padding-top: 0.75rem;
+}
+
+.work-all summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--color-chrome-3);
+  cursor: pointer;
+  list-style: none;
+}
+
+.work-all summary::-webkit-details-marker {
+  display: none;
+}
+
+.work-all-chevron {
+  transition: transform 150ms var(--ease-out);
+}
+
+.work-all[open] .work-all-chevron {
+  transform: rotate(90deg);
+}
+
+.work-all table {
+  width: 100%;
+  margin-top: 0.75rem;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.work-all th {
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  text-align: left;
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.work-all td {
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  border-top: 1px solid var(--color-hairline);
+  color: var(--color-muted);
+  vertical-align: top;
+}
+
+.work-all td:first-child {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+}
+
+.work-all td a {
+  color: var(--color-chrome-4);
+}
+
+.work-all td a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 639px) {
+  .work-all th:nth-child(2),
+  .work-all td:nth-child(2) {
+    display: none;
+  }
+}
+
+/* ---------- Finder window ---------- */
+
+.finder {
+  font-size: 0.8125rem;
+}
+
+.finder-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid rgb(0 0 0 / 0.12);
+  background: var(--color-window);
+  color: var(--color-ink-2);
+}
+
+.finder-path strong {
+  font-weight: 400;
+  color: var(--color-ink);
+}
+
+.finder-note {
+  padding: 0.75rem 1rem 0.25rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-ink-2);
+}
+
+.finder-list {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.finder-list th {
+  padding: 0.5rem 1rem;
+  text-align: left;
+  font-weight: 400;
+  color: var(--color-ink-2);
+}
+
+.finder-list td {
+  border-top: 1px solid rgb(0 0 0 / 0.08);
+}
+
+.finder-list tbody tr:nth-child(odd) {
+  background: rgb(0 0 0 / 0.025);
+}
+
+.finder-list tbody tr:hover {
+  background: var(--color-navy);
+  color: var(--color-chrome-4);
+}
+
+.finder-list tbody tr:hover .finder-title,
+.finder-list tbody tr:hover .finder-when {
+  color: var(--color-chrome-3);
+}
+
+.finder-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.625rem;
+  padding: 0.5rem 1rem;
+}
+
+.finder-icon {
+  grid-row: span 2;
+  padding-top: 0.125rem;
+  font-size: 1rem;
+}
+
+.finder-title {
+  font-family: var(--font-body);
+  color: var(--color-ink-2);
+}
+
+.finder-when {
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+  vertical-align: top;
+  color: var(--color-ink-2);
+}
+
+/* ---------- Project window ---------- */
+
+.pw-loading {
+  display: flex;
+  gap: 0.25rem;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-ink-2);
+}
+
+.pw-loading-dots::after {
+  content: '...';
+  animation: pw-dots 900ms steps(4) infinite;
+  display: inline-block;
+  overflow: hidden;
+  width: 0;
+  vertical-align: bottom;
+}
+
+@keyframes pw-dots {
+  to {
+    width: 3ch;
+  }
+}
+
+.pw-cover {
+  height: clamp(10rem, 34vh, 17rem);
+  overflow: hidden;
+  border-bottom: 1px solid rgb(0 0 0 / 0.12);
+  background: var(--color-titlebar);
+}
+
+.pw-cover img,
+.wp-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Photos of people are usually framed high; keep heads in the crop. */
+.pw-cover-cover img {
+  object-position: 50% 30%;
+}
+
+.pw-body {
+  padding: 1.25rem 1.5rem 2rem;
+}
+
+.pw-title {
+  margin-top: 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-variation-settings: 'wght' 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+.pw-summary,
+.wp-summary {
+  margin-top: 0.625rem;
+  max-width: 52ch;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+.work-facts {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding: 0.875rem 1rem;
+  border-left: 3px solid var(--color-navy);
+  background: rgb(26 43 85 / 0.06);
+}
+
+.work-facts dt {
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.work-facts dd {
+  margin-top: 0.125rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--color-ink);
+}
+
+/* Markdown body inside windows and pages. */
+.work-prose {
+  max-width: 64ch;
+  padding: 0;
+  margin-top: 1.5rem;
+}
+
+.work-prose h2,
+.work-prose h4 {
+  margin-top: 1.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-ink);
+}
+
+.work-prose h2:first-child,
+.work-prose h4:first-child {
+  margin-top: 0;
+}
+
+.work-prose li + li {
+  margin-top: 0.375rem;
+}
+
+.pw-photos ul,
+.wp-photos ul {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+}
+
+.pw-photos li {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.pw-photos img {
+  display: block;
+  width: auto;
+  height: 170px;
+  border-radius: 6px;
+  background: var(--color-titlebar);
+}
+
+figcaption {
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.work-links {
+  margin-top: 1.75rem;
+}
+
+.work-links h2,
+.work-links h4 {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.work-links ul {
+  margin-top: 0.5rem;
+}
+
+.work-links li + li {
+  margin-top: 0.25rem;
+}
+
+.work-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding-block: 0.25rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pw-full {
+  display: inline-block;
+  margin-top: 2rem;
+  font-size: 0.8125rem;
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---------- Project page ---------- */
+
+.wp {
+  max-width: 57rem;
+  margin-inline: auto;
+  padding: 2rem 1rem 4rem;
+}
+
+.wp-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0;
+  font-size: 0.8125rem;
+  color: var(--color-chrome-3);
+}
+
+.wp-back:hover {
+  color: var(--color-chrome-4);
+}
+
+.wp-back-icon {
+  transform: rotate(180deg);
+}
+
+.wp-window {
+  margin-top: 1rem;
+  overflow: hidden;
+  border: 1px solid rgb(0 0 0 / 0.4);
+  border-radius: var(--radius-window);
+  background: var(--color-window);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-window);
+}
+
+.wp-cover {
+  height: clamp(13rem, 46vw, 26rem);
+  overflow: hidden;
+  border-bottom: 1px solid rgb(0 0 0 / 0.12);
+  background: var(--color-titlebar);
+}
+
+.wp-cover picture {
+  display: block;
+  height: 100%;
+}
+
+.wp-body {
+  padding: 1.5rem 1.25rem 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .wp-body {
+    padding: 2.5rem 3rem 3rem;
+  }
+}
+
+.wp-title {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-variation-settings: 'wght' 350;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.wp-photos ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: visible;
+}
+
+@media (min-width: 768px) {
+  .wp-photos ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.wp-photos img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--color-titlebar);
+}
+
+.work-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.work-tags li {
+  padding: 0.25rem 0.625rem;
+  border: 1px solid rgb(0 0 0 / 0.18);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.wp-next {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.wp-next a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-width: 48%;
+  padding: 0.5rem 0;
+  font-family: var(--font-body);
+  color: var(--color-chrome-3);
+}
+
+.wp-next a:hover {
+  color: var(--color-chrome-4);
+}
+
+.wp-next span {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.wp-next-older {
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ---------- Menu divider ---------- */
+
+.os-menu-divider {
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--color-hairline);
+}
+
+/* ---------- Lite and reduced motion ---------- */
+
+[data-lite='true'] .folder-paper,
+[data-lite='true'] .folder-front,
+[data-lite='true'] .btn-ink,
+[data-lite='true'] .work-all-chevron {
+  transition: none;
+}
+
+[data-lite='true'] .fcard {
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .folder-paper,
+  .folder-front,
+  .btn-ink,
+  .work-all-chevron {
+    transition: none;
+  }
+
+  .pw-loading-dots::after {
+    animation: none;
+    width: 3ch;
+  }
+}
+
+/* ---------- Phones: a featured card has to fit between the menu bar and the dock ---------- */
+
+@media (max-width: 767px) {
+  .stack {
+    --stack-top: calc(var(--menubar-h) + 0.75rem);
+    --stack-step: 10px;
+  }
+
+  .stack-slot + .stack-slot {
+    margin-top: 3rem;
+  }
+
+  .fcard-cover {
+    height: 8.5rem;
+  }
+
+  .fcard-text {
+    padding: 1rem 1rem 1.25rem;
+  }
+
+  .fcard-title {
+    margin-top: 0.5rem;
+    font-size: 1.875rem;
+  }
+
+  .fcard-summary {
+    font-size: 0.9375rem;
+  }
+
+  .fcard-result {
+    padding-top: 1rem;
+    font-size: 1.25rem;
+  }
+
+  /* The role is in the window and on the full page. */
+  .fcard-role {
+    display: none;
+  }
+
+  .fcard-tags-big {
+    font-size: 1.125rem;
+  }
+}
+
+.fcard-cover.pw-cover-cover img {
+  object-position: 50% 50%;
+}

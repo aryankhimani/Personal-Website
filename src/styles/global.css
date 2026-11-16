@@ -1,12 +1,11 @@
 @import 'tailwindcss';
 @import 'lenis/dist/lenis.css';
-@import '@fontsource-variable/anybody/wdth.css';
-@import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
-/* Only used by type pairing B (/lab, ?type=b). Remove once a pairing is picked. */
 @import '@fontsource-variable/bricolage-grotesque/wght.css';
+@import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
 @import './tokens.css';
 @import './os.css';
 @import './hero.css';
+@import './work.css';
 
 :root {
   --menubar-h: 2.75rem;

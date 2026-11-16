@@ -84,8 +84,7 @@ export default function Hero() {
           <p className="hero-line">I research gene editing, build AI tools and start ventures.</p>
         )}
 
-        {/* TODO(aryan): add city / school here once confirmed. */}
-        <p className="hero-sub">Student researcher and builder.</p>
+        <p className="hero-sub">Student researcher and builder. Computer Science and Ivey HBA at Western University.</p>
 
         <div className="hero-actions">
           <a

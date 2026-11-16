@@ -1,0 +1,159 @@
+---
+// ~/work on the homepage: four featured windows that stack as you scroll, then the desk of
+// folders, then a plain list of everything (also what search engines and no-JS visitors use).
+import { Picture } from 'astro:assets';
+import { Icon } from '../os/Icon';
+import { getFeatured, getProjects } from '../../lib/projects';
+import { FOLDERS, formatWhen } from '../../lib/work';
+
+const featured = await getFeatured();
+const all = await getProjects();
+const countIn = (id: string) => all.filter((p) => p.data.folder === id || p.data.alsoIn.includes(id as never)).length;
+---
+
+<section id="work" class="work" aria-labelledby="work-title">
+  <header class="work-head">
+    <p class="os-path">~/work</p>
+    <h2 id="work-title" class="work-heading">Labs, startups and things I built.</h2>
+    <p class="work-lede">Four I&rsquo;d show you first. Everything else is in the folders below.</p>
+  </header>
+
+  <div class="stack" data-scroll-stack style={`--stack-count:${featured.length}`}>
+    {
+      featured.map((p, i) => {
+        const d = p.data;
+        return (
+          <div class="stack-slot" data-stack-slot style={`--i:${i}`}>
+            <article class="fcard" aria-labelledby={`f-${p.id}`}>
+              <div class="fcard-bar">
+                <span class="wp-lights" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <span class="fcard-file">{p.id}.md</span>
+              </div>
+              <div class="fcard-body">
+                <div class="fcard-text">
+                  <p class="pw-meta">
+                    <span class="work-folder">{d.folder}/</span>
+                    <time>{formatWhen(d.start, d.end)}</time>
+                  </p>
+                  <h3 id={`f-${p.id}`} class="fcard-title">
+                    {d.title}
+                  </h3>
+                  <p class="fcard-summary">{d.summary}</p>
+                  {d.result && <p class="fcard-result">{d.result}</p>}
+                  {d.role && <p class="fcard-role">{d.role}</p>}
+                  <div class="fcard-actions">
+                    <a href={`/work/${p.id}/`} data-open-window={p.id} class="btn-ink" aria-haspopup="dialog">
+                      Open {p.id}.md
+                    </a>
+                    <a href={`/work/${p.id}/`} class="btn-quiet">
+                      Full page
+                    </a>
+                  </div>
+                </div>
+                <div class:list={['fcard-cover', d.cover ? `pw-cover-${d.coverFit}` : 'fcard-cover-empty']}>
+                  {d.cover ? (
+                    <Picture
+                      src={d.cover}
+                      alt={d.coverAlt ?? ''}
+                      widths={[420, 640, 900]}
+                      width={900}
+                      sizes="(max-width: 767px) 100vw, 560px"
+                      formats={['avif', 'webp']} fallbackFormat="jpg"
+                    />
+                  ) : (
+                    <ul class="fcard-tags-big" aria-label="Built with">
+                      {d.tags.map((t) => (
+                        <li>{t}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </article>
+          </div>
+        );
+      })
+    }
+  </div>
+
+  <div class="desk" aria-labelledby="desk-title">
+    <h3 id="desk-title" class="os-path">~/work/ <span class="desk-count">{FOLDERS.length} folders, {all.length} files</span></h3>
+    <ul class="folders">
+      {
+        FOLDERS.map((f) => (
+          <li>
+            <a href={`#${f.id}`} data-open-window={f.id} class="folder" aria-haspopup="dialog">
+              <span class="folder-art" aria-hidden="true">
+                <span class="folder-back" />
+                <span class="folder-paper" />
+                <span class="folder-paper" />
+                <span class="folder-front" />
+              </span>
+              <span class="folder-name">{f.id}/</span>
+              <span class="folder-note">
+                {countIn(f.id)} files. {f.note}.
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <details class="work-all">
+      <summary>
+        <Icon name="chevron-right" className="work-all-chevron" />
+        Show everything as a list
+      </summary>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Folder</th>
+            <th scope="col">When</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            all.map((p) => (
+              <tr>
+                <td>
+                  <a href={`/work/${p.id}/`} data-open-window={p.id}>
+                    {p.data.title}
+                  </a>
+                </td>
+                <td>{p.data.folder}/</td>
+                <td>{formatWhen(p.data.start, p.data.end) || '—'}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </details>
+  </div>
+</section>
+
+<script>
+  import { initScrollStack } from '../../lib/scroll-stack';
+  import { loadProjectDetails } from '../../lib/work-data';
+
+  const work = document.getElementById('work');
+  const stack = work?.querySelector<HTMLElement>('[data-scroll-stack]');
+  if (stack) initScrollStack(stack);
+
+  // Fetch the project data as ~/work comes near, so windows open with content ready.
+  if (work) {
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        loadProjectDetails().catch(() => {});
+      },
+      { rootMargin: '400px 0px' },
+    );
+    io.observe(work);
+  }
+</script>

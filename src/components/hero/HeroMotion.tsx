@@ -7,15 +7,14 @@ import VariableProximity from '../rb/VariableProximity';
 
 export const ROLES = ['research gene editing', 'build AI tools', 'start ventures'];
 
-/** Per-letter weight and width that swell near the cursor. Ranges fit each display typeface. */
+/** Per-letter weight that swells near the cursor (Bricolage Grotesque runs 200 to 800). */
 export function Name({ label, area }: { label: string; area: RefObject<HTMLElement | null> }) {
-  const pairingB = document.documentElement.dataset.type === 'b';
   return (
     <VariableProximity
       label={label}
       containerRef={area}
-      fromFontVariationSettings={pairingB ? "'wght' 300, 'wdth' 100" : "'wght' 300, 'wdth' 100"}
-      toFontVariationSettings={pairingB ? "'wght' 800, 'wdth' 100" : "'wght' 900, 'wdth' 130"}
+      fromFontVariationSettings="'wght' 300"
+      toFontVariationSettings="'wght' 800"
       radius={220}
       falloff="gaussian"
     />
