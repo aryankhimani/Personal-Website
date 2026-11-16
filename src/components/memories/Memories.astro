@@ -23,7 +23,6 @@
           <video
             data-memories-video
             src="/media/memories.mp4"
-            poster="/media/memories-poster.jpg"
             preload="none"
             muted
             playsinline
@@ -31,6 +30,17 @@
             height="720"
             aria-label="Short clips: a TED-Ed stage, an interview at Elevate, a panel, a classroom and a dance at SHAD"
           ></video>
+          <!-- The poster is a lazy image, not the video's poster attribute, which would download on arrival. -->
+          <img
+            class="crt-poster"
+            data-memories-poster
+            src="/media/memories-poster.jpg"
+            alt=""
+            width="960"
+            height="540"
+            loading="lazy"
+            decoding="async"
+          />
           <button type="button" class="crt-play" data-memories-play>
             <span class="crt-play-label">Play memories.mov</span>
           </button>
@@ -48,10 +58,12 @@
   const video = document.querySelector<HTMLVideoElement>('[data-memories-video]');
   const play = document.querySelector<HTMLButtonElement>('[data-memories-play]');
   const label = play?.querySelector('.crt-play-label');
+  const poster = document.querySelector<HTMLImageElement>('[data-memories-poster]');
 
   if (video && play && label) {
     play.addEventListener('click', () => {
       play.hidden = true;
+      if (poster) poster.hidden = true;
       video.controls = true;
       void video.play().catch(() => {
         play.hidden = false; // couldn't start: give the button back

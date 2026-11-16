@@ -1,0 +1,28 @@
+---
+// On every page: an ASCII signature, when the site was last built, the Lite switch and the source.
+import LiteToggle from './LiteToggle';
+
+const built = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Toronto' });
+
+const SIGNATURE = String.raw`
+   __ _ _ __ _   _  __ _ _ __    ___  ___
+  / _' | '__| | | |/ _' | '_ \  / _ \/ __|
+ | (_| | |  | |_| | (_| | | | || (_) \__ \
+  \__,_|_|   \__, |\__,_|_| |_| \___/|___/
+             |___/`.slice(1);
+---
+
+<footer class="site-foot">
+  <div class="site-foot-inner">
+    <pre class="site-foot-sig" aria-hidden="true">{SIGNATURE}</pre>
+    <div class="site-foot-meta">
+      <p>Built by Aryan with Astro. Last updated {built}.</p>
+      <p>
+        <a href="https://github.com/aryankhimani/Personal-Website" target="_blank" rel="noopener noreferrer">
+          View the source<span class="sr-only"> (opens in a new tab)</span>
+        </a>
+      </p>
+      <LiteToggle client:idle />
+    </div>
+  </div>
+</footer>

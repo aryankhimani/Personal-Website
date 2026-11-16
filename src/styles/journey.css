@@ -323,6 +323,11 @@
     0 0 0 3px rgb(255 255 255 / 0.08);
 }
 
+.crt-poster {
+  position: absolute;
+  inset: 0;
+}
+
 .crt-screen video,
 .crt-screen img {
   display: block;

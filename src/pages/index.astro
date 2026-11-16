@@ -2,16 +2,13 @@
 import Base from '../layouts/Base.astro';
 import DesktopIcon from '../components/os/DesktopIcon';
 import Hero from '../components/hero/Hero';
+import About from '../components/about/About.astro';
+import Contact from '../components/contact/Contact.astro';
 import Journey from '../components/journey/Journey.astro';
 import Memories from '../components/memories/Memories.astro';
+import Playground from '../components/playground/Playground.astro';
 import WorkSection from '../components/work/WorkSection.astro';
-
-// Sections still to be built. Each keeps its place on the page so the dock has somewhere to go.
-const upcoming = [
-  { id: 'playground', file: '~/playground.fig', note: 'A live design canvas and a few toys.' },
-  { id: 'writing', file: '~/writing', note: 'Articles, newsletters and talks.' },
-  { id: 'contact', file: 'new_message.eml', note: 'How to reach me.' },
-];
+import Writing from '../components/writing/Writing.astro';
 ---
 
 <Base boot>
@@ -26,13 +23,8 @@ const upcoming = [
   <WorkSection />
   <Journey />
   <Memories />
-
-  {
-    upcoming.map((s) => (
-      <section id={s.id} class="min-h-[70dvh] border-t border-hairline px-4 py-16 sm:px-6">
-        <h2 class="text-xl text-chrome-4">{s.file}</h2>
-        <p class="mt-2 max-w-md text-sm leading-relaxed text-muted">{s.note} Not built yet.</p>
-      </section>
-    ))
-  }
+  <Playground />
+  <Writing />
+  <About />
+  <Contact />
 </Base>

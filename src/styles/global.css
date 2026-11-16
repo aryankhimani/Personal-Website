@@ -7,6 +7,7 @@
 @import './hero.css';
 @import './work.css';
 @import './journey.css';
+@import './sections.css';
 
 :root {
   --menubar-h: 2.75rem;

@@ -1,0 +1,90 @@
+---
+// me.md: a short bio, a photo, skills as plain tags and a few honours.
+// Facts from Aryan's resume, LinkedIn and his answers (see memory notes); nothing invented.
+import { Picture } from 'astro:assets';
+import portrait from '../../assets/photos/shad/IMG_3240.jpg';
+
+const SKILLS: { group: string; items: string[] }[] = [
+  { group: 'Code', items: ['Python', 'TypeScript', 'Java', 'SQL', 'Swift', 'R'] },
+  { group: 'Build', items: ['React', 'FastAPI', 'Node.js', 'Flask', 'MongoDB', 'Docker'] },
+  { group: 'Machine learning', items: ['PyTorch', 'Hugging Face', 'scikit-learn', 'OpenCV', 'SLEAP'] },
+  { group: 'Product', items: ['Figma', 'User testing', 'Onboarding design', 'Partnerships', 'Pitching'] },
+];
+
+const HONOURS = [
+  'Harvard Prize Book Award, one of three winners in the Greater Toronto Area (2024)',
+  'Western Scholarship of Distinction',
+  'Won two TKS hackathons',
+  '3rd place, W5 Catalyst Case Competition (Manulife case)',
+  'Best Delegate, OxfordMUN Canada (2024)',
+  'JA Extra Mile Award (2023)',
+];
+---
+
+<section id="about" class="about" aria-labelledby="about-title">
+  <article class="me-window">
+    <div class="wp-bar">
+      <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="wp-file">me.md</span>
+    </div>
+
+    <div class="me-body">
+      <figure class="me-photo">
+        <Picture
+          src={portrait}
+          alt="Aryan in a dark suit and tie, leaning against a wall"
+          widths={[320, 520, 760]}
+          width={760}
+          sizes="(max-width: 767px) 100vw, 360px"
+          formats={['avif', 'webp']}
+          fallbackFormat="jpg"
+        />
+      </figure>
+
+      <div class="me-text">
+        <p class="os-path me-path">~/me.md</p>
+        <h2 id="about-title" class="section-heading me-heading">Hi, I&rsquo;m Aryan.</h2>
+
+        <div class="me-prose">
+          <p>
+            I&rsquo;m studying Computer Science at Western University and business at the Ivey Business School, in the
+            dual-degree program (class of 2029).
+          </p>
+          <p>
+            I like problems where biology meets code. At Mount Sinai I built an AI tool that tracks mice for memory
+            research. With Youreka I studied genes linked to PTSD. I&rsquo;ve written about CRISPR, base editing and
+            phage biology along the way.
+          </p>
+          <p>
+            I also like starting things. I co-founded JoeyHelps, which matched Gen Z with mental health professionals,
+            and CraftNova, which helps Gen Z explore the skilled trades. Right now I&rsquo;m building TruthLens with
+            Western AI and running events for the Western Founders Network.
+          </p>
+          <!-- TODO(aryan): one line on what you're looking for (e.g. internships in ...). -->
+        </div>
+
+        <div class="me-skills">
+          {
+            SKILLS.map((s) => (
+              <div class="me-skill-row">
+                <h3>{s.group}</h3>
+                <ul class="work-tags">
+                  {s.items.map((i) => (
+                    <li>{i}</li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="me-honours">
+          <h3>Honours</h3>
+          <ul>
+            {HONOURS.map((h) => <li>{h}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </article>
+</section>

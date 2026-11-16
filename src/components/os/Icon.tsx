@@ -17,6 +17,11 @@ import home from 'pixelarticons/svg/home.svg?raw';
 import mail from 'pixelarticons/svg/mail.svg?raw';
 import minus from 'pixelarticons/svg/minus.svg?raw';
 import notes from 'pixelarticons/svg/notes.svg?raw';
+import play from 'pixelarticons/svg/play.svg?raw';
+import send from 'pixelarticons/svg/send.svg?raw';
+import copy from 'pixelarticons/svg/copy.svg?raw';
+import user from 'pixelarticons/svg/user.svg?raw';
+import code from 'pixelarticons/svg/code.svg?raw';
 import shapes from 'pixelarticons/svg/shapes.svg?raw';
 
 const ICONS = {
@@ -36,6 +41,11 @@ const ICONS = {
   mail,
   minus,
   notes,
+  play,
+  send,
+  copy,
+  user,
+  code,
   shapes,
 } as const;
 

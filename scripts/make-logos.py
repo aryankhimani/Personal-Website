@@ -1,7 +1,8 @@
 """Draws the AK logo (the "shared stem" monogram Aryan picked) and the favicon made from it.
 
 Run: python3 scripts/make-logos.py
-Writes public/logo.svg (black on transparent, used by the liquid-metal hero) and public/favicon.svg.
+Writes public/logo.svg (black on transparent, used by the liquid-metal hero), public/favicon.svg and
+public/sticker.svg (the playground sticker).
 public/favicon.ico is a 32px render of favicon.svg (for browsers and pages that ask for /favicon.ico).
 The three other monogram options from Phase 2 are in git history (commit 4f0f048).
 """
@@ -43,4 +44,12 @@ write(
     '<rect width="240" height="240" rx="52" fill="#111113"/>'
     f'<path fill="#ece7dc" transform="translate(22.4 24) scale(0.8)" d="{D}"/></svg>',
 )
-print('wrote public/logo.svg and public/favicon.svg')
+# Sticker for the playground: a die-cut white edge around an accent tile with the cream mark.
+write(
+    'sticker.svg',
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 260">'
+    '<rect x="6" y="6" width="248" height="248" rx="60" fill="#ffffff"/>'
+    '<rect x="20" y="20" width="220" height="220" rx="48" fill="#ff4a2b"/>'
+    f'<path fill="#ece7dc" transform="translate(32.4 34) scale(0.8)" d="{D}"/></svg>',
+)
+print('wrote public/logo.svg, public/favicon.svg and public/sticker.svg')

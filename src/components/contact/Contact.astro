@@ -1,0 +1,124 @@
+---
+// new_message.eml: a compose window. Send opens the visitor's mail app with the subject and
+// message filled in (a mailto link); nothing is sent from the site itself.
+import { Icon } from '../os/Icon';
+import { EMAIL, GITHUB_URL, LINKEDIN_URL } from '../hero/links';
+---
+
+<section id="contact" class="contact" aria-labelledby="contact-title">
+  <header class="section-head">
+    <p class="os-path">new_message.eml</p>
+    <h2 id="contact-title" class="section-heading">Say hi.</h2>
+    <p class="section-lede">
+      Questions about a project, a coffee chat, or something you&rsquo;re building. I read everything.
+    </p>
+  </header>
+
+  <form class="compose" data-compose action={`mailto:${EMAIL}`} method="get" enctype="text/plain">
+    <div class="wp-bar">
+      <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="wp-file">new_message.eml</span>
+    </div>
+
+    <div class="compose-row">
+      <span class="compose-label" id="compose-to">To</span>
+      <span class="compose-to" aria-labelledby="compose-to">
+        Aryan Khimani <span class="compose-addr">&lt;{EMAIL}&gt;</span>
+      </span>
+      <button type="button" class="compose-copy" data-copy={EMAIL}>
+        <Icon name="copy" className="text-sm" />
+        <span data-copy-label>Copy address</span>
+      </button>
+    </div>
+
+    <label class="compose-row">
+      <span class="compose-label">Subject</span>
+      <input type="text" name="subject" class="compose-input" placeholder="Coffee chat?" autocomplete="off" />
+    </label>
+
+    <label class="compose-message">
+      <span class="sr-only">Message</span>
+      <textarea name="body" rows="6" class="compose-input" placeholder="Hi Aryan,"></textarea>
+    </label>
+
+    <div class="compose-foot">
+      <button type="submit" class="btn-ink compose-send" data-send>
+        <Icon name="send" className="text-sm" />
+        Send
+      </button>
+      <p class="compose-note">Opens your email app with this filled in.</p>
+      <span class="compose-elsewhere">
+        <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">
+          <Icon name="linkedin" />
+          LinkedIn<span class="sr-only"> (opens in a new tab)</span>
+        </a>
+        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+          <Icon name="github" />
+          GitHub<span class="sr-only"> (opens in a new tab)</span>
+        </a>
+      </span>
+    </div>
+  </form>
+</section>
+
+<script>
+  import { isLite } from '../../lib/device-tier';
+
+  const form = document.querySelector<HTMLFormElement>('[data-compose]');
+
+  // A short burst of sparks from the Send button (an idea from React Bits' Click Spark).
+  function spark(from: HTMLElement) {
+    if (isLite()) return;
+    const r = from.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    for (let i = 0; i < 10; i++) {
+      const s = document.createElement('i');
+      s.className = 'spark';
+      s.style.left = `${x}px`;
+      s.style.top = `${y}px`;
+      s.style.rotate = `${(360 / 10) * i}deg`;
+      document.body.append(s);
+      s.animate(
+        [
+          { transform: 'translateY(0) scaleY(1)', opacity: 1 },
+          { transform: 'translateY(-34px) scaleY(0.2)', opacity: 0 },
+        ],
+        { duration: 420, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+      ).onfinish = () => s.remove();
+    }
+  }
+
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const params = new URLSearchParams();
+      const subject = String(data.get('subject') ?? '').trim();
+      const body = String(data.get('body') ?? '').trim();
+      if (subject) params.set('subject', subject);
+      if (body) params.set('body', body);
+      // URLSearchParams writes spaces as +, which mail apps show literally.
+      const query = params.toString().replaceAll('+', '%20');
+      const url = `${form.action}${query ? `?${query}` : ''}`;
+      form.dataset.mailto = url; // the link we open, kept for tests
+      spark(form.querySelector('[data-send]')!);
+      window.setTimeout(() => (location.href = url), 250);
+    });
+
+    const copy = form.querySelector<HTMLButtonElement>('[data-copy]');
+    const label = copy?.querySelector('[data-copy-label]');
+    copy?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(copy.dataset.copy ?? '');
+        if (label) label.textContent = 'Copied';
+      } catch {
+        if (label) label.textContent = 'Press Cmd+C';
+        const sel = window.getSelection();
+        const to = form.querySelector('.compose-addr');
+        if (sel && to) sel.selectAllChildren(to);
+      }
+      window.setTimeout(() => label && (label.textContent = 'Copy address'), 2000);
+    });
+  }
+</script>

@@ -1,0 +1,115 @@
+---
+// ~/playground.fig: a design canvas where four cursors build a card (lib/playground.ts),
+// then a row of toys to play with (Toys.tsx).
+import Toys from './Toys';
+
+const CURSORS = [
+  { id: 'designer', color: '#ff4a2b' },
+  { id: 'researcher', color: '#3f6fd8' },
+  { id: 'engineer', color: '#2f9e6a' },
+  { id: 'founder', color: '#b05cc8' },
+];
+const LAYERS = [
+  { id: 'frame', label: 'hi-card', depth: 0 },
+  { id: 'heading', label: 'Heading', depth: 1 },
+  { id: 'body', label: 'Body', depth: 1 },
+  { id: 'button', label: 'Button', depth: 1 },
+];
+---
+
+<section id="playground" class="playground" aria-labelledby="playground-title">
+  <header class="section-head">
+    <p class="os-path">~/playground.fig</p>
+    <h2 id="playground-title" class="section-heading">I design in Figma before I code.</h2>
+    <p class="section-lede">Here&rsquo;s what that looks like when all four of me are in the file.</p>
+  </header>
+
+  <div class="fig" data-fig>
+    <div class="wp-bar">
+      <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="wp-file">playground.fig</span>
+    </div>
+
+    <div class="fig-toolbar">
+      <span class="fig-tools" aria-hidden="true">
+        <span data-on>Move</span><span>Frame</span><span>Text</span><span>Comment</span>
+      </span>
+      <ul class="fig-people" aria-label="In this file: designer, researcher, engineer and founder">
+        {
+          CURSORS.map((c) => (
+            <li style={`--c:${c.color}`} title={c.id} aria-hidden="true">
+              {c.id[0].toUpperCase()}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="fig-body">
+      <aside class="fig-panel fig-layers" aria-hidden="true">
+        <p class="fig-panel-title">Layers</p>
+        <ul>
+          {
+            LAYERS.map((l) => (
+              <li data-layer={l.id} style={`--depth:${l.depth}`}>
+                {l.label}
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+
+      <!-- The canvas is a picture of the process; the caption below says what it shows. -->
+      <div class="fig-canvas" data-canvas aria-hidden="true">
+        <p class="fig-frame-label">Desktop / hi</p>
+        <div class="fig-card" data-el="card">
+          <p class="fig-h" data-el="heading">hi, I&rsquo;m Aryan</p>
+          <p class="fig-p" data-el="body">I research, build and start things. This card was made by four of me.</p>
+          <span class="fig-btn" data-el="button" data-filled>Say hi</span>
+        </div>
+        <div class="fig-select" data-select hidden><i></i><i></i><i></i><i></i></div>
+        {
+          CURSORS.map((c) => (
+            <div class="fig-cursor" data-cursor={c.id} style={`--c:${c.color}`}>
+              <svg viewBox="0 0 16 16" width="18" height="18">
+                <path d="M1 1l5.5 14 2-6 6-2z" />
+              </svg>
+              <span>{c.id}</span>
+            </div>
+          ))
+        }
+      </div>
+
+      <aside class="fig-panel fig-props" aria-hidden="true">
+        <p class="fig-panel-title">Design</p>
+        <dl data-props>
+          <dt>Frame</dt>
+          <dd>hi-card</dd>
+          <dt>Fill</dt>
+          <dd>#ECE7DC</dd>
+          <dt>Button</dt>
+          <dd>#FF4A2B</dd>
+        </dl>
+      </aside>
+    </div>
+
+    <div class="fig-foot">
+      <p class="fig-caption">
+        Four cursors, one canvas: the designer draws a frame, the researcher writes the heading, the engineer writes
+        the body and the founder adds a button.
+      </p>
+      <button type="button" class="fig-replay" data-replay hidden>Replay</button>
+    </div>
+  </div>
+
+  <div class="toys">
+    <h3 class="os-path">~/playground/toys <span class="desk-count">pull, drag, tear</span></h3>
+    <Toys client:visible />
+  </div>
+</section>
+
+<script>
+  import { initPlayground } from '../../lib/playground';
+  const fig = document.querySelector<HTMLElement>('[data-fig]');
+  if (fig) initPlayground(fig);
+</script>
