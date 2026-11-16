@@ -564,3 +564,27 @@
   background: radial-gradient(closest-side, rgb(255 74 43 / 0.16), rgb(255 74 43 / 0.05) 55%, transparent);
   filter: blur(20px);
 }
+
+/* ---------- CRT overlay on the hero (View → CRT effect) ---------- */
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgb(5 9 26 / 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 90% at 50% 45%, transparent 60%, rgb(5 9 26 / 0.55) 100%);
+  mix-blend-mode: multiply;
+}
+
+[data-crt='off'] .hero::after {
+  display: none;
+}
+
+@media print {
+  .hero::after {
+    display: none;
+  }
+}

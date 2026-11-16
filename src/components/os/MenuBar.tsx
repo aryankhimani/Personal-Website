@@ -1,9 +1,11 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { setLite, useLite } from '../../lib/device-tier';
 import { HEROES, setHero, useHero } from '../../lib/hero';
+import { setCrt, useCrt } from '../../lib/crt';
 import { scrollToSection } from '../../lib/scroll';
 import { openWindow } from '../../lib/windows';
 import Clock from './Clock';
+import SysTray from './SysTray';
 import { Icon } from './Icon';
 import LiteToggle from './LiteToggle';
 import { RESUME_URL } from './nav';
@@ -49,6 +51,7 @@ function Brand() {
 export default function MenuBar() {
   const lite = useLite();
   const hero = useHero();
+  const crt = useCrt();
   const [open, setOpen] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
@@ -72,6 +75,7 @@ export default function MenuBar() {
           radio: true,
           onSelect: () => setHero(h.id),
         })),
+        { label: 'CRT effect', checked: crt, divider: true, onSelect: () => setCrt(!crt) },
         { label: 'Lite mode', checked: lite, onSelect: () => setLite(!lite) },
       ],
     },
@@ -88,7 +92,10 @@ export default function MenuBar() {
     {
       id: 'help',
       label: 'Help',
-      entries: [{ label: 'About this site', onSelect: (t) => openWindow('about-this-site', t) }],
+      entries: [
+        { label: 'About Aryan OS', onSelect: (t) => openWindow('about-this-site', t) },
+        { label: 'Read me', onSelect: (t) => openWindow('readme', t) },
+      ],
     },
   ];
 
@@ -277,6 +284,7 @@ export default function MenuBar() {
           </ul>
         </nav>
         <div className="ml-auto flex items-center gap-5">
+          <SysTray />
           <Clock className="text-chrome-3" />
           <LiteToggle />
         </div>

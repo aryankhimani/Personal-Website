@@ -235,3 +235,77 @@
     transition: none;
   }
 }
+
+/* ---------- Menu bar extras ---------- */
+
+.clock-flap {
+  vertical-align: middle;
+}
+
+.systray {
+  display: none;
+  gap: 1rem;
+  white-space: pre;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.systray-batt {
+  color: var(--color-cream-100);
+}
+
+@media (min-width: 1100px) {
+  .systray {
+    display: flex;
+  }
+}
+
+/* ---------- Secret terminal ---------- */
+
+.term {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--color-navy-950);
+  color: var(--color-cream-100);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  cursor: text;
+}
+
+.term-log {
+  flex: 1;
+}
+
+.term-log pre {
+  white-space: pre-wrap;
+}
+
+.term-in {
+  color: var(--color-navy-300);
+}
+
+.term-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.term-prompt {
+  color: var(--color-ember-500);
+  white-space: nowrap;
+}
+
+.term-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  color: var(--color-cream-50);
+  caret-color: var(--color-ember-500);
+  outline: none;
+}
+
+.os-window .term :focus-visible {
+  outline: none;
+}

@@ -20,7 +20,9 @@ export type WindowMeta = {
 
 export const WINDOWS: WindowMeta[] = [
   { id: 'readme', file: 'readme.md', icon: 'file-text', width: 460, height: 400 },
-  { id: 'about-this-site', file: 'about.txt', icon: 'info', width: 520, height: 470 },
+  { id: 'about-this-site', file: 'about.txt', icon: 'info', width: 520, height: 560 },
+  // The secret one: opened by typing "sudo" or the Konami code (lib/easter.ts).
+  { id: 'terminal', file: 'root@aryan-os', icon: 'code', width: 620, height: 420 },
 ];
 
 function readIndex(): IndexEntry[] {

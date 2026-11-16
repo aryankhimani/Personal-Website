@@ -69,6 +69,9 @@ const projectCount = (await getProjects()).length;
         }
         var root = document.documentElement;
         root.dataset.lite = String(lite);
+        try {
+          if (localStorage.getItem('aryan-os:crt') === 'off') root.dataset.crt = 'off';
+        } catch (e) {}
 
         // Boot sequence: first page of the session only, never on a shared window link.
         // Full sequence ~4.5s; Lite / reduced motion get a 0.5s fade. The timers are hard
@@ -131,9 +134,11 @@ const projectCount = (await getProjects()).length;
       import { runBoot } from '../lib/boot';
       import { bindWindowLinks } from '../lib/windows';
       import { initMotion } from '../lib/motion';
+      import { initEasterEgg } from '../lib/easter';
       import '../components/os/window-list';
       initScroll();
       initMotion();
+      initEasterEgg();
       runBoot();
       bindWindowLinks();
     </script>
