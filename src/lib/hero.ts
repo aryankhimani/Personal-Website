@@ -7,6 +7,8 @@ export const HEROES = [
   { id: 'liquid-metal', label: 'Liquid metal' },
   { id: 'ascii', label: 'ASCII' },
   { id: 'terminal', label: 'Terminal' },
+  { id: 'astral', label: 'Astral' },
+  { id: 'orbits', label: 'Orbits' },
 ] as const;
 
 export type HeroId = (typeof HEROES)[number]['id'];

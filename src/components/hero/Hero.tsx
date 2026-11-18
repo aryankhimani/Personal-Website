@@ -13,6 +13,8 @@ const VISUALS: Record<HeroId, React.LazyExoticComponent<() => React.ReactNode>> 
   'liquid-metal': lazy(() => import('./visuals/LiquidMetalVisual')),
   ascii: lazy(() => import('./visuals/AsciiVisual')),
   terminal: lazy(() => import('./visuals/TerminalVisual')),
+  astral: lazy(() => import('./visuals/AstralVisual')),
+  orbits: lazy(() => import('./visuals/OrbitsVisual')),
 };
 
 const GlassLens = lazy(() => import('./GlassLens'));

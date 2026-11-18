@@ -1,7 +1,7 @@
 // React Bits Split Flap Text (https://reactbits.dev/text-animations/split-flap-text), MIT + Commons Clause, by David Haz. Copied unchanged.
 'use client';
 
-import { CSSProperties, HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, type HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react';
 import './SplitFlapText.css';
 
 type TileState = {

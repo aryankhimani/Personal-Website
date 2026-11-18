@@ -29,3 +29,4 @@ Third-party work used on this site, with licenses.
 | [Swarm](https://califa.github.io/swarm-site/) by Joel Califa and [swarm-cursors](https://github.com/DhvanilPatel/swarm-cursors) by Dhvanil Patel | Inspiration for ~/rebuild. Neither has a license, so no code was used; `src/lib/swarm.ts` is written from scratch | n/a (inspiration only) |
 | [matter-js](https://brm.io/matter-js/) | Physics for Folder Float | MIT |
 | [three.js](https://threejs.org) | Lanyard, Paper Crumple, Folding Bill | MIT |
+| React Bits Pro: Astral Shell and Binary Orbits | Inspiration for heroes 4 (Astral) and 5 (Orbits). Pro components, looked at only; `AstralField.tsx` and `OrbitSystem.tsx` are written from scratch in canvas 2D | n/a (inspiration only) |

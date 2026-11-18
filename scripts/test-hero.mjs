@@ -88,11 +88,25 @@ const canvases = (page) => page.$$eval('.hero-visual canvas', (c) => c.length);
   await sleep(2500);
   check('H key moves to the terminal hero', (await heroOf(page)) === 'terminal');
   check('one canvas in the terminal hero', (await canvases(page)) === 1, `canvases=${await canvases(page)}`);
+  for (const id of ['astral', 'orbits']) {
+    await page.keyboard.press('h');
+    await sleep(1500);
+    check(`H key moves to the ${id} hero`, (await heroOf(page)) === id);
+    check(`one canvas in the ${id} hero`, (await canvases(page)) === 1, `canvases=${await canvases(page)}`);
+    const drawn = await page.$eval('.hero-visual canvas', (c) => {
+      const g = c.getContext('2d');
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      let lit = 0;
+      for (let i = 3; i < d.length; i += 4 * 97) if (d[i] > 40) lit++;
+      return lit;
+    });
+    check(`${id} hero draws stars`, drawn > 50, `lit samples=${drawn}`);
+  }
 
   await page.click('[data-menu-trigger="view"]');
   await sleep(100);
   const radios = await page.$$eval('[data-menu="view"] [role="menuitemradio"]', (r) => r.map((x) => [x.innerText.trim(), x.getAttribute('aria-checked')]));
-  check('View menu lists the heroes with the current one checked', radios.length === 3 && radios[2][1] === 'true', JSON.stringify(radios));
+  check('View menu lists the heroes with the current one checked', radios.length === 5 && radios[4][1] === 'true', JSON.stringify(radios));
   await page.click('[data-menu="view"] [role="menuitemradio"]');
   await sleep(1500);
   check('View menu switches hero', (await heroOf(page)) === 'liquid-metal');
