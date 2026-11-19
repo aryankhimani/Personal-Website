@@ -26,14 +26,6 @@ const CURSORS = [
 ---
 
 <div class="rebuild" data-rebuild>
-  <div class="rebuild-bar">
-    <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
-    <span class="wp-file">this-site.fig</span>
-    <ul class="rebuild-people" aria-hidden="true">
-      {CURSORS.map((c) => <li style={`--c:${c.color}`} title={c.id}>{c.id[0].toUpperCase()}</li>)}
-    </ul>
-  </div>
-
   <div class="rebuild-canvas" data-rebuild-canvas>
     <SwarmFinale client:visible />
 

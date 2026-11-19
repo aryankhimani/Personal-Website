@@ -99,7 +99,32 @@ const insideCanvas = (page) =>
   const away = await state(page);
   check('scrolling away stops it at the finished card', !away.playing && away.heading === 'hi, I’m Aryan', JSON.stringify(away));
 
-  // Toys.
+  // Pace toggle: one window, normal pace by default; hyper speed swaps in the swarm rebuild.
+  await goTo(page, '[data-pace-root]', -80);
+  const pace = () =>
+    page.evaluate(() => ({
+      normal: !document.querySelector('[data-pace-panel="normal"]').hidden,
+      hyper: !document.querySelector('[data-pace-panel="hyper"]').hidden,
+      file: document.querySelector('[data-pace-file]').textContent,
+      windows: document.querySelectorAll('#playground .fig').length,
+    }));
+  const p0 = await pace();
+  check('one cursor window, normal pace by default', p0.windows === 1 && p0.normal && !p0.hyper, JSON.stringify(p0));
+  await click(page, '[data-pace="hyper"]');
+  await sleep(1500);
+  const p1 = await pace();
+  const swarmOn = await page.evaluate(() => document.querySelector('[data-rebuild-layer]').hasAttribute('data-on'));
+  check('hyper speed shows the swarm rebuild and it runs', !p1.normal && p1.hyper && p1.file === 'this-site.fig' && swarmOn, JSON.stringify(p1));
+  await click(page, '[data-pace="normal"]');
+  await sleep(300);
+  check('normal pace switches back', (await pace()).normal);
+
+  // Toys: their own section, after Writing.
+  const order = await page.evaluate(() => {
+    const w = document.getElementById('writing'), t = document.getElementById('toys');
+    return !!w && !!t && !!(w.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING) && !document.querySelector('#playground .toys');
+  });
+  check('toys sit after the Writing section', order);
   await goTo(page, '.toys');
   await sleep(1200);
   check('the sticker is a live canvas', await page.$('.toy-stage-sticker canvas').then(Boolean));
