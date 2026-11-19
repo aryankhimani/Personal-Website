@@ -39,7 +39,7 @@ export default function Clock({ className = '', flaps = true }: { className?: st
   }, []);
 
   return (
-    <p className={`flex gap-3 tabular-nums ${className}`}>
+    <div className={`flex gap-3 tabular-nums ${className}`}>
       {ZONES.map((zone) => {
         const t = now ? timeIn(zone.tz, now) : '--:--';
         return (
@@ -57,6 +57,6 @@ export default function Clock({ className = '', flaps = true }: { className?: st
           </span>
         );
       })}
-    </p>
+    </div>
   );
 }

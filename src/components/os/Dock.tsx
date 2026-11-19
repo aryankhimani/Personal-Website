@@ -31,6 +31,7 @@ export default function Dock() {
   const { windows } = useWindows();
   const [mobile, setMobile] = useState(false);
   const [active, setActive] = useState('home');
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)');
@@ -38,6 +39,41 @@ export default function Dock() {
     update();
     mq.addEventListener('change', update);
     return () => mq.removeEventListener('change', update);
+  }, []);
+
+  // Auto-hide: slide away while scrolling down, come back on scroll-up, when the mouse
+  // nears the bottom edge, or near the end of the page.
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let nearEdge = false;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const y = window.scrollY;
+      const atEnd = y + window.innerHeight >= document.documentElement.scrollHeight - 80;
+      if (y < 120 || atEnd || nearEdge) setHidden(false);
+      else if (y > lastY + 4) setHidden(true);
+      else if (y < lastY - 4) setHidden(false);
+      if (Math.abs(y - lastY) > 4) lastY = y;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      const near = e.clientY > window.innerHeight - 96;
+      if (near !== nearEdge) {
+        nearEdge = near;
+        if (near) setHidden(false);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('pointermove', onMove);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   // Mark the section currently on screen.
@@ -90,7 +126,12 @@ export default function Dock() {
   const still = lite || mobile;
 
   return (
-    <nav aria-label="Sections" className="os-dock pointer-events-none fixed inset-x-0 bottom-0 z-40 h-24 print:hidden">
+    <nav
+      aria-label="Sections"
+      data-hidden={hidden || undefined}
+      onFocus={() => setHidden(false)}
+      className="os-dock pointer-events-none fixed inset-x-0 bottom-0 z-40 h-24 print:hidden"
+    >
       <RbDock
         items={items}
         className="pointer-events-auto"

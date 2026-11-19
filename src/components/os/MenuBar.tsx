@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react';
 import { setLite, useLite } from '../../lib/device-tier';
 import { HEROES, setHero, useHero } from '../../lib/hero';
 import { setCrt, useCrt } from '../../lib/crt';
@@ -29,21 +29,36 @@ type Entry = {
 
 type Menu = { id: string; label: string; entries: Entry[] };
 
+// Aryan's AK mark (same paths as public/logo.svg).
+const AK_PATH =
+  'M112 44h28v152h-28zM18 196 98 44h28L48 196zM76 140h36v22H66zM140 110l48-66h36l-56 76 58 76h-36l-38-50-12 16z';
+
 function Brand() {
+  // Brand renders twice (desktop + phone bar), so each copy needs its own gradient id.
+  const grad = `ak-chrome-${useId().replace(/:/g, '')}`;
   return (
     <a
       href="#home"
-      className="flex items-center gap-2 text-chrome-4"
+      className="os-brand"
       onClick={(e) => {
         e.preventDefault();
         scrollToSection('home');
       }}
     >
-      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-        <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" strokeWidth="2" />
-        <circle cx="8" cy="8" r="2" fill="var(--color-accent)" />
-      </svg>
-      <span>Aryan OS</span>
+      <span className="os-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 240 240">
+          <defs>
+            <linearGradient id={grad} x1="0" y1="0" x2="0.35" y2="1">
+              <stop offset="0" stopColor="#fbf7ef" />
+              <stop offset="0.45" stopColor="#c9c3b6" />
+              <stop offset="0.55" stopColor="#8d8a84" />
+              <stop offset="1" stopColor="#efe8da" />
+            </linearGradient>
+          </defs>
+          <path fill={`url(#${grad})`} d={AK_PATH} />
+        </svg>
+      </span>
+      <span className="os-brand-name">Aryan OS</span>
     </a>
   );
 }
@@ -203,7 +218,7 @@ export default function MenuBar() {
   }
 
   const mobileBar = (
-    <div className="flex h-(--menubar-h) items-center justify-between glass pr-3 pl-3.5 text-[13px]">
+    <div className="os-bar flex h-(--menubar-h) items-center justify-between glass pr-3 pl-3.5 text-[13px]">
       <Brand />
       <span className="px-1 text-chrome-3">Menu</span>
     </div>
@@ -214,9 +229,9 @@ export default function MenuBar() {
       {/* Desktop */}
       <div
         ref={barRef}
-        className="hidden h-(--menubar-h) items-center gap-1 glass px-3 md:flex"
+        className="os-bar hidden h-(--menubar-h) items-center gap-1 glass px-3 md:flex"
       >
-        <div className="mr-3">
+        <div className="mr-4">
           <Brand />
         </div>
         <nav aria-label="Menu bar">
@@ -229,7 +244,7 @@ export default function MenuBar() {
                   aria-haspopup="menu"
                   aria-expanded={open === menu.id}
                   data-menu-trigger={menu.id}
-                  className="os-menu-trigger h-6 rounded px-2.5 text-chrome-3 aria-expanded:bg-navy aria-expanded:text-chrome-4"
+                  className="os-menu-trigger"
                   onClick={() => (open === menu.id ? setOpen(null) : openMenu(menu.id))}
                   onPointerEnter={() => open && open !== menu.id && setOpen(menu.id)}
                   onKeyDown={(e) => onTriggerKey(e, menu.id)}
