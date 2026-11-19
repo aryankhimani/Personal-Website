@@ -19,11 +19,11 @@ Third-party work used on this site, with licenses.
 | [Bricolage Grotesque](https://github.com/ateliertriay/bricolage) by Mathieu Triay | Display typeface | SIL OFL 1.1 |
 | React Bits: Variable Proximity, Rotating Text, Faulty Terminal, Decrypted Text | Hero, copied into `src/components/rb/` | MIT + Commons Clause |
 | React Bits: Split Flap Text | Menu-bar clock, ticker; copied into `src/components/rb/` (Electric Logo was used for the old boot flash, removed in Phase 6) | MIT + Commons Clause |
-| [ogl](https://github.com/oframe/ogl) | Small WebGL library used by Dither Veil and Flex Carousel | Unlicense |
+| [ogl](https://github.com/oframe/ogl) | Small WebGL library used by Flex Carousel | Unlicense |
 | [Bencho](https://bencho.dev) ASCII Wake by Lorenzo Cabra | Idea for the ASCII hero's cursor wake (heat grid + glyph ramp); the field itself is written from scratch in `src/components/hero/AsciiField.tsx` | MIT |
 | React Bits: Gradient ASCII, Scroll Float | Ideas for the ASCII field's drift; Scroll Float's "float" effect ported to plain DOM in `src/lib/motion.ts` | MIT + Commons Clause |
 | [matthisgarnier.com](https://www.matthisgarnier.com/) | Reference for the ASCII lettering look (nothing copied) | n/a |
-| React Bits: Flip Card, Flex Carousel, Paper Crumple, Refine Frame, Thought Line, Lanyard, Target Cursor, Dither Veil, Topography, Flux Lines, Tech Text, Swarm Cursor | Work folders and cards, About desk, Writing carousel, Contact, Journey, reader, section labels, rebuild finale; copied into `src/components/rb/` (Hugeicons swapped for Pixelarticons via `hugeicons-shim.tsx`) | MIT + Commons Clause |
+| React Bits: Flip Card, Flex Carousel, Paper Crumple, Refine Frame, Thought Line, Lanyard, Target Cursor, Topography, Flux Lines, Tech Text, Swarm Cursor | Work folders and cards, About desk, Writing carousel, Contact, Journey, reader, section labels, rebuild finale; copied into `src/components/rb/` (Hugeicons swapped for Pixelarticons via `hugeicons-shim.tsx`) | MIT + Commons Clause |
 | Bencho Upload dropzone | Inspiration for the feel of the image → ASCII drop box (the toy is written from scratch) | MIT |
 | [Swarm](https://califa.github.io/swarm-site/) by Joel Califa and [swarm-cursors](https://github.com/DhvanilPatel/swarm-cursors) by Dhvanil Patel | Inspiration for ~/rebuild. Neither has a license, so no code was used; `src/lib/swarm.ts` is written from scratch | n/a (inspiration only) |
 | [three.js](https://threejs.org) | Lanyard, Paper Crumple | MIT |

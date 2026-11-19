@@ -190,14 +190,39 @@
   height: min(58dvh, 34rem);
 }
 
-/* Halftone reveal: a grid of dots that grow until they merge. --dot runs 0 to 1. */
+/* Photo reveal, scrubbed by scroll: --dot runs 0 to 1. */
+[data-lite='false'] .chapter-photo-img {
+  position: relative;
+  overflow: hidden;
+}
+
+[data-lite='false'] .chapter-photo-img::before,
+[data-lite='false'] .chapter-photo-img::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  pointer-events: none;
+}
+
+/* Scan wipe: a cream beam draws the photo top to bottom, CRT scanlines fade out behind it. */
 [data-lite='false'] .chapter-photo-img picture {
-  --cell: 14px;
-  --r: calc(var(--dot, 1) * var(--cell) * 0.75);
-  -webkit-mask-image: radial-gradient(circle, #000 var(--r), transparent calc(var(--r) + 0.6px));
-  mask-image: radial-gradient(circle, #000 var(--r), transparent calc(var(--r) + 0.6px));
-  -webkit-mask-size: var(--cell) var(--cell);
-  mask-size: var(--cell) var(--cell);
+  --edge: calc(var(--dot, 1) * 108% - 4%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(var(--edge) - 3%), transparent var(--edge));
+  mask-image: linear-gradient(to bottom, #000 calc(var(--edge) - 3%), transparent var(--edge));
+}
+
+[data-lite='false'] .chapter-photo-img::before {
+  inset-block: 0;
+  background: repeating-linear-gradient(to bottom, rgb(11 20 48 / 0.35) 0 1px, transparent 1px 3px);
+  opacity: calc(1 - var(--dot, 1));
+}
+
+[data-lite='false'] .chapter-photo-img::after {
+  top: clamp(0%, calc(var(--dot, 1) * 104% - 3%), 100%);
+  height: 2px;
+  background: var(--color-cream-100);
+  box-shadow: 0 0 14px 3px rgb(255 106 61 / 0.55);
+  opacity: clamp(0, calc((1 - var(--dot, 1)) * 12), 1);
 }
 
 [data-lite='false'] .journey-rail {

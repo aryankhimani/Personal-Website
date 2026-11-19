@@ -81,7 +81,7 @@ const activeTick = (page) => page.$$eval('[data-journey-rail] li', (els) => els.
   const mid = await shown(page);
   check('scrolling moves to chapter 4, one chapter visible at a time', mid.join() === '4' && (await activeTick(page)) === 4, mid.join());
   const dot = await page.$eval('[data-chapter]:nth-child(4) [data-chapter-photo]', (e) => getComputedStyle(e).getPropertyValue('--dot'));
-  check('the photo has finished its halftone reveal', Number(dot) === 1, `--dot=${dot}`);
+  check('the photo has finished its reveal', Number(dot) === 1, `--dot=${dot}`);
   await page.screenshot({ path: '.shots/p4-journey.png' });
 
   // The link in the visible chapter opens its project window.

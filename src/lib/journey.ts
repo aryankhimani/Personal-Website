@@ -1,5 +1,6 @@
 // The pinned Journey scene. The stage stays on screen while scrolling scrubs through the
-// chapters: each one's words come in one by one and its photo grows out of halftone dots.
+// chapters: each one's words come in one by one and its photo scans in
+// top to bottom like a CRT (journey.css).
 // Loaded on demand and never in Lite mode (see Journey.astro); journey.css does the layout.
 
 import gsap from 'gsap';

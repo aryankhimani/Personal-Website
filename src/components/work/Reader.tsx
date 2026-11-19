@@ -7,11 +7,9 @@
 // doesn't move underneath). The address is #work/<slug>, so it can be shared.
 // On phones it's a full-screen sheet that slides up. Lite mode: a plain fade.
 
-import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { motion } from 'motion/react';
 import { closeWindow, focusWindow, minimizeWindow, replaceWindow, type WindowState } from '../../lib/windows';
-import { cream, ember, navy } from '../../lib/palette';
-import GlGate from '../os/GlGate';
 import { Icon } from '../os/Icon';
 import type { WindowMeta } from '../os/window-list';
 import { WORK_INDEX, workEntry } from '../os/window-list';
@@ -20,8 +18,6 @@ import { demoteHeadings, useDetail } from './WorkWindows';
 
 type Props = { meta: WindowMeta; win: WindowState; mobile: boolean; lite: boolean };
 
-const DitherVeil = lazy(() => import('../rb/DitherVeil'));
-
 export default function Reader({ meta, win, mobile, lite }: Props) {
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);
@@ -29,9 +25,6 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
   const id = meta.id;
   const entry = workEntry(id);
   const { detail, failed } = useDetail(id);
-  // The cover gets a dither veil (React Bits' Dither Veil) that your cursor wipes away.
-  const [veilOk, setVeilOk] = useState(false);
-  useEffect(() => setVeilOk(!lite && !mobile && window.matchMedia('(pointer: fine)').matches), [lite, mobile]);
 
   const { x, y, sx, sy, opacity, veil } = useGrow(id, ref, lite, mobile);
 
@@ -161,7 +154,6 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
                       aria-label={d.cover.alt}
                     />
                   ) : (
-                    <>
                     <img
                       src={d.cover.src}
                       srcSet={d.cover.srcset}
@@ -171,27 +163,6 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
                       alt={d.cover.alt}
                       decoding="async"
                     />
-                      {veilOk && (
-                        <div className="reader-veil-fx" aria-hidden="true">
-                          <GlGate priority>
-                            <Suspense fallback={null}>
-                              <DitherVeil
-                                key={d.cover.src}
-                                src={d.cover.src}
-                                fit={d.cover.fit === 'contain' ? 'contain' : 'cover'}
-                                inkColor={navy['950']}
-                                paperColor={cream['100']}
-                                rimColor={ember['500']}
-                                rim={0.5}
-                                revealRadius={180}
-                                linger={1.4}
-                                pixelSize={2}
-                              />
-                            </Suspense>
-                          </GlGate>
-                        </div>
-                      )}
-                    </>
                   )}
                 </div>
               )}
