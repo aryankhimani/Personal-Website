@@ -21,8 +21,13 @@ export type Scene = {
   draw: (g: CanvasRenderingContext2D, t: number, dt: number, p: Pointer) => void;
 };
 
-/** `still`: draw one settled frame and never loop (Lite). Re-mount (key) to change it. */
-export function useCanvasScene(make: () => Scene, { still = false }: { still?: boolean } = {}) {
+/** Whole-number pixel ratio (1 or 2) for pixel art: every art pixel lands on whole device
+ *  pixels, so sprites stay sharp. */
+export const pixelDpr = () => Math.max(1, Math.min(2, Math.round(window.devicePixelRatio || 1)));
+
+/** `still`: draw one settled frame and never loop (Lite). Re-mount (key) to change it.
+ *  `pixel`: pixel-art canvas (whole-number pixel ratio, no smoothing). */
+export function useCanvasScene(make: () => Scene, { still = false, pixel = false }: { still?: boolean; pixel?: boolean } = {}) {
   const canvas = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -42,12 +47,13 @@ export function useCanvasScene(make: () => Scene, { still = false }: { still?: b
 
     const resize = () => {
       const r = c.getBoundingClientRect();
-      const dpr = Math.min(HERO_DPR, window.devicePixelRatio || 1);
+      const dpr = pixel ? pixelDpr() : Math.min(HERO_DPR, window.devicePixelRatio || 1);
       W = Math.max(1, r.width);
       H = Math.max(1, r.height);
       c.width = Math.round(W * dpr);
       c.height = Math.round(H * dpr);
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g.imageSmoothingEnabled = !pixel;
       scene.resize(W, H);
     };
 

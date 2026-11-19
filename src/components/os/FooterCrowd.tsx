@@ -1,51 +1,97 @@
-// Footer scene: Aryan stands still in the middle while pixel people walk past on a few
-// depth lanes, like a time-lapse of a busy street. Some carry tags of his work and fields.
+// Footer scene, v2: a pixel street on the footer CRT. Aryan stands still in the middle under an
+// HUD bracket while pixel people walk past on five depth lanes; a few carry tags of his work.
+// Pixel art rules: one art-pixel size for every sprite (P CSS px), a whole-number pixel ratio,
+// no smoothing, no soft gradients. Sprites move on device pixels (not art pixels), so motion stays
+// smooth while every pixel edge stays sharp. Depth comes from tone and height on screen, not size.
 // Canvas 2D on the shared loop (pauses off-screen); Lite and reduced motion get one still frame.
-// TODO(aryan): if you'd rather stand there as yourself, a pixelated version of the cut-out
-// photo (lib/me.ts) can replace the sprite in drawAryan().
+// TODO(aryan): if you'd rather stand there as yourself, a pixelated version of your photo can
+// replace the ARYAN sprite below (same 10x19 grid).
 import { useLite } from '../../lib/device-tier';
 import { cream, ember, navy } from '../../lib/palette';
-import { rgb, rng, useCanvasScene, type Scene } from '../hero/canvas-loop';
+import { pixelDpr, rgb, rng, useCanvasScene, type Scene } from '../hero/canvas-loop';
 
-// 7x12 walker frames, facing right ('#' = filled). Mirrored for walking left.
-const TOP_A = ['..###..', '..####.', '...#...', '.#####.', '#.###.#', '#.###.#', '..###..', '..###..'];
-const TOP_B = ['..###..', '..####.', '...#...', '.#####.', '.#####.', '.#####.', '..###..', '..###..'];
-const LEG_STRIDE = ['..#.#..', '.#...#.', '.#...#.', '#.....#'];
-const LEG_HALF = ['..#.#..', '.#..#..', '.#...#.', '.#...#.'];
-const LEG_PASS = ['..#.#..', '..#.#..', '..#.#..', '..#.#..'];
-const FRAMES = [
-  [...TOP_A, ...LEG_STRIDE],
-  [...TOP_B, ...LEG_HALF],
-  [...TOP_B, ...LEG_PASS],
-  [...TOP_A, ...LEG_HALF],
-].map((rows) => {
-  const cells: [number, number][] = [];
-  rows.forEach((r, y) => [...r].forEach((ch, x) => ch === '#' && cells.push([x, y])));
-  return cells;
-});
-
-// Aryan, 9x16, standing: h hair, c skin, e ember top, n trousers, k shoes.
-const ARYAN = [
-  '..hhhh...',
-  '.hhhhhh..',
-  '.hcccch..',
-  '..cccc...',
-  '...cc....',
-  '.eeeeee..',
-  'eeeeeeee.',
-  'e.eeeee.e',
-  'e.eeeee.e',
-  'c.eeeee.c',
-  '..nnnnn..',
-  '..nn.nn..',
-  '..nn.nn..',
-  '..nn.nn..',
-  '..nn.nn..',
-  '.kkk.kkk.',
+// Walker frames, 8x16, facing right. h hair, s skin, e eye, t top, a far arm, p near leg,
+// q far leg, f shoes. Cycle: stride, pass, stride (legs swapped), pass. Pass frames sit 1px higher.
+const HEAD = ['..hhhh..', '.hhhhhh.', '.hhhses.', '.hhssss.', '..ssss..', '...ss...'];
+const STRIDE_1 = [
+  '..tttt..',
+  '.attttt.',
+  '.attttt.',
+  'a.tttt.t',
+  's.tttt.s',
+  '..pppp..',
+  '..qqpp..',
+  '.qq..pp.',
+  'qq....pp',
+  'ff....ff',
 ];
-const ARYAN_INK: Record<string, string> = { h: navy['950'], c: cream['200'], e: ember['500'], n: navy['700'], k: navy['950'] };
+const STRIDE_2 = [
+  '..tttt..',
+  '.ttttta.',
+  '.ttttta.',
+  't.tttt.a',
+  's.tttt.s',
+  '..pppp..',
+  '..ppqq..',
+  '.pp..qq.',
+  'pp....qq',
+  'ff....ff',
+];
+const PASS = [
+  '..tttt..',
+  '..tttt..',
+  '..attt..',
+  '..attt..',
+  '..sttt..',
+  '..pppp..',
+  '...qpp..',
+  '...qpp..',
+  '...qpp..',
+  '...ffff.',
+];
+type Cell = [x: number, y: number, ink: string];
+const cells = (rows: string[]): Cell[] => {
+  const out: Cell[] = [];
+  rows.forEach((r, y) => [...r].forEach((ch, x) => ch !== '.' && out.push([x, y, ch])));
+  return out;
+};
+const FRAMES = [STRIDE_1, PASS, STRIDE_2, PASS].map((body) => cells([...HEAD, ...body]));
+const LIFT = [0, 1, 0, 1];
+
+// Aryan, 10x19, facing out. o ember hoodie, O its shade, n trousers, k shoes.
+const ARYAN = cells([
+  '...hhhh...',
+  '..hhhhhh..',
+  '..hssssh..',
+  '..sesses..',
+  '..ssssss..',
+  '...ssss...',
+  '....ss....',
+  '..oooooo..',
+  '.OooooooO.',
+  '.OooooooO.',
+  '.OooooooO.',
+  '.OoOOOOoO.',
+  '.s.oooo.s.',
+  '..nnnnnn..',
+  '..nn..nn..',
+  '..nn..nn..',
+  '..nn..nn..',
+  '..nn..nn..',
+  '.kkk..kkk.',
+]);
+const ARYAN_INK: Record<string, string> = {
+  h: navy['950'],
+  s: cream['200'],
+  e: navy['950'],
+  o: ember['500'],
+  O: ember['700'],
+  n: navy['600'],
+  k: navy['950'],
+};
 
 const TAGS = ['CRISPR', 'TruthLens', 'PyTorch', 'Ivey', 'JoeyHelps', 'Youreka', 'iGEM', 'React', 'gene editing', 'AI tools', 'ventures', 'TKS'];
+const LANES = [0, 0.25, 0.5, 0.75, 1];
 
 type Walker = {
   x: number;
@@ -54,188 +100,210 @@ type Walker = {
   speed: number;
   phase: number;
   tag: string | null;
-  ink: string;
+  ink: Record<string, string>;
 };
 
-const [cr, cg, cb] = rgb(cream['100']);
-const [sr, sg, sb] = rgb(navy['300']);
+// Tones run from the navy ground up to cream: far people sit low on the ramp, near ones high.
+const lo = rgb(navy['700']);
+const hi = rgb(cream['100']);
+const tone = (k: number) => {
+  const m = Math.max(0, Math.min(1, k));
+  return `rgb(${lo.map((v, i) => Math.round(v + (hi[i] - v) * m)).join(' ')})`;
+};
 
 function makeScene(): Scene {
   const rand = rng(2029);
   let W = 0;
   let H = 0;
-  let ground = 0;
+  let P = 3; // CSS px per art pixel, the same on every screen
+  let dpr = 1;
   let walkers: Walker[] = [];
+  let skyline: HTMLCanvasElement | null = null;
+  let beacon = { x: 0, y: 0 };
   const phone = () => W < 640;
+  /** Snap to whole device pixels. */
+  const snap = (v: number) => Math.round(v * dpr) / dpr;
+  const laneY = (lane: number) => H - 6 * P - Math.round((1 - lane) * (phone() ? 12 : 14)) * P;
 
-  const scaleOf = (lane: number) => (phone() ? 2 : 2) + Math.round(lane * (phone() ? 1 : 2));
-  const spread = () => (phone() ? 44 : 72);
-  const laneY = (lane: number) => ground - spread() + lane * spread();
-  // People in front of Aryan fade as they pass him, so he never disappears in the crowd.
-  const clearOf = (w: Walker) => {
-    if (w.lane <= 0.5) return 1;
-    const d = Math.abs(w.x - W / 2) / (phone() ? 34 : 52);
-    return Math.min(1, 0.18 + d * d * 0.82);
-  };
-
-  const spawn = (x?: number): Walker => {
-    const lane = Math.round(rand() * 4) / 4;
-    const near = lane >= 0.5;
-    const mix = 0.25 + lane * 0.6;
+  const inks = (lane: number): Record<string, string> => {
+    const base = 0.12 + lane * 0.5;
+    const hot = lane >= 0.75 && rand() < 0.12;
+    const top = base + 0.08 + rand() * 0.22;
     return {
-      x: x ?? 0,
-      dir: rand() < 0.5 ? 1 : -1,
-      lane,
-      speed: (22 + rand() * 18) * (0.6 + lane * 0.8),
-      phase: rand() * 4,
-      tag: near && rand() < 0.3 ? TAGS[Math.floor(rand() * TAGS.length)] : null,
-      // Far people fade into the navy, near ones are bright cream (atmospheric depth).
-      ink: `rgb(${Math.round(sr + (cr - sr) * mix)} ${Math.round(sg + (cg - sg) * mix)} ${Math.round(sb + (cb - sb) * mix)} / ${0.35 + lane * 0.6})`,
+      h: tone(base - 0.1),
+      s: tone(base + 0.32),
+      e: tone(base - 0.12),
+      t: hot ? ember['600'] : tone(top),
+      a: hot ? ember['800'] : tone(top - 0.14),
+      p: tone(base - 0.02),
+      q: tone(base - 0.1),
+      f: tone(base - 0.16),
     };
   };
 
-  function drawWalker(g: CanvasRenderingContext2D, w: Walker, frame: number, x: number, alpha: number) {
-    const s = scaleOf(w.lane);
-    const baseY = Math.round(laneY(w.lane)) - 12 * s;
-    const left = Math.round(x) - 3 * s;
-    g.globalAlpha = alpha * clearOf(w);
-    g.fillStyle = w.ink;
-    for (const [cx, cy] of FRAMES[frame]) {
-      const px = w.dir === 1 ? cx : 6 - cx;
-      g.fillRect(left + px * s, baseY + cy * s, s, s);
+  const spawn = (lane: number, x: number): Walker => ({
+    x,
+    dir: rand() < 0.5 ? 1 : -1,
+    lane,
+    speed: (16 + rand() * 14) * (0.7 + lane * 0.7),
+    phase: rand() * 4,
+    tag: lane >= 0.75 && rand() < 0.3 ? TAGS[Math.floor(rand() * TAGS.length)] : null,
+    ink: inks(lane),
+  });
+
+  /** People in front of Aryan step down in opacity as they pass him, in hard steps. */
+  const clearOf = (w: Walker) => {
+    if (w.lane <= 0.5) return 1;
+    const d = Math.abs(w.x - W / 2) / (9 * P);
+    return d >= 1 ? 1 : Math.max(0.25, Math.ceil(d * 4) / 4);
+  };
+
+  // The city behind the street, drawn once per resize: flat navy blocks with a few lit windows.
+  function buildSkyline() {
+    const c = document.createElement('canvas');
+    c.width = Math.round(W * dpr);
+    c.height = Math.round(H * dpr);
+    const g = c.getContext('2d')!;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const r = rng(77);
+    const base = laneY(0) - 2 * P;
+    let x = -r() * 8 * P;
+    let tallest = 0;
+    while (x < W) {
+      const bw = (6 + Math.floor(r() * 10)) * P;
+      const bh = (8 + Math.floor(r() * 22)) * P;
+      g.fillStyle = r() < 0.5 ? navy['900'] : navy['800'];
+      g.fillRect(x, base - bh, bw, bh);
+      g.fillStyle = 'rgb(242 235 221 / 0.22)';
+      for (let wy = base - bh + 2 * P; wy < base - 2 * P; wy += 3 * P)
+        for (let wx = x + 2 * P; wx < x + bw - 2 * P; wx += 3 * P) if (r() < 0.22) g.fillRect(wx, wy, P, P);
+      if (bh > tallest && x > W * 0.1 && x < W * 0.9) {
+        tallest = bh;
+        beacon = { x: x + Math.floor(bw / P / 2) * P, y: base - bh - 2 * P };
+      }
+      x += bw + Math.floor(r() * 3) * P;
+    }
+    // Pavement: a solid band with a dashed kerb line on the art grid.
+    g.fillStyle = navy['900'];
+    g.fillRect(0, base, W, H - base);
+    g.fillStyle = 'rgb(242 235 221 / 0.12)';
+    for (let k = 0; k < W; k += 6 * P) g.fillRect(k, base, 3 * P, P);
+    g.fillStyle = 'rgb(242 235 221 / 0.06)';
+    for (const lane of [0.5, 1]) for (let k = 2 * P; k < W; k += 8 * P) g.fillRect(k, laneY(lane) + P, 2 * P, P);
+    skyline = c;
+  }
+
+  function drawWalker(g: CanvasRenderingContext2D, w: Walker) {
+    const f = Math.floor(w.phase) % 4;
+    const left = snap(w.x - 4 * P);
+    const top = Math.round(laneY(w.lane)) - (16 + LIFT[f]) * P;
+    g.globalAlpha = clearOf(w);
+    for (const [cx, cy, ch] of FRAMES[f]) {
+      g.fillStyle = w.ink[ch];
+      g.fillRect(left + (w.dir === 1 ? cx : 7 - cx) * P, top + cy * P, P, P);
     }
   }
 
   function drawTag(g: CanvasRenderingContext2D, w: Walker) {
-    if (!w.tag || clearOf(w) < 1 || Math.abs(w.x - W / 2) < (phone() ? 70 : 110)) return;
-    const s = scaleOf(w.lane);
-    const top = Math.round(laneY(w.lane)) - 12 * s;
-    const x = Math.round(w.x);
+    if (!w.tag || clearOf(w) < 1 || Math.abs(w.x - W / 2) < 22 * P) return;
+    const f = Math.floor(w.phase) % 4;
+    const top = Math.round(laneY(w.lane)) - (16 + LIFT[f]) * P;
     g.globalAlpha = 1;
     g.font = '10px "Departure Mono", ui-monospace, monospace';
-    const tw = Math.ceil(g.measureText(w.tag).width) + 10;
-    const ty = top - 22;
-    // A little placard on a stick.
-    g.fillStyle = cream['100'];
-    g.fillRect(x - 1 + w.dir * 2 * s, ty + 14, 2, 22 - 14 + 4 * s);
+    const tw = Math.ceil(g.measureText(w.tag).width / P + 3) * P;
+    const hand = snap(w.x + w.dir * 3 * P);
+    const ty = top - 7 * P;
+    g.fillStyle = cream['200'];
+    g.fillRect(hand, ty + 5 * P, P, 6 * P); // stick
     g.fillStyle = w.lane === 1 ? ember['500'] : cream['100'];
-    g.fillRect(x - tw / 2 + w.dir * 2 * s, ty, tw, 14);
+    g.fillRect(snap(hand - tw / 2), ty, tw, 5 * P);
     g.fillStyle = navy['950'];
     g.textBaseline = 'middle';
-    g.fillText(w.tag, x - tw / 2 + 5 + w.dir * 2 * s, ty + 7.5);
-  }
-
-  function drawAryan(g: CanvasRenderingContext2D, t: number) {
-    const s = phone() ? 4 : 6;
-    const cx = Math.round(W / 2);
-    const feet = Math.round(laneY(0.5));
-    // Spotlight cone and floor pool.
-    const cone = g.createLinearGradient(0, 0, 0, feet);
-    cone.addColorStop(0, 'rgb(242 235 221 / 0)');
-    cone.addColorStop(1, 'rgb(242 235 221 / 0.07)');
-    g.globalAlpha = 1;
-    g.fillStyle = cone;
-    g.beginPath();
-    g.moveTo(cx - 14, 0);
-    g.lineTo(cx + 14, 0);
-    g.lineTo(cx + 9 * s, feet);
-    g.lineTo(cx - 9 * s, feet);
-    g.closePath();
-    g.fill();
-    g.fillStyle = 'rgb(255 74 43 / 0.16)';
-    g.beginPath();
-    g.ellipse(cx, feet, 10 * s, 2 * s, 0, 0, Math.PI * 2);
-    g.fill();
-
-    // Breathing: one pixel up and down, slowly.
-    const bob = Math.sin(t * 1.6) > 0.6 ? -1 : 0;
-    const left = cx - Math.round(4.5 * s);
-    const top = feet - 16 * s;
-    ARYAN.forEach((row, y) =>
-      [...row].forEach((ch, x) => {
-        if (ch === '.') return;
-        g.fillStyle = ARYAN_INK[ch];
-        g.fillRect(left + x * s, top + y * s + (y < 10 ? bob : 0), s, s);
-      }),
-    );
-
-    // HUD label: brackets and a name, the one thing that holds still.
-    g.font = '11px "Departure Mono", ui-monospace, monospace';
-    g.textBaseline = 'middle';
     g.textAlign = 'center';
-    const ly = top - 18;
-    g.fillStyle = cream['100'];
-    g.fillText('aryan', cx, ly);
-    g.strokeStyle = 'rgb(255 74 43 / 0.8)';
-    g.lineWidth = 1;
-    const bw = 30;
-    g.beginPath();
-    g.moveTo(cx - bw + 4, ly - 8.5);
-    g.lineTo(cx - bw, ly - 8.5);
-    g.lineTo(cx - bw, ly + 8.5);
-    g.lineTo(cx - bw + 4, ly + 8.5);
-    g.moveTo(cx + bw - 4, ly - 8.5);
-    g.lineTo(cx + bw, ly - 8.5);
-    g.lineTo(cx + bw, ly + 8.5);
-    g.lineTo(cx + bw - 4, ly + 8.5);
-    g.stroke();
+    g.fillText(w.tag, snap(hand), ty + 2.5 * P + 0.5);
     g.textAlign = 'left';
   }
 
-  function drawFloor(g: CanvasRenderingContext2D) {
+  function drawAryan(g: CanvasRenderingContext2D, t: number) {
     g.globalAlpha = 1;
-    for (let i = 0; i < 5; i++) {
-      const y = Math.round(laneY(i / 4)) + 0.5;
-      g.strokeStyle = `rgb(242 235 221 / ${0.03 + i * 0.015})`;
-      g.setLineDash([2, 6 - i]);
-      g.beginPath();
-      g.moveTo(0, y);
-      g.lineTo(W, y);
-      g.stroke();
+    const feet = Math.round(laneY(0.5)) + P;
+    const left = snap(W / 2) - 5 * P;
+    const top = feet - 19 * P;
+    // Blink every few seconds: eyes take the skin colour for a moment.
+    const blink = t % 4.2 > 4.05;
+    // Floor mark: a pixel ember line under his feet.
+    g.fillStyle = ember['700'];
+    g.fillRect(left - P, feet, 12 * P, P);
+    for (const [cx, cy, ch] of ARYAN) {
+      g.fillStyle = blink && ch === 'e' ? ARYAN_INK.s : ARYAN_INK[ch];
+      g.fillRect(left + cx * P, top + cy * P, P, P);
     }
-    g.setLineDash([]);
+
+    // HUD bracket: ember corners on the art grid, and his name above.
+    const bx = left - 3 * P;
+    const by = top - 3 * P;
+    const bw = 16 * P;
+    const bh = 23 * P;
+    const arm = 3 * P;
+    g.fillStyle = ember['500'];
+    for (const [x, y, sx, sy] of [
+      [bx, by, 1, 1],
+      [bx + bw - P, by, -1, 1],
+      [bx, by + bh - P, 1, -1],
+      [bx + bw - P, by + bh - P, -1, -1],
+    ]) {
+      g.fillRect(sx > 0 ? x : x - arm + P, y, arm, P);
+      g.fillRect(x, sy > 0 ? y : y - arm + P, P, arm);
+    }
+    g.font = '11px "Departure Mono", ui-monospace, monospace';
+    g.textBaseline = 'bottom';
+    g.textAlign = 'center';
+    g.fillStyle = cream['100'];
+    g.fillText('aryan', snap(W / 2), by - P);
+    g.textAlign = 'left';
   }
 
   return {
     resize(w, h) {
-      const first = !W;
       W = w;
       H = h;
-      ground = H - 14;
-      const n = Math.max(8, Math.round(W / (phone() ? 42 : 52)));
-      if (first || walkers.length !== n) {
-        walkers = Array.from({ length: n }, () => spawn(rand() * W));
-        walkers.sort((a, b) => a.lane - b.lane);
-      }
+      dpr = pixelDpr();
+      P = 3;
+      const perLane = Math.max(2, Math.round(W / (phone() ? 150 : 210)));
+      walkers = LANES.flatMap((lane) => Array.from({ length: perLane }, () => spawn(lane, rand() * W)));
+      buildSkyline();
     },
     draw(g, t, dt) {
-      drawFloor(g);
+      g.globalAlpha = 1;
+      if (skyline) g.drawImage(skyline, 0, 0, W, H);
+      // The beacon on the tallest roof blinks ember, in two hard steps.
+      if (Math.floor(t * 1.2) % 2 === 0) {
+        g.fillStyle = ember['500'];
+        g.fillRect(beacon.x, beacon.y, P, P);
+      }
       let aryanDrawn = false;
       for (const w of walkers) {
+        w.x += w.dir * w.speed * dt;
+        w.phase += (w.speed / (5.5 * P)) * dt;
+        if (w.x < -8 * P || w.x > W + 8 * P) {
+          Object.assign(w, spawn(w.lane, 0));
+          w.x = w.dir === 1 ? -6 * P : W + 6 * P;
+        }
         if (!aryanDrawn && w.lane > 0.5) {
           drawAryan(g, t);
           aryanDrawn = true;
         }
-        w.x += w.dir * w.speed * dt;
-        w.phase += (w.speed / 14) * dt;
-        if (w.x < -60 || w.x > W + 60) {
-          Object.assign(w, spawn(), { lane: w.lane, ink: w.ink });
-          w.x = w.dir === 1 ? -40 : W + 40;
-        }
-        const frame = Math.floor(w.phase) % 4;
-        // Time-lapse smear: two fading ghosts behind each walker.
-        for (let k = 2; k >= 1; k--) drawWalker(g, w, (frame + 4 - k) % 4, w.x - w.dir * k * 5 * scaleOf(w.lane), 0.12 / k);
-        drawWalker(g, w, frame, w.x, 1);
+        drawWalker(g, w);
       }
       if (!aryanDrawn) drawAryan(g, t);
-      g.globalAlpha = 1;
       for (const w of walkers) drawTag(g, w);
+      g.globalAlpha = 1;
     },
   };
 }
 
 function Crowd({ still }: { still: boolean }) {
-  const ref = useCanvasScene(makeScene, { still });
+  const ref = useCanvasScene(makeScene, { still, pixel: true });
   return <canvas ref={ref} className="foot-crowd-canvas" aria-hidden="true" />;
 }
 

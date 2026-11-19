@@ -790,13 +790,287 @@
 }
 
 /* ---------- Footer ---------- */
+/* The footer is a CRT tube, the same one the boot sequence runs on: navy glass, scanlines,
+   vignette, a rolling refresh band, HUD rings behind the title and readouts in the corners. */
 
 .site-foot {
-  border-top: 1px solid var(--color-hairline);
-  padding: 5rem 0 8rem;
+  padding: 4rem 0 8rem;
 }
 
-.foot-cta,
+.foot-crt {
+  position: relative;
+  overflow: hidden;
+  margin-inline: max(1rem, calc((100% - 80rem) / 2));
+  border-radius: clamp(14px, 2.4vmin, 28px);
+  background: radial-gradient(120% 90% at 50% 35%, var(--color-navy-900) 0%, var(--color-navy-950) 62%, #05091a 100%);
+  box-shadow:
+    inset 0 0 clamp(40px, 10vmin, 120px) rgb(0 0 0 / 0.65),
+    0 0 0 1px rgb(242 235 221 / 0.08),
+    0 0 0 6px var(--color-navy-950),
+    0 0 0 7px rgb(242 235 221 / 0.06);
+  isolation: isolate;
+}
+
+/* Scanlines on top of everything (the pixel street too), then the vignette and glass sheen. */
+.foot-crt::before,
+.foot-crt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.foot-crt::before {
+  background: repeating-linear-gradient(0deg, rgb(5 9 26 / 0.45) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+}
+
+.foot-crt::after {
+  background:
+    radial-gradient(60% 40% at 28% 12%, rgb(242 235 221 / 0.05), transparent 70%),
+    radial-gradient(ellipse at center, transparent 55%, rgb(5 9 26 / 0.8) 100%);
+}
+
+.foot-roll {
+  position: absolute;
+  inset: -20% 0 auto;
+  z-index: 4;
+  height: 18%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgb(242 235 221 / 0.03), transparent);
+  animation: boot-roll 3.4s linear infinite;
+}
+
+/* HUD rings centred on the title, cut off by the tube. */
+.foot-rings {
+  position: absolute;
+  top: 9rem;
+  left: 50%;
+  z-index: 0;
+  width: min(62rem, 140%);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  fill: none;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgb(242 235 221 / 0.2));
+  /* Fade out before the street, so the HUD frames the title only. */
+  mask-image: linear-gradient(#000 52%, transparent 68%);
+}
+
+.foot-ring {
+  stroke: rgb(242 235 221 / 0.16);
+  stroke-width: 1.5;
+}
+
+.foot-ring-inner {
+  stroke: rgb(242 235 221 / 0.1);
+}
+
+.foot-ticks {
+  stroke: rgb(242 235 221 / 0.22);
+  stroke-width: 10;
+  stroke-dasharray: 0.4 2.6;
+}
+
+.foot-arc {
+  stroke: var(--color-ember-500);
+  stroke-width: 4;
+  stroke-dasharray: 14 86;
+}
+
+.foot-arc-cream {
+  stroke: rgb(242 235 221 / 0.4);
+  stroke-width: 2;
+  stroke-dasharray: 22 78;
+  stroke-dashoffset: 50;
+}
+
+.foot-spin {
+  transform-origin: 0 0;
+  animation: boot-spin 24s linear infinite;
+}
+
+.foot-hud {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5rem 2rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: rgb(242 235 221 / 0.6);
+}
+
+.foot-hud-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-ember-400);
+}
+
+.foot-hud-live i {
+  width: 6px;
+  height: 6px;
+  background: var(--color-ember-500);
+  animation: boot-blink 1.2s steps(2, jump-none) infinite;
+}
+
+.foot-cta {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  padding: 3rem 1rem 2.5rem;
+  text-align: center;
+}
+
+.foot-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--color-ember-400);
+}
+
+.foot-caret {
+  display: inline-block;
+  width: 0.6em;
+  height: 1em;
+  margin-left: 0.35em;
+  vertical-align: -0.15em;
+  background: var(--color-ember-400);
+  animation: boot-blink 1.2s steps(2, jump-none) infinite;
+}
+
+.foot-title {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 6vw, 4.5rem);
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-cream-100);
+  text-shadow: 0 0 18px rgb(242 235 221 / 0.18);
+}
+
+.foot-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 1.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+/* HUD buttons: square, hairline, cream corner brackets that turn ember on hover. */
+.foot-links a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  color: rgb(242 235 221 / 0.82);
+  background: rgb(5 9 26 / 0.55);
+  box-shadow: inset 0 0 0 1px rgb(242 235 221 / 0.1);
+  transition:
+    color 150ms var(--ease-out),
+    background-color 150ms var(--ease-out);
+}
+
+.foot-links a::before,
+.foot-links a::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 0 solid rgb(242 235 221 / 0.55);
+  transition: border-color 150ms var(--ease-out);
+}
+
+.foot-links a::before {
+  top: 0;
+  left: 0;
+  border-width: 2px 0 0 2px;
+}
+
+.foot-links a::after {
+  right: 0;
+  bottom: 0;
+  border-width: 0 2px 2px 0;
+}
+
+.foot-links a:hover {
+  color: var(--color-cream-50);
+  background: rgb(255 74 43 / 0.08);
+}
+
+.foot-links a:hover::before,
+.foot-links a:hover::after {
+  border-color: var(--color-ember-500);
+}
+
+/* The pixel street fills the bottom of the tube, edge to edge. */
+.foot-crowd {
+  position: relative;
+  z-index: 1;
+  height: 16rem;
+  margin: 0;
+}
+
+.foot-crowd-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.foot-cam {
+  position: absolute;
+  top: 0.75rem;
+  left: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  color: rgb(242 235 221 / 0.45);
+}
+
+@media (max-width: 639px) {
+  .foot-crowd {
+    height: 11rem;
+  }
+
+  .foot-cta {
+    padding-bottom: 1rem;
+  }
+
+  .foot-hud {
+    padding: 1rem 1rem 0;
+  }
+
+  .foot-cam {
+    left: 1rem;
+  }
+}
+
+[data-lite='true'] .foot-roll,
+[data-lite='true'] .foot-spin,
+[data-lite='true'] .foot-hud-live i,
+[data-lite='true'] .foot-caret {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foot-roll,
+  .foot-spin,
+  .foot-hud-live i,
+  .foot-caret {
+    animation: none;
+  }
+}
+
 .site-foot-inner {
   padding-inline: max(1rem, calc((100% - 75rem) / 2));
 }
@@ -873,6 +1147,8 @@
 }
 
 .site-foot-inner {
+  padding-inline: max(1rem, calc((100% - 80rem) / 2));
+  margin-top: 2.5rem;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
