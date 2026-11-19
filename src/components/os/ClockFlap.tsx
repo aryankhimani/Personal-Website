@@ -16,9 +16,10 @@ export default function ClockFlap({ text }: { text: string }) {
       tileColor={navy['800']}
       textColor={cream['50']}
       charset="0123456789:"
-      flipsPerChar={3}
-      flipDuration={0.08}
-      stagger={0.05}
+      // One calm flip per changed digit. Three random flips at 11px read as broken glyphs.
+      flipsPerChar={0}
+      flipDuration={0.16}
+      stagger={0.06}
       depth={0.3}
       tileStyle="minimal"
     />

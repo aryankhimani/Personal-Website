@@ -14,6 +14,7 @@
 
 import { useEffect, useRef } from 'react';
 import { cream, ember } from '../../lib/palette';
+import { HERO_DPR } from './canvas-loop';
 
 type CharSet = { name: string; ramp: string[] };
 
@@ -53,6 +54,7 @@ export default function AsciiField({ logo = defaultLogo, onSet }: Props) {
     if (!host || !c || !g) return;
 
     let dpr = 1;
+    let drawn = 0; // last drawn frame: the field runs at ~30 fps, which reads fine for text
     let W = 0;
     let H = 0;
     let cw = 10;
@@ -131,7 +133,7 @@ export default function AsciiField({ logo = defaultLogo, onSet }: Props) {
       const r = host.getBoundingClientRect();
       W = Math.max(1, Math.round(r.width));
       H = Math.max(1, Math.round(r.height));
-      dpr = Math.min(2, window.devicePixelRatio || 1);
+      dpr = Math.min(HERO_DPR, window.devicePixelRatio || 1);
       c.width = Math.round(W * dpr);
       c.height = Math.round(H * dpr);
       c.style.width = `${W}px`;
@@ -175,6 +177,11 @@ export default function AsciiField({ logo = defaultLogo, onSet }: Props) {
     const frame = (now: number) => {
       raf = 0;
       if (!visible) return;
+      if (now - drawn < 31) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+      drawn = now;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const t = now / 1000;

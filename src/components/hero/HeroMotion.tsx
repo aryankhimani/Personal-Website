@@ -29,6 +29,9 @@ export function Roles() {
       rotationInterval={2600}
       staggerDuration={0.012}
       splitBy="characters"
+      // "sync" rolls the new phrase in while the old one leaves (both stacked in one grid
+      // cell, see .hero-roles), so the line never shrinks to a bare "I".
+      animatePresenceMode="sync"
       mainClassName="hero-roles"
     />
   );

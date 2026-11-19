@@ -1,5 +1,6 @@
 // Hero 4, "Astral": a slowly turning globe of stars joined into constellations, with a few
-// red-orange signals hopping from star to star along the lines. The pointer tilts the globe
+// red-orange signals hopping from star to star along the lines, short electric arcs, and a
+// HUD (tick ring, brackets, a reticle that locks on to stars). The pointer tilts the globe
 // and lights up the stars near it.
 //
 // Written from scratch; the idea (a plexus of stars on a sphere) is inspired by React Bits
@@ -7,7 +8,9 @@
 
 import { cream, ember, navy } from '../../lib/palette';
 import { rgb, rng, useCanvasScene, type Scene } from './canvas-loop';
+import { arcs, frame, reticle } from './hud';
 
+const BUCKETS = 8; // brightness steps for batched drawing
 const NODES = 230;
 const LINKS = 3; // nearest neighbours per star
 const MAX_LINK = 0.42; // max link length, in sphere radii
@@ -68,6 +71,17 @@ function astral(): Scene {
   const px = new Float32Array(NODES);
   const py = new Float32Array(NODES);
   const pz = new Float32Array(NODES);
+  const edgeLevel = new Uint8Array(edges.length);
+  const starLevel = new Uint8Array(NODES);
+  const starSize = new Float32Array(NODES);
+  // Arcs jump along a constellation line on the near side of the globe.
+  const sparks = arcs(3, () => {
+    for (let tries = 0; tries < 12; tries++) {
+      const [a, b] = edges[Math.floor(Math.random() * edges.length)];
+      if (pz[a] > 0.15 && pz[b] > 0.15) return [a, b];
+    }
+    return null;
+  });
   const [cr, cg, cb] = rgb(cream['100']);
   const [er, eg, eb] = rgb(ember['500']);
   const [mr, mg, mb] = rgb(navy['300']);
@@ -128,23 +142,35 @@ function astral(): Scene {
         pz[i] = z2; // -1 back .. 1 front
       }
 
-      // Constellation lines, fainter at the back.
-      g.lineWidth = 0.7;
-      for (const [a, b] of edges) {
+      // Constellation lines, fainter at the back. Bucketed by brightness so the whole web is
+      // BUCKETS strokes a frame instead of one per line.
+      for (let e = 0; e < edges.length; e++) {
+        const [a, b] = edges[e];
         const z = (pz[a] + pz[b]) / 2;
         let alpha = 0.05 + 0.3 * ((z + 1) / 2) ** 2;
         if (p.inside) {
           const d = Math.hypot((px[a] + px[b]) / 2 - hx, (py[a] + py[b]) / 2 - hy);
           alpha += Math.max(0, 1 - d / (R * 0.45)) * 0.35;
         }
-        g.strokeStyle = `rgba(${cr},${cg},${cb},${alpha})`;
+        edgeLevel[e] = Math.min(BUCKETS - 1, Math.floor(alpha * BUCKETS * 1.4));
+      }
+      g.lineWidth = 0.7;
+      for (let lv = 0; lv < BUCKETS; lv++) {
         g.beginPath();
-        g.moveTo(px[a], py[a]);
-        g.lineTo(px[b], py[b]);
+        let any = false;
+        for (let e = 0; e < edges.length; e++) {
+          if (edgeLevel[e] !== lv) continue;
+          const [a, b] = edges[e];
+          g.moveTo(px[a], py[a]);
+          g.lineTo(px[b], py[b]);
+          any = true;
+        }
+        if (!any) continue;
+        g.strokeStyle = `rgba(${cr},${cg},${cb},${((lv + 0.5) / (BUCKETS * 1.4)).toFixed(3)})`;
         g.stroke();
       }
 
-      // Stars.
+      // Stars, bucketed the same way (cream and ember separately).
       for (let i = 0; i < NODES; i++) {
         const n = nodes[i];
         const front = (pz[i] + 1) / 2;
@@ -155,11 +181,30 @@ function astral(): Scene {
           alpha = Math.min(1, alpha + near * 0.5);
           size += near * 1.2;
         }
-        g.fillStyle = n.hot ? `rgba(${er},${eg},${eb},${alpha})` : `rgba(${cr},${cg},${cb},${alpha})`;
-        g.beginPath();
-        g.arc(px[i], py[i], size, 0, Math.PI * 2);
-        g.fill();
+        starLevel[i] = Math.min(BUCKETS - 1, Math.floor(alpha * BUCKETS));
+        starSize[i] = size;
       }
+      for (const hot of [false, true]) {
+        for (let lv = 0; lv < BUCKETS; lv++) {
+          g.beginPath();
+          let any = false;
+          for (let i = 0; i < NODES; i++) {
+            if (starLevel[i] !== lv || nodes[i].hot !== hot) continue;
+            g.moveTo(px[i] + starSize[i], py[i]);
+            g.arc(px[i], py[i], starSize[i], 0, Math.PI * 2);
+            any = true;
+          }
+          if (!any) continue;
+          const a = ((lv + 1) / BUCKETS).toFixed(3);
+          g.fillStyle = hot ? `rgba(${er},${eg},${eb},${a})` : `rgba(${cr},${cg},${cb},${a})`;
+          g.fill();
+        }
+      }
+
+      // The interface on top: arcs between front stars, the ring, the reticle.
+      sparks.draw(g, dt, px, py);
+      frame(g, cx, cy, R, t);
+      reticle(g, p, W, H, px, py, NODES, (i) => pz[i] > 0, (i) => `STAR ${String(i).padStart(4, '0')} · Z ${pz[i].toFixed(2)}`);
 
       // Signals: ember sparks that travel a line, then pick a neighbour and carry on.
       g.save();

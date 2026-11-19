@@ -1,6 +1,14 @@
 import AstralField from '../AstralField';
+import HeroHud from '../HeroHud';
 
-/** A turning globe of connected stars, with red-orange signals running the lines. */
+const UNITS: [string, string] = ['RA', 'DEC'];
+
+/** A turning globe of connected stars, with red-orange signals and arcs, under a HUD. */
 export default function AstralVisual() {
-  return <AstralField />;
+  return (
+    <>
+      <AstralField />
+      <HeroHud sector="04" title="STAR MAP" units={UNITS} />
+    </>
+  );
 }

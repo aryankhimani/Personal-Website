@@ -126,6 +126,9 @@ async function floatHeadings(headings: HTMLElement[]) {
           start: 'center bottom+=50%',
           end: 'bottom bottom-=40%',
           scrub: true,
+          // Letters only get their own GPU layer while they're moving. 130 always-on layers
+          // made every scroll frame slower to composite.
+          onToggle: (self) => h.classList.toggle('is-floating', self.isActive),
         },
       },
     );

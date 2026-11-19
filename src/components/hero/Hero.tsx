@@ -125,7 +125,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {animated && hero !== 'terminal' && (
+      {animated && hero === 'liquid-metal' && (
         <Suspense fallback={null}>
           <GlassLens area={ref} />
         </Suspense>

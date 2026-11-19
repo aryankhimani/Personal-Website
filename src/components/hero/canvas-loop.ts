@@ -4,6 +4,10 @@
 
 import { useEffect, useRef } from 'react';
 
+/** Pixel-ratio cap for the full-screen hero canvases. At 2x a 1440px hero is ~5 million
+ *  pixels redrawn every frame; at 1.5x it's under 3 million and looks the same on stars. */
+export const HERO_DPR = 1.5;
+
 export type Pointer = {
   /** Pointer position as -1..1 across the canvas, eased; 0,0 when away. */
   x: number;
@@ -37,7 +41,7 @@ export function useCanvasScene(make: () => Scene) {
 
     const resize = () => {
       const r = c.getBoundingClientRect();
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const dpr = Math.min(HERO_DPR, window.devicePixelRatio || 1);
       W = Math.max(1, r.width);
       H = Math.max(1, r.height);
       c.width = Math.round(W * dpr);

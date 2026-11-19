@@ -19,6 +19,7 @@ export default function TerminalVisual() {
         mouseReact
         mouseStrength={0.3}
         pageLoadAnimation
+        dpr={1}
       />
       <div className="hero-terminal-lines">
         {LINES.map((line, i) => (

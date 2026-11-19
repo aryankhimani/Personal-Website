@@ -9,6 +9,7 @@
 
 import { cream, ember, navy } from '../../lib/palette';
 import { rgb, rng, useCanvasScene, type Scene } from './canvas-loop';
+import { arcs, frame, reticle } from './hud';
 
 const TWIST = 3.4; // how far the ellipses turn from core to rim, in radians
 const SQUASH = 0.58; // ellipse minor/major ratio: lower = stronger arms
@@ -26,7 +27,29 @@ function galaxy(): Scene {
   let cx = 0;
   let cy = 0;
   let R = 0;
-  let pos = new Float32Array(0);
+  let px = new Float32Array(0);
+  let py = new Float32Array(0);
+
+  // Arcs leap between two neighbouring stars in the arms.
+  const sparks = arcs(3, () => {
+    if (!stars.length) return null;
+    for (let tries = 0; tries < 6; tries++) {
+      const a = Math.floor(Math.random() * stars.length);
+      if (stars[a].r < 0.2 || stars[a].r > 0.75) continue;
+      let best = -1;
+      let bd = Infinity;
+      for (let k = 0; k < 260; k++) {
+        const b = Math.floor(Math.random() * stars.length);
+        const d = Math.hypot(px[b] - px[a], py[b] - py[a]);
+        if (d > 14 && d < 52 && d < bd) {
+          bd = d;
+          best = b;
+        }
+      }
+      if (best >= 0) return [a, best];
+    }
+    return null;
+  });
 
   const seed = (count: number) => {
     stars = Array.from({ length: count }, () => {
@@ -43,7 +66,8 @@ function galaxy(): Scene {
         tone: hot ? 3 : r < 0.18 ? 0 : r < 0.55 ? 1 : 2,
       };
     });
-    pos = new Float32Array(count * 3);
+    px = new Float32Array(count);
+    py = new Float32Array(count);
     sky = Array.from({ length: 140 }, () => ({ x: rand(), y: rand(), s: 0.4 + rand() * 0.7 }));
   };
 
@@ -98,9 +122,8 @@ function galaxy(): Scene {
             y += (dy / d) * push;
           }
         }
-        pos[i * 3] = x;
-        pos[i * 3 + 1] = y;
-        pos[i * 3 + 2] = s.r;
+        px[i] = x;
+        py[i] = y;
       }
 
       // The core glow first, then the stars on top, added like light.
@@ -126,7 +149,7 @@ function galaxy(): Scene {
             const lv = fade > 0.66 ? 2 : fade > 0.33 ? 1 : 0;
             if (lv !== level) continue;
             const z = s.size;
-            g.rect(pos[i * 3] - z / 2, pos[i * 3 + 1] - z / 2, z, z);
+            g.rect(px[i] - z / 2, py[i] - z / 2, z, z);
           }
           g.fillStyle = `rgba(${r},${gg},${b},${tone === 3 ? 0.9 : 0.42 + level * 0.26})`;
           g.fill();
@@ -140,6 +163,21 @@ function galaxy(): Scene {
       g.fillStyle = heart;
       g.fillRect(cx - R * 0.06, cy - R * 0.06, R * 0.12, R * 0.12);
       g.restore();
+
+      // The interface on top: arcs in the arms, a ring flattened to the disc, the reticle.
+      sparks.draw(g, dt, px, py);
+      frame(g, cx, cy, R * 0.82, t, Math.max(0.42, ct + 0.05));
+      reticle(
+        g,
+        p,
+        W,
+        H,
+        px,
+        py,
+        stars.length,
+        (i) => stars[i].size > 1.1 || stars[i].tone === 3,
+        (i) => `STAR ${String(i).padStart(4, '0')} · R ${(stars[i].r * 15).toFixed(1)} KPC`,
+      );
     },
   };
 }

@@ -8,7 +8,16 @@ Aryan's usage is limited: keep sessions small, read only what a task needs, and 
 - Done: Phases 0-5, and Phase 5B steps 1-9 (colour system, boot v2, ASCII field, glass lens, liquid metal, project reader, React Bits/Bencho components, ~/rebuild swarm, CRT toggle, secret terminal, 404 dialog). `git log --oneline | head -20` has the details.
 - Fixed Nov 16: `npm run dev` crashed on a React type import in `src/components/rb/SplitFlapText.tsx` (now `import { type CSSProperties, type HTMLAttributes, ... }`).
 - Phase 6 step 1 done (Nov 18): heroes 4 Astral (`AstralField.tsx`, star globe) and 5 Orbits (`OrbitSystem.tsx`, spiral galaxy), canvas 2D via `hero/canvas-loop.ts`, stills in `public/hero/`. Switcher now 1/5.
-- Next (Phase 6, one per session): hero 6 (propose 2 21st.dev pop-up heroes to Aryan first), then copy pass, a11y pass, perf pass (first-load JS ~191 KB vs 150 KB budget), Unslop audit, OG/sitemap/favicon, remove `/colour` route. Then Phase 7 launch.
+- Phase 6 (final) plan: `_private/phase6-plan.md` (replaces the old hero-6 plan; hero 6 skipped). One step per session; read only that step. "continue Phase 6" = do the first unchecked step.
+  - [x] Step 1 (Nov 18): hero DPR cap 1.5, ASCII field ~30 fps, batched Astral drawing, heading letters only layered while moving; lens only on hero 1; arcs + HUD (`hud.ts`, `HeroHud.tsx`); HUD moved clear of desktop icons on phones; tagline + clock fixed. Perf at 4x CPU: ASCII hover 39 -> 60 fps, rest already 60. First-load JS still ~285 KB raw (Step 8). Tools: `scripts/perf-hero.mjs`, `perf-scroll.mjs`, `perf-profile.mjs`. Stop old dev/preview servers before testing.
+  - [ ] Step 2: opening v3, CRT/HUD terminal boot then anime.js-style grid-cell breakdown of the name (≤5 s, skippable)
+  - [ ] Step 3: motion.dev-style orb behind the liquid-metal AK (one canvas or CSS fake)
+  - [ ] Step 4: storyboard scroll, Aryan's photo travels from hero to About (GSAP Flip; phones = fade)
+  - [ ] Step 5: liquid-glass folders in one row, top 3 in front + rest blurred, folder expands to #work/<folder> page
+  - [ ] Step 6: header v2 (AK logo not red dot, refined type, glass bar), remove mouse-reactive red tab, dock auto-hide
+  - [ ] Step 7: footer, Aryan stands still while pixel walkers pass; contact + "Let's build something." above
+  - [ ] Step 8: polish (copy, colour, a11y, perf ≤150 KB / Lighthouse ≥90, Unslop, remove /colour, OG/sitemap/robots/favicon, final walkthrough)
+  - Also from Nov 18 notes: hero composition (drop floating desktop icons), tighten navy gap between Work and Journey.
 - Open TODO(aryan) items: grep -rn "TODO(aryan)" src
 
 ## The full plan

@@ -1,6 +1,14 @@
 import OrbitSystem from '../OrbitSystem';
+import HeroHud from '../HeroHud';
 
-/** A tilted two-armed spiral galaxy that the pointer bends. */
+const UNITS: [string, string] = ['AZ', 'EL'];
+
+/** A tilted two-armed spiral galaxy that the pointer bends, under a HUD. */
 export default function OrbitsVisual() {
-  return <OrbitSystem />;
+  return (
+    <>
+      <OrbitSystem />
+      <HeroHud sector="05" title="ORBITS" units={UNITS} />
+    </>
+  );
 }
