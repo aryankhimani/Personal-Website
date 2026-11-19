@@ -443,19 +443,18 @@
   transition: none;
 }
 
-/* ---------- Boot screen (v3: CRT terminal + HUD, then the name breaks down) ---------- */
+/* ---------- Boot screen (v4: CRT terminal + HUD, split-flap name, CRT off) ---------- */
 
 #boot {
   display: none;
 }
 
 [data-boot] #boot {
-  --b: 0; /* breakdown progress, set by lib/boot.ts */
   position: fixed;
   inset: 0;
   z-index: 100;
   display: block;
-  background: rgb(5 9 26 / calc(1 - var(--b)));
+  background: #05091a;
   color: var(--color-cream-100);
   cursor: pointer;
   touch-action: none;
@@ -473,7 +472,6 @@
   font-size: 0.6875rem;
   line-height: 1.55;
   transform-origin: 50% 50%;
-  opacity: calc(1 - var(--b) * 1.4);
   animation: crt-on 460ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
@@ -531,6 +529,32 @@
   100% {
     transform: scale(1, 1);
     filter: brightness(1);
+  }
+}
+
+/* CRT off: the picture collapses to a line, then a dot, and the desktop shows through. */
+#boot.boot-off .boot-crt {
+  animation: crt-off 360ms cubic-bezier(0.6, 0, 0.8, 0.4) forwards;
+}
+
+#boot.boot-off {
+  background: transparent;
+  transition: background-color 260ms ease-in 120ms;
+}
+
+@keyframes crt-off {
+  0% {
+    transform: scale(1, 1);
+    filter: brightness(1);
+  }
+  45% {
+    transform: scale(1, 0.004);
+    filter: brightness(5);
+  }
+  100% {
+    transform: scale(0, 0.004);
+    filter: brightness(8);
+    opacity: 0.6;
   }
 }
 
@@ -675,8 +699,9 @@
   }
 }
 
-[data-boot-phase='cells'] .boot-logo,
-[data-boot-phase='ready'] .boot-logo {
+[data-boot-phase='title'] .boot-logo,
+[data-boot-phase='ready'] .boot-logo,
+[data-boot-phase='off'] .boot-logo {
   animation: boot-logo-out 300ms ease-in forwards;
 }
 
@@ -690,15 +715,49 @@
   }
 }
 
-/* The name's grid cells (drawn by lib/boot.ts), with a phosphor glow. */
-#boot-cells {
+/* "ARYAN OS" on split-flap tiles in the middle of the rings (BootTitle island). */
+.boot-title {
   position: absolute;
-  inset: 0;
-  z-index: 4;
-  width: 100%;
-  height: 100%;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  translate: -50% -50%;
+  overflow: hidden;
+  padding: 0.5rem;
+  filter: drop-shadow(0 0 14px rgb(242 235 221 / 0.18));
+}
+
+.boot-flap .split-flap-text__tile {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    0 0 0 1px rgb(242 235 221 / 0.08);
+}
+
+/* One phosphor scan line across the title once it has landed. */
+.boot-sweep {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 22%;
   pointer-events: none;
-  filter: drop-shadow(0 0 6px rgb(242 235 221 / 0.35));
+  background: linear-gradient(90deg, transparent, rgb(255 74 43 / 0.28), rgb(242 235 221 / 0.35), transparent);
+  mix-blend-mode: screen;
+  translate: -120% 0;
+  opacity: 0;
+}
+
+[data-boot-phase='ready'] .boot-sweep {
+  animation: boot-sweep 700ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes boot-sweep {
+  0% {
+    translate: -120% 0;
+    opacity: 1;
+  }
+  100% {
+    translate: 560% 0;
+    opacity: 1;
+  }
 }
 
 #boot-log {
@@ -802,7 +861,7 @@
 [data-boot='lite'] .boot-skip,
 [data-boot='lite'] .boot-hud,
 [data-boot='lite'] .boot-roll,
-[data-boot='lite'] #boot-cells {
+[data-boot='lite'] .boot-title {
   display: none;
 }
 

@@ -1,4 +1,4 @@
-// Boot v3: scroll drives the breakdown, the page stays put underneath, a tap skips on phones,
+// Boot v4: the split-flap name shows, a scroll clicks the CRT off early, the page stays put underneath, a tap skips on phones,
 // and frame times stay smooth. Usage: node scripts/test-boot.mjs [baseUrl] [shotsDir]
 // (needs `npm run preview` running). Pass a shots dir to save two frames.
 import puppeteer from 'puppeteer-core';
@@ -32,11 +32,10 @@ async function open(vp) {
       requestAnimationFrame(f);
     };
     requestAnimationFrame(f);
-    // When the breakdown starts moving and when the boot ends.
+    // When the CRT-off starts and when the boot ends.
     window.__bt = {};
     const watch = (n) => {
-      const v = parseFloat(document.getElementById('boot')?.style.getPropertyValue('--b') || '0');
-      if (v > 0 && !window.__bt.start) window.__bt.start = n;
+      if (document.getElementById('boot')?.classList.contains('boot-off') && !window.__bt.start) window.__bt.start = n;
       if (window.__bt.start && !document.documentElement.dataset.boot) return void (window.__bt.end = n);
       requestAnimationFrame(watch);
     };
@@ -50,6 +49,8 @@ async function open(vp) {
   const p = await open({ width: 1440, height: 900 });
   const t0 = Date.now();
   await sleep(2300);
+  check('the split-flap name is showing', (await p.$$eval('#boot .split-flap-text__tile', (t) => t.length)) >= 8);
+  check('the old grid-cell name is gone', !(await p.$('#boot-cells')));
   if (shots) await p.screenshot({ path: `${shots}/boot-desk.jpg`, type: 'jpeg', quality: 60 });
   await p.mouse.move(700, 450);
   for (let i = 0; i < 6; i++) {
@@ -64,11 +65,12 @@ async function open(vp) {
     const f = window.__f.slice(5).sort((a, b) => a - b);
     return { y: scrollY, slow: f.filter((x) => x > 33).length, p95: +f[Math.floor(f.length * 0.95)].toFixed(1) };
   });
-  check('scrolling breaks the name apart early', took < 3600, `${took}ms`);
+  check('scrolling enters the desktop early', took < 3600, `${took}ms`);
   const bt = await p.evaluate(() => window.__bt.end - window.__bt.start);
-  check('the breakdown is visible (takes at least 0.6s)', bt >= 600, `${Math.round(bt)}ms`);
+  check('the CRT-off is visible (at least 0.3s)', bt >= 300, `${Math.round(bt)}ms`);
   check('the page stays at the top under the boot', r.y === 0, `scrollY=${r.y}`);
   check('boot frames stay smooth', r.p95 < 20 && r.slow < 6, `p95=${r.p95}ms, frames over 33ms=${r.slow}`);
+  await sleep(500); // the boot swallows the rest of the entering gesture
   await p.mouse.wheel({ deltaY: 400 });
   await sleep(800);
   check('the page scrolls normally afterwards', (await p.evaluate(() => scrollY)) > 100);

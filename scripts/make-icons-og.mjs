@@ -28,7 +28,7 @@ await page.evaluateOnNewDocument(() => sessionStorage.setItem('aryan-os:booted',
 await page.goto(base, { waitUntil: 'networkidle2' });
 await new Promise((r) => setTimeout(r, 2500));
 // No dock or hero switch in the preview image.
-await page.addStyleTag({ content: '.os-dock,.hero-switch,.photo-fly,.hero-cutout{display:none!important}' });
+await page.addStyleTag({ content: '.os-dock,.hero-switch{display:none!important}' });
 writeFileSync('public/og.jpg', await page.screenshot({ type: 'jpeg', quality: 82 }));
 await browser.close();
 console.log('wrote apple-touch-icon.png, favicon-32.png, og.jpg');

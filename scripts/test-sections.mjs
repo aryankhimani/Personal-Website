@@ -154,7 +154,8 @@ const insideCanvas = (page) =>
   const ext = await page.$$eval('[data-writing] a', (els) => els.every((a) => a.target === '_blank' && a.rel.includes('noopener')));
   check('writing links open in a new tab, safely', ext);
 
-  check('me.md has a heading, photo with alt text, and skills', (await page.$eval('#about h2', (e) => e.textContent)) === 'Hi, I’m Aryan.' && (await page.$eval('#about img', (e) => e.alt.length > 10)) && (await page.$$('#about .work-tags li')).length >= 15);
+  check('me.md has a heading and skills; the desk has the badge and a resume link', (await page.$eval('#about h2', (e) => e.textContent)) === 'Hi, I’m Aryan.' && (await page.$$('#about .work-tags li')).length >= 15 && Boolean(await page.$('#about .desk-badge')) && Boolean(await page.$('#about a.desk-resume')));
+  check('no photo stack or folding resume in About', (await page.$('#about .card-swap, #about .bill-stage, #about [data-photo-slot]')) === null);
 
   // Compose: Send builds a mailto link from the fields.
   await goTo(page, '#contact');

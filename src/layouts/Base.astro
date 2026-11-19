@@ -4,6 +4,7 @@ import Dock from '../components/os/Dock';
 import Footer from '../components/os/Footer.astro';
 import MenuBar from '../components/os/MenuBar';
 import WindowManager from '../components/os/WindowManager';
+import BootTitle from '../components/os/BootTitle';
 import { getProjects, toIndexEntry } from '../lib/projects';
 import { INDEX_ELEMENT_ID } from '../lib/work';
 import heroFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
@@ -132,6 +133,7 @@ const ogImage = new URL('/og.jpg', Astro.site).href;
             <div class="boot-logo">
               <img src="/logo.svg" alt="" width="96" height="96" />
             </div>
+            <div class="boot-title"><BootTitle client:load /><i class="boot-sweep" /></div>
             <pre id="boot-log" data-projects={projectCount} />
             <p class="boot-read"><span>AK/OS · BOOT</span><span id="boot-clock">T+0.00</span></p>
             <div class="boot-progress">
@@ -141,7 +143,6 @@ const ogImage = new URL('/og.jpg', Astro.site).href;
             <p class="boot-skip">Scroll to enter <span class="boot-dim">· any key to skip</span></p>
             <i class="boot-roll" />
           </div>
-          <canvas id="boot-cells" />
         </div>
       )
     }
@@ -165,12 +166,10 @@ const ogImage = new URL('/og.jpg', Astro.site).href;
       import { runBoot } from '../lib/boot';
       import { bindWindowLinks } from '../lib/windows';
       import { initMotion } from '../lib/motion';
-      import { initStoryboard } from '../lib/storyboard';
       import { initEasterEgg } from '../lib/easter';
       import '../components/os/window-list';
       initScroll();
       initMotion();
-      initStoryboard();
       initEasterEgg();
       runBoot();
       bindWindowLinks();
