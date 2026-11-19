@@ -33,11 +33,33 @@ const sleep = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms))
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
+// While the panel is off-screen every tween freezes (no frames) and picks up where it left off.
+let offscreen = false;
+let wakers: (() => void)[] = [];
+const setOffscreen = (v: boolean) => {
+  offscreen = v;
+  if (!v) {
+    const w = wakers;
+    wakers = [];
+    w.forEach((f) => f());
+  }
+};
+
 function tween(ms: number, step: (t: number) => void, ease = easeInOut): Promise<void> {
   return new Promise((resolve) => {
-    const t0 = performance.now();
+    let elapsed = 0;
+    let prev = performance.now();
     const frame = (now: number) => {
-      const t = Math.min(1, (now - t0) / ms);
+      if (offscreen) {
+        wakers.push(() => {
+          prev = performance.now();
+          requestAnimationFrame(frame);
+        });
+        return;
+      }
+      elapsed += Math.min(now - prev, 100);
+      prev = now;
+      const t = Math.min(1, elapsed / ms);
       step(ease(t));
       if (t < 1) requestAnimationFrame(frame);
       else resolve();
@@ -313,4 +335,5 @@ export function initRebuild(root: HTMLElement): void {
     { threshold: 0.55 },
   );
   io.observe(canvas);
+  new IntersectionObserver(([e]) => setOffscreen(!e.isIntersecting)).observe(root);
 }

@@ -282,7 +282,7 @@ const ItemCard = ({ item }: { item: CardSwapItem }) => (
       )}
       {item.image && (
         <div className="card-swap-media">
-          <img src={item.image} alt={item.alt ?? item.title ?? ''} draggable={false} />
+          <img src={item.image} alt={item.alt ?? item.title ?? ''} draggable={false} loading="lazy" decoding="async" />
         </div>
       )}
     </div>

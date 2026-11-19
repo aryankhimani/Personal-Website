@@ -1,4 +1,4 @@
-// React Bits Split Flap Text (https://reactbits.dev/text-animations/split-flap-text), MIT + Commons Clause, by David Haz. Copied unchanged.
+// React Bits Split Flap Text (https://reactbits.dev/text-animations/split-flap-text), MIT + Commons Clause, by David Haz. Copied; one change: the cycle waits while the board is off-screen.
 'use client';
 
 import { type CSSProperties, type HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react';
@@ -218,6 +218,17 @@ const SplitFlapText = ({
     timingRef.current = timing;
   }, [timing]);
 
+  // Aryan OS: don't cycle phrases while the board is scrolled off-screen.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const onScreenRef = useRef(true);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => (onScreenRef.current = e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -343,7 +354,7 @@ const SplitFlapText = ({
       timer = setTimeout(() => {
         if (cancelled) return;
 
-        if (document.hidden) {
+        if (document.hidden || !onScreenRef.current) {
           scheduleNext(timingRef.current.holdMs);
           return;
         }
@@ -427,7 +438,7 @@ const SplitFlapText = ({
   };
 
   return (
-    <div className={rootClass} style={componentStyle} {...props}>
+    <div ref={rootRef} className={rootClass} style={componentStyle} {...props}>
       <span className="split-flap-text__sr">{label}</span>
       {tiles.map((tile, index) => (
         <span
