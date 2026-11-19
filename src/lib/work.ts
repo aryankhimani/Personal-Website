@@ -3,13 +3,21 @@
 export const FOLDER_IDS = ['research', 'ventures', 'code', 'programs', 'talks'] as const;
 export type FolderId = (typeof FOLDER_IDS)[number];
 
-export const FOLDERS: { id: FolderId; note: string }[] = [
-  { id: 'research', note: 'Labs and research programs' },
-  { id: 'ventures', note: 'Companies I started or joined early' },
-  { id: 'code', note: 'Things I built' },
-  { id: 'programs', note: 'Programs, clubs and teams' },
-  { id: 'talks', note: 'Talks and videos' },
+/** `top`: the best three, shown clearly in front of each folder (Aryan picked these, Nov 18). */
+export const FOLDERS: { id: FolderId; note: string; top: string[] }[] = [
+  { id: 'research', note: 'Labs and research programs', top: ['okamoto-lab', 'youreka', 'prevent-project'] },
+  { id: 'ventures', note: 'Companies I started or joined early', top: ['joeyhelps', 'craftnova', 'jobby'] },
+  { id: 'code', note: 'Things I built', top: ['truthlens', 'okamoto-lab', 'ascendance-kingdom'] },
+  { id: 'programs', note: 'Programs, clubs and teams', top: ['western-founders-network', 'tks', 'shad'] },
+  { id: 'talks', note: 'Talks and videos', top: ['teded', 'mamita-health'] },
 ];
+
+/** A folder's projects with its top picks first, the rest in their usual order. */
+export function topFirst<T extends { id: string }>(folder: FolderId, items: T[]): T[] {
+  const top = FOLDERS.find((f) => f.id === folder)?.top ?? [];
+  const rank = (id: string) => (top.includes(id) ? top.indexOf(id) : top.length);
+  return items.map((p, i) => ({ p, i })).sort((a, b) => rank(a.p.id) - rank(b.p.id) || a.i - b.i).map(({ p }) => p);
+}
 
 export const isFolderId = (id: string): id is FolderId => (FOLDER_IDS as readonly string[]).includes(id);
 

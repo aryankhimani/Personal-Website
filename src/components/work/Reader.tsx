@@ -8,35 +8,24 @@
 // On phones it's a full-screen sheet that slides up. Lite mode: a plain fade.
 
 import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react';
-import { animate, motion, useMotionValue, usePresence } from 'motion/react';
-import {
-  closeWindow,
-  focusWindow,
-  minimizeWindow,
-  openerRect,
-  replaceWindow,
-  type WindowState,
-} from '../../lib/windows';
+import { motion } from 'motion/react';
+import { closeWindow, focusWindow, minimizeWindow, replaceWindow, type WindowState } from '../../lib/windows';
 import { cream, ember, navy } from '../../lib/palette';
 import GlGate from '../os/GlGate';
 import { Icon } from '../os/Icon';
 import type { WindowMeta } from '../os/window-list';
 import { WORK_INDEX, workEntry } from '../os/window-list';
+import { useGrow, trapTab as trap } from './useGrow';
 import { demoteHeadings, useDetail } from './WorkWindows';
 
 type Props = { meta: WindowMeta; win: WindowState; mobile: boolean; lite: boolean };
 
 const DitherVeil = lazy(() => import('../rb/DitherVeil'));
 
-const EASE = [0.22, 1, 0.36, 1] as const;
-const FOCUSABLE =
-  'a[href], button:not([disabled]), input, select, textarea, video[controls], [tabindex]:not([tabindex="-1"])';
-
 export default function Reader({ meta, win, mobile, lite }: Props) {
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
-  const [isPresent, safeToRemove] = usePresence();
   const id = meta.id;
   const entry = workEntry(id);
   const { detail, failed } = useDetail(id);
@@ -44,88 +33,11 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
   const [veilOk, setVeilOk] = useState(false);
   useEffect(() => setVeilOk(!lite && !mobile && window.matchMedia('(pointer: fine)').matches), [lite, mobile]);
 
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const sx = useMotionValue(1);
-  const sy = useMotionValue(1);
-  const opacity = useMotionValue(0);
-  const veil = useMotionValue(0);
+  const { x, y, sx, sy, opacity, veil } = useGrow(id, ref, lite, mobile);
 
   const index = WORK_INDEX.findIndex((p) => p.id === id);
   const prev = index > 0 ? WORK_INDEX[index - 1] : undefined;
   const next = index >= 0 && index < WORK_INDEX.length - 1 ? WORK_INDEX[index + 1] : undefined;
-
-  // FLIP: start as the card that was clicked, grow to the reader's box.
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const stops: { stop: () => void }[] = [];
-    if (lite) {
-      stops.push(animate(opacity, 1, { duration: 0.15 }), animate(veil, 1, { duration: 0.15 }));
-    } else if (mobile) {
-      y.set(window.innerHeight);
-      opacity.set(1);
-      stops.push(animate(y, 0, { duration: 0.34, ease: EASE }), animate(veil, 1, { duration: 0.3 }));
-    } else {
-      const from = openerRect(id);
-      const to = el.getBoundingClientRect();
-      if (from) {
-        x.set(from.left + from.width / 2 - (to.left + to.width / 2));
-        y.set(from.top + from.height / 2 - (to.top + to.height / 2));
-        sx.set(Math.max(0.05, from.width / to.width));
-        sy.set(Math.max(0.05, from.height / to.height));
-        opacity.set(0.4);
-      } else {
-        y.set(24);
-        sx.set(0.97);
-        sy.set(0.97);
-      }
-      const t = { duration: 0.46, ease: EASE };
-      stops.push(
-        animate(x, 0, t),
-        animate(y, 0, t),
-        animate(sx, 1, t),
-        animate(sy, 1, t),
-        animate(opacity, 1, { duration: 0.2 }),
-        animate(veil, 1, { duration: 0.3 }),
-      );
-    }
-    el.focus({ preventScroll: true });
-    return () => stops.forEach((s) => s.stop());
-    // Once per open.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Close: shrink back into the card (or slide down / fade).
-  useEffect(() => {
-    if (isPresent) return;
-    const el = ref.current;
-    if (lite || !el) {
-      animate(veil, 0, { duration: 0.12 });
-      animate(opacity, 0, { duration: 0.12 }).then(safeToRemove);
-      return;
-    }
-    animate(veil, 0, { duration: 0.28 });
-    if (mobile) {
-      animate(y, window.innerHeight, { duration: 0.26, ease: 'easeIn' }).then(safeToRemove);
-      return;
-    }
-    const to = openerRect(id);
-    const box = el.getBoundingClientRect();
-    const t = { duration: 0.32, ease: [0.5, 0, 0.75, 0] as const };
-    if (to) {
-      animate(x, to.left + to.width / 2 - (box.left + box.width / 2), t);
-      animate(y, to.top + to.height / 2 - (box.top + box.height / 2), t);
-      animate(sx, Math.max(0.05, to.width / box.width), t);
-      animate(sy, Math.max(0.05, to.height / box.height), t);
-      animate(opacity, 0, { duration: 0.3, ease: 'easeIn' }).then(safeToRemove);
-    } else {
-      animate(sy, 0.97, t);
-      animate(sx, 0.97, t);
-      animate(opacity, 0, { duration: 0.2 }).then(safeToRemove);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPresent]);
 
   // A new project in the same reader starts at the top.
   useEffect(() => {
@@ -145,21 +57,7 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
   }, [id, prev, next]);
 
   // It's modal: Tab stays inside.
-  function trapTab(e: React.KeyboardEvent) {
-    if (e.key !== 'Tab' || !ref.current) return;
-    const items = [...ref.current.querySelectorAll<HTMLElement>(FOCUSABLE)];
-    if (!items.length) return;
-    const first = items[0];
-    const last = items[items.length - 1];
-    const active = document.activeElement;
-    if (e.shiftKey && (active === first || active === ref.current)) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && active === last) {
-      e.preventDefault();
-      first.focus();
-    }
-  }
+  const trapTab = (e: React.KeyboardEvent) => trap(e, ref.current);
 
   const d = detail;
   const page = `/work/${id}/`;

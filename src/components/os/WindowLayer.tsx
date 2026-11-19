@@ -3,9 +3,11 @@
 
 import { AnimatePresence } from 'motion/react';
 import type { WindowState } from '../../lib/windows';
+import FolderPage from '../work/FolderPage';
 import Reader from '../work/Reader';
 import WorkWindow from '../work/WorkWindows';
-import { isProject } from '../../lib/windows';
+import { isFolderPage, isProject } from '../../lib/windows';
+import { isFolderId } from '../../lib/work';
 import Window, { type Bounds } from './Window';
 import { WINDOW_CONTENT } from './window-content';
 import { windowMeta } from './window-list';
@@ -32,6 +34,12 @@ export default function WindowLayer({ windows, focused, bounds, mobile, lite }: 
           const Fixed = WINDOW_CONTENT[win.id];
           // Projects open in the reader (focus mode); everything else is a small window.
           // One reader at a time, kept mounted while it switches project (prev / next).
+          // Folders open as a full page that lists the folder.
+          if (!Fixed && isFolderPage(win.id) && isFolderId(win.id)) {
+            return (
+              <FolderPage key={`folder-${win.id}-${mobile ? 'sheet' : 'desk'}`} folder={win.id} win={win} mobile={mobile} lite={lite} />
+            );
+          }
           if (!Fixed && isProject(win.id)) {
             if (win.id !== topReader) return null;
             return <Reader key={`reader-${mobile ? 'sheet' : 'desk'}`} meta={meta} win={win} mobile={mobile} lite={lite} />;

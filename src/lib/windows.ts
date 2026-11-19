@@ -2,6 +2,7 @@
 // A tiny external store: islands are separate React roots, so context can't span them.
 
 import { useSyncExternalStore } from 'react';
+import { isFolderId } from './work';
 
 export type Point = { x: number; y: number };
 
@@ -28,7 +29,9 @@ const openers = new Map<string, HTMLElement>();
 let knownIds = new Set<string>();
 /** Projects open in the reader and live at #work/<slug> (old #<slug> links still work). */
 let projectIds = new Set<string>();
-const hashFor = (id: string) => (projectIds.has(id) ? `work/${id}` : id);
+/** Full-page views (focus mode): projects in the reader and folders as a folder page. */
+const isPage = (id: string) => projectIds.has(id) || isFolderId(id);
+const hashFor = (id: string) => (isPage(id) ? `work/${id}` : id);
 const idFromHash = (hash: string) => {
   const raw = decodeURIComponent(hash.replace(/^#/, ''));
   return raw.startsWith('work/') ? raw.slice(5) : raw;
@@ -56,6 +59,7 @@ export function openerRect(id: string): DOMRect | null {
 }
 
 export const isProject = (id: string) => projectIds.has(id);
+export const isFolderPage = (id: string) => isFolderId(id);
 
 function centreOf(el: Element | null | undefined): Point | null {
   if (!el) return null;
@@ -72,7 +76,11 @@ function pushHash(id: string) {
   }
   // Only one history entry is ever a window. Opening a second window replaces it, so the
   // back button always returns to the plain page instead of replaying old windows.
-  if (history.state?.aryanOsWindow) {
+  // The one exception: a project opened from an open folder page gets its own entry, so
+  // back (or Esc) returns to the folder, and back again to the page.
+  const under = history.state?.aryanOsWindow as string | undefined;
+  const stacking = !!under && isFolderId(under) && projectIds.has(id) && state.windows.some((w) => w.id === under);
+  if (history.state?.aryanOsWindow && !stacking) {
     history.replaceState({ aryanOsWindow: id }, '', want);
   } else {
     history.pushState({ aryanOsWindow: id }, '', want);
@@ -147,8 +155,15 @@ function syncFromHash() {
   const id = idFromHash(location.hash);
   if (knownIds.has(id)) {
     // An old-style #<slug> link: show the new #work/<slug> address.
-    if (projectIds.has(id) && !location.hash.startsWith('#work/')) {
+    if (isPage(id) && !location.hash.startsWith('#work/')) {
       history.replaceState(history.state, '', `#work/${id}`);
+    }
+    // Back from a project to the folder page it was opened from: close the project.
+    const left = hashed;
+    if (left && left !== id && projectIds.has(left) && state.windows.some((w) => w.id === left)) {
+      const rest = state.windows.filter((w) => w.id !== left);
+      set({ windows: rest, focused: topVisible(rest) });
+      restoreFocus(left);
     }
     hashed = id;
     const existing = state.windows.find((w) => w.id === id);

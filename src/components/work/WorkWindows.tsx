@@ -1,56 +1,13 @@
-// Window contents for ~/work: a Finder list per folder, and one window per project.
+// Window contents for ~/work projects (folders open as a full page: FolderPage.tsx).
 
 import { useEffect, useState } from 'react';
 import { loadProjectDetails } from '../../lib/work-data';
-import { FOLDERS, isFolderId, type FolderId, type ProjectDetail } from '../../lib/work';
+import { type ProjectDetail } from '../../lib/work';
 import { Icon } from '../os/Icon';
-import { WORK_INDEX, workEntry } from '../os/window-list';
+import { workEntry } from '../os/window-list';
 
 export default function WorkWindow({ id }: { id: string }) {
-  return isFolderId(id) ? <Finder folder={id} /> : <ProjectWindow id={id} />;
-}
-
-function Finder({ folder }: { folder: FolderId }) {
-  const items = WORK_INDEX.filter((p) => p.folders.includes(folder));
-  const note = FOLDERS.find((f) => f.id === folder)?.note;
-  // Warm the project data while the visitor reads the list.
-  useEffect(() => void loadProjectDetails().catch(() => {}), []);
-
-  return (
-    <div className="finder">
-      <div className="finder-bar">
-        <span className="finder-path">
-          ~/work/<strong>{folder}</strong>
-        </span>
-        <span>
-          {items.length} {items.length === 1 ? 'item' : 'items'}
-        </span>
-      </div>
-      {note && <p className="finder-note">{note}</p>}
-      <table className="finder-list">
-        <thead>
-          <tr>
-            <th scope="col">Name</th>
-            <th scope="col">When</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((p) => (
-            <tr key={p.id}>
-              <td>
-                <a href={`/work/${p.id}/`} data-open-window={p.id} className="finder-row">
-                  <Icon name="file-text" className="finder-icon" />
-                  <span className="finder-file">{p.id}.md</span>
-                  <span className="finder-title">{p.title}</span>
-                </a>
-              </td>
-              <td className="finder-when">{p.when || '—'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  return <ProjectWindow id={id} />;
 }
 
 type Loaded = { detail?: ProjectDetail; failed?: boolean };

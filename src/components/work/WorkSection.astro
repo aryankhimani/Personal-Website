@@ -5,7 +5,7 @@ import TechLabel from '../os/TechLabel';
 import { Picture } from 'astro:assets';
 import { Icon } from '../os/Icon';
 import { getFeatured, getProjects, whenOf } from '../../lib/projects';
-import { FOLDERS } from '../../lib/work';
+import { FOLDERS, topFirst } from '../../lib/work';
 import FlipCover from './FlipCover';
 import FolderDesk from './FolderDesk';
 import WorkCursor from './WorkCursor';
@@ -16,7 +16,8 @@ const inFolder = (id: string) => all.filter((p) => p.data.folder === id || p.dat
 const folders = FOLDERS.map((f) => ({
   id: f.id,
   note: f.note,
-  items: inFolder(f.id).map((p) => ({ label: p.data.title, value: p.id })),
+  items: topFirst(f.id, inFolder(f.id)).map((p) => ({ id: p.id, title: p.data.title })),
+  top: Math.min(3, f.top.length),
 }));
 ---
 

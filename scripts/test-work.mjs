@@ -1,4 +1,4 @@
-// Drives ~/work in real Chrome: featured windows, folders, Finder, project windows,
+// Drives ~/work in real Chrome: featured windows, folders, folder pages, project windows,
 // project pages, old-URL redirects, shared links, the phone layout and Lite mode.
 // Usage: node scripts/test-work.mjs [baseUrl]   (needs `npm run preview` running)
 import puppeteer from 'puppeteer-core';
@@ -60,16 +60,16 @@ check('project data has every project', index.length === 21, `${index.length} pr
   await sleep(500);
   check('Esc closes the project window', !(await has(page, '[data-window="okamoto-lab"]')));
 
-  // Folder, then Finder, then a project.
-  await scrollTo(page, 'a.folder-open[data-open-window="ventures"]');
+  // Folder page, then a project (folder details: scripts/test-folders.mjs).
+  await scrollTo(page, 'a.gf-hit[data-open-window="ventures"]');
   await sleep(600);
-  await page.click('a.folder-open[data-open-window="ventures"]');
-  await page.waitForSelector('[data-window="ventures"] .finder-row', { timeout: 4000 }).catch(() => {});
-  const rows = await page.$$eval('[data-window="ventures"] .finder-file', (els) => els.map((e) => e.textContent));
-  check('ventures/ lists its projects, newest first', rows.join(',') === 'craftnova.md,joeyhelps.md,jobby.md', rows.join(','));
+  await page.click('a.gf-hit[data-open-window="ventures"]');
+  await page.waitForSelector('[data-window="ventures"] .fp-card', { timeout: 4000 }).catch(() => {});
+  const rows = await page.$$eval('[data-window="ventures"] .fp-name', (els) => els.map((e) => e.textContent));
+  check('ventures/ lists its projects, top picks first', rows.join(',') === 'JoeyHelps,CraftNova,Jobby', rows.join(','));
   await page.click('[data-window="ventures"] a[data-open-window="craftnova"]');
   await page.waitForSelector('[data-window="craftnova"] .reader-title', { timeout: 4000 }).catch(() => {});
-  check('clicking a Finder row opens the project', (await text(page, '[data-window="craftnova"] .reader-title')) === 'CraftNova');
+  check('clicking a folder card opens the project', (await text(page, '[data-window="craftnova"] .reader-title')) === 'CraftNova');
   check(
     'both windows stay open, project in front',
     (await has(page, '[data-window="ventures"]')) &&
@@ -134,9 +134,9 @@ check('project data has every project', index.length === 21, `${index.length} pr
   check('no sideways scroll on phone', overflow <= 0, `overflow=${overflow}`);
   const tallest = await page.$$eval('.fcard', (els) => Math.max(...els.map((e) => e.getBoundingClientRect().height)));
   check('featured cards fit between the menu bar and the dock', tallest < 844 - 44 - 96, `tallest=${Math.round(tallest)}`);
-  await scrollTo(page, 'a.folder-open[data-open-window="code"]');
+  await scrollTo(page, 'a.gf-hit[data-open-window="code"]');
   await sleep(500);
-  await page.tap('a.folder-open[data-open-window="code"]');
+  await page.tap('[data-folder="code"] .gf-front');
   await page.waitForSelector('[data-window="code"]', { timeout: 4000 }).catch(() => {});
   await sleep(500);
   const r = await page.$eval('[data-window="code"]', (w) => w.getBoundingClientRect().toJSON()).catch(() => ({}));

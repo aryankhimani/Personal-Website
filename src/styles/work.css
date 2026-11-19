@@ -331,114 +331,366 @@
   color: var(--color-muted);
 }
 
-.folders {
+/* ---------- Liquid-glass folders (FolderDesk.tsx) ---------- */
+
+.gfolders {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem 1rem;
-  margin-top: 1.75rem;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(13rem, 1fr);
+  gap: 1.25rem;
+  margin: 0.5rem -1rem 0;
+  /* Room above and at the sides for the papers to fan into; sideways scroll when five
+     don't fit. */
+  padding: 4rem 1rem 0.75rem;
+  scroll-padding-inline: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  list-style: none;
 }
 
 @media (min-width: 768px) {
-  .folders {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+  .gfolders {
+    margin-inline: -2rem;
+    padding-inline: 2rem;
+    scroll-padding-inline: 2rem;
   }
 }
 
-.folder {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.375rem;
-  padding: 0.5rem;
-  border-radius: 8px;
+.gf {
+  scroll-snap-align: start;
 }
 
-.folder:hover .folder-name {
-  color: var(--color-chrome-4);
-}
-
-/* A brushed-chrome folder with two sheets of paper that lift on hover. */
-.folder-art {
+.gf-body {
+  --tx: 0;
+  --ty: 0;
   position: relative;
-  width: 104px;
-  height: 80px;
-  margin-bottom: 0.5rem;
+  aspect-ratio: 5 / 4;
+  transform: perspective(900px) rotateX(calc(var(--ty) * -5deg)) rotateY(calc(var(--tx) * 7deg));
+  transition: transform 300ms var(--ease-out);
 }
 
-.folder-back {
+.gf-hit {
   position: absolute;
-  inset: 8px 0 0;
-  border-radius: 4px 8px 6px 6px;
-  background: linear-gradient(180deg, var(--color-slate-400), var(--color-slate-600));
+  inset: 0;
+  border-radius: 12px;
+  outline: none;
 }
 
-.folder-back::before {
+.gf-back {
+  position: absolute;
+  inset: 12% 0 0;
+  z-index: 1;
+  border-radius: 4px 12px 12px 12px;
+  background: linear-gradient(180deg, var(--color-navy-600), var(--color-navy-800));
+  box-shadow: inset 0 1px 0 rgb(242 235 221 / 0.14);
+}
+
+.gf-back::before {
   content: '';
   position: absolute;
-  top: -8px;
+  bottom: 100%;
   left: 0;
   width: 42%;
-  height: 12px;
-  border-radius: 4px 6px 0 0;
-  background: var(--color-slate-400);
+  height: 0.75rem;
+  border-radius: 8px 10px 0 0;
+  background: var(--color-navy-600);
 }
 
-.folder-paper {
+/* Papers: the top picks fan out in front (best in the middle), the rest wait behind. */
+.gf-paper {
+  --o: 0; /* -1 left, 0 centre, 1 right */
+  --d: 0; /* 1 for the side papers */
   position: absolute;
-  left: 10px;
-  right: 10px;
-  top: 14px;
-  height: 52px;
-  border-radius: 3px;
-  background: var(--color-window);
-  box-shadow: 0 1px 2px rgb(11 20 48 / 0.3);
-  transition: transform 200ms var(--ease-out);
+  top: 5%;
+  left: 18%;
+  z-index: calc(6 - var(--d));
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 64%;
+  height: 62%;
+  padding: 0.625rem 0.75rem;
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 1.15rem, rgb(11 20 48 / 0.06) 1.15rem calc(1.15rem + 1px)) 0 2.6rem / 100% 100% no-repeat,
+    var(--color-cream-100);
+  color: var(--color-navy-950);
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgb(5 9 26 / 0.35);
+  transform: translate(calc(var(--o) * 16%), calc(var(--d) * 8px)) rotate(calc(var(--o) * 6deg));
+  transition: transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.folder-paper:nth-child(3) {
-  left: 16px;
-  right: 6px;
-  top: 18px;
+.gf-paper-file {
+  font-size: 0.625rem;
+  color: var(--color-slate-500, #5b6584);
+}
+
+.gf-paper-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.gf-paper:focus-visible {
+  outline: 2px solid var(--color-ember-500);
+  outline-offset: 2px;
+}
+
+.gf-paper-behind {
+  z-index: 2;
+  pointer-events: none;
   background: var(--color-cream-300);
+  opacity: 0.45;
+  filter: blur(2.5px);
+  transform: translate(calc((var(--i) - 1) * 24%), -16%) rotate(calc((var(--i) - 1) * -8deg)) scale(0.9);
 }
 
-.folder-front {
+.gf:hover .gf-paper,
+.gf:focus-within .gf-paper {
+  transform: translate(calc(var(--o) * 52%), calc(-36% + var(--d) * 14px)) rotate(calc(var(--o) * 10deg));
+}
+
+.gf:hover .gf-paper-behind,
+.gf:focus-within .gf-paper-behind {
+  transform: translate(calc((var(--i) - 1) * 30%), -40%) rotate(calc((var(--i) - 1) * -10deg)) scale(0.88);
+}
+
+/* The glass front: frosted (it really blurs the papers behind it), an edge highlight, and
+   a sheen that slides as the folder tilts. */
+.gf-front {
   position: absolute;
-  inset: 26px 0 0;
-  border-radius: 4px 4px 6px 6px;
-  background: linear-gradient(180deg, var(--color-slate-50) 0%, var(--color-slate-200) 45%, var(--color-slate-300) 55%, var(--color-slate-100) 100%);
+  inset: 40% 0 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: end;
+  column-gap: 0.75rem;
+  padding: 0.875rem 0.875rem 0.875rem 1rem;
+  overflow: hidden;
+  border: 1px solid rgb(242 235 221 / 0.22);
+  border-radius: 6px 6px 12px 12px;
+  background:
+    linear-gradient(165deg, rgb(242 235 221 / 0.2), rgb(242 235 221 / 0.06) 45%, rgb(242 235 221 / 0.03)),
+    rgb(22 34 74 / 0.32);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.8),
-    0 6px 14px -6px rgb(11 20 48 / 0.7);
+    inset 0 1px 0 rgb(242 235 221 / 0.45),
+    inset 0 -14px 28px -10px rgb(5 9 26 / 0.45),
+    0 22px 32px -18px rgb(5 9 26 / 0.85);
   transform-origin: 50% 100%;
-  transition: transform 200ms var(--ease-out);
+  transition: transform 300ms var(--ease-out);
 }
 
-.folder:hover .folder-paper,
-.folder:focus-visible .folder-paper {
-  transform: translateY(-10px) rotate(-2deg);
+.gf-front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgb(242 235 221 / 0.16) 45%, transparent 60%);
+  transform: translateX(calc(var(--tx) * 35%));
+  transition: transform 300ms var(--ease-out);
 }
 
-.folder:hover .folder-paper:nth-child(3),
-.folder:focus-visible .folder-paper:nth-child(3) {
-  transform: translateY(-6px) rotate(3deg);
+.gf:hover .gf-front,
+.gf:focus-within .gf-front {
+  transform: perspective(500px) rotateX(-9deg);
 }
 
-.folder:hover .folder-front,
-.folder:focus-visible .folder-front {
-  transform: perspective(300px) rotateX(-14deg);
+.gf-hit:focus-visible .gf-front {
+  outline: 2px solid var(--color-ember-500);
+  outline-offset: 3px;
 }
 
-.folder-name {
-  font-size: 0.9375rem;
-  color: var(--color-chrome-3);
+.gf-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-variation-settings: 'wght' 420;
+  line-height: 1.1;
+  color: var(--color-cream-50);
 }
 
-.folder-note {
+.gf-count {
+  grid-column: 1;
+  font-size: 0.6875rem;
+  color: rgb(242 235 221 / 0.65);
+}
+
+.gf-arrow {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: end;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: var(--color-cream-100);
+}
+
+.gf-arrow svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  fill: none;
+  stroke: var(--color-navy-950);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gf-note {
+  margin-top: 0.875rem;
   font-family: var(--font-body);
   font-size: 0.8125rem;
   line-height: 1.4;
   color: var(--color-muted);
+}
+
+[data-lite='true'] .gf-body,
+[data-lite='true'] .gf-paper,
+[data-lite='true'] .gf-front,
+[data-lite='true'] .gf-front::after {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gf-body,
+  .gf-paper,
+  .gf-front,
+  .gf-front::after {
+    transition: none;
+  }
+}
+
+/* ---------- A folder as a full page (FolderPage.tsx) ---------- */
+
+.fp-head {
+  width: min(100% - 2.5rem, 64rem);
+  margin: 2.25rem auto 0;
+}
+
+.fp-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-variation-settings: 'wght' 350;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.fp-note {
+  margin-top: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  color: var(--color-ink-2);
+}
+
+.fp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1.25rem;
+  width: min(100% - 2.5rem, 64rem);
+  margin: 2rem auto 3rem;
+  list-style: none;
+}
+
+.fp-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(11 20 48 / 0.14);
+  border-radius: 10px;
+  background: var(--color-cream-50);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 220ms var(--ease-out),
+    box-shadow 220ms var(--ease-out);
+}
+
+.fp-card:hover,
+.fp-card:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px -16px rgb(11 20 48 / 0.6);
+}
+
+.fp-card:focus-visible {
+  outline: 2px solid var(--color-ember-500);
+  outline-offset: 2px;
+}
+
+.fp-cover {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--color-titlebar);
+}
+
+.fp-cover img {
+  width: 100%;
+  height: 100%;
+}
+
+.fp-cover-cover {
+  object-fit: cover;
+}
+
+.fp-cover-contain {
+  object-fit: contain;
+}
+
+.fp-cover-file {
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.fp-text {
+  display: grid;
+  gap: 0.375rem;
+  padding: 0.875rem 1rem 1.125rem;
+}
+
+.fp-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.6875rem;
+  color: var(--color-ink-2);
+}
+
+.fp-pin {
+  color: var(--color-ember-600, #d93a1f);
+}
+
+.fp-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-variation-settings: 'wght' 450;
+  line-height: 1.15;
+}
+
+.fp-summary {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-ink-2, inherit);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fp-card {
+    transition: none;
+  }
 }
 
 /* ---------- Everything as a list ---------- */
@@ -930,8 +1182,6 @@ figcaption {
 
 /* ---------- Lite and reduced motion ---------- */
 
-[data-lite='true'] .folder-paper,
-[data-lite='true'] .folder-front,
 [data-lite='true'] .btn-ink,
 [data-lite='true'] .work-all-chevron {
   transition: none;
@@ -942,8 +1192,6 @@ figcaption {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .folder-paper,
-  .folder-front,
   .btn-ink,
   .work-all-chevron {
     transition: none;
@@ -1356,51 +1604,6 @@ figcaption {
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.4;
-}
-
-/* ---------- Floating folders ---------- */
-
-.folders-float {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
-  gap: 1rem 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.folder-cell {
-  display: grid;
-  justify-items: center;
-  gap: 0.75rem;
-  padding-top: 9rem;
-  border-radius: 10px;
-}
-
-.folder-open {
-  display: grid;
-  justify-items: center;
-  gap: 0.125rem;
-  font-size: 0.75rem;
-  color: var(--color-cream-100);
-  text-align: center;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.folder-open-note {
-  margin-top: -0.5rem;
-  font-size: 0.6875rem;
-  line-height: 1.4;
-  color: var(--color-muted);
-  text-align: center;
-}
-
-@media (max-width: 767px) {
-  .folders-float {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .folder-cell {
-    padding-top: 7rem;
-  }
 }
 
 /* The flip card fills the cover; its faces carry their own padding. */
