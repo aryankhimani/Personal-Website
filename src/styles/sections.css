@@ -542,8 +542,16 @@
 }
 
 .me-photo {
+  position: relative;
   height: 22rem;
-  background: var(--color-titlebar);
+  margin: 0;
+  overflow: hidden;
+  /* A navy landing pad with a faint grid, so a cut-out photo has something to stand in. */
+  background:
+    radial-gradient(70% 55% at 50% 100%, rgb(255 74 43 / 0.16), transparent 70%),
+    linear-gradient(rgb(242 235 221 / 0.05) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgb(242 235 221 / 0.05) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--color-navy-900);
 }
 
 @media (min-width: 768px) {
@@ -554,13 +562,61 @@
   }
 }
 
-.me-photo picture,
 .me-photo img {
+  position: absolute;
+  inset: auto 0 0;
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 20%;
+  width: min(86%, 21rem);
+  max-height: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  margin: 0 auto;
+  object-fit: contain;
+  object-position: 50% 100%;
+}
+
+/* Storyboard (lib/storyboard.ts): while the flying copy is on its way, the slot's own photo
+   waits; it appears the moment the copy lands on it. */
+.photo-landing img {
+  visibility: hidden;
+}
+
+.photo-landing.is-landed img {
+  visibility: visible;
+}
+
+.photo-fly {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  object-fit: contain;
+  object-position: 50% 100%;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  filter: drop-shadow(0 18px 24px rgb(5 9 26 / 0.45));
+  animation: photo-fly-in 600ms ease-out both;
+}
+
+@keyframes photo-fly-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Phones: a plain fade and slide when me.md scrolls in. */
+.photo-reveal img {
+  opacity: 0;
+  translate: 0 1.5rem;
+  transition:
+    opacity 600ms ease-out,
+    translate 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.photo-reveal.is-in img {
+  opacity: 1;
+  translate: 0 0;
 }
 
 .me-text {
@@ -1561,4 +1617,9 @@
 
 .desk-now .thought-line__step-text {
   white-space: normal !important;
+}
+
+/* The photo stack (card swap) under me.md leans past a phone's edge. */
+#about {
+  overflow-x: clip;
 }

@@ -3,6 +3,7 @@
 .hero {
   position: relative;
   display: grid;
+  overflow-x: clip; /* the orb's dust ring and glow may spill past a phone's edge */
   gap: 1.5rem;
   min-height: calc(100dvh - var(--menubar-h));
   padding: 7.5rem 1rem 8.5rem;

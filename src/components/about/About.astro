@@ -2,7 +2,8 @@
 import TechLabel from '../os/TechLabel';
 // me.md: a short bio, a photo, skills as plain tags and a few honours.
 // Facts from Aryan's resume, LinkedIn and his answers (see memory notes); nothing invented.
-import { getImage, Picture } from 'astro:assets';
+import { getImage } from 'astro:assets';
+import { CUTOUT } from '../../lib/me';
 import portrait from '../../assets/photos/shad/IMG_3240.jpg';
 import tks from '../../assets/photos/TKS_Hackathon.jpg';
 import joeyhelps from '../../assets/photos/joeyhelps/image013.jpg';
@@ -49,16 +50,8 @@ const HONOURS = [
     </div>
 
     <div class="me-body">
-      <figure class="me-photo">
-        <Picture
-          src={portrait}
-          alt="Aryan in a dark suit and tie, leaning against a wall"
-          widths={[320, 520, 760]}
-          width={760}
-          sizes="(max-width: 767px) 100vw, 360px"
-          formats={['avif', 'webp']}
-          fallbackFormat="jpg"
-        />
+      <figure class="me-photo" data-photo-slot>
+        <img class="me-cutout" src={CUTOUT.src} alt={CUTOUT.alt} width="300" height="400" loading="lazy" decoding="async" />
       </figure>
 
       <div class="me-text">
