@@ -1,6 +1,11 @@
 ---
-// On every page: an ASCII signature, when the site was last built, the Lite switch and the source.
+// On every page: "Let's build something." with the contact links, the crowd scene (Aryan stands
+// still while the world walks past), then the ASCII signature, build date, Lite switch and source.
 import LiteToggle from './LiteToggle';
+import FooterCrowd from './FooterCrowd';
+import { Icon } from './Icon';
+import { RESUME_URL } from './nav';
+import { EMAIL, GITHUB_URL, LINKEDIN_URL } from '../hero/links';
 
 const built = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Toronto' });
 
@@ -13,6 +18,27 @@ const SIGNATURE = String.raw`
 ---
 
 <footer class="site-foot">
+  <div class="foot-cta" data-reveal>
+    <p class="foot-kicker">~/contact --open</p>
+    <h2 class="foot-title">Let&rsquo;s build something.</h2>
+    <ul class="foot-links">
+      <li><a href={`mailto:${EMAIL}`}><Icon name="mail" />{EMAIL}</a></li>
+      <li>
+        <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer"><Icon name="linkedin" />LinkedIn<span class="sr-only"> (opens in a new tab)</span></a>
+      </li>
+      <li>
+        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer"><Icon name="github" />GitHub<span class="sr-only"> (opens in a new tab)</span></a>
+      </li>
+      <li>
+        <a href={RESUME_URL} target="_blank" rel="noopener noreferrer"><Icon name="file-text" />resume.pdf<span class="sr-only"> (opens in a new tab)</span></a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="foot-crowd" data-reveal>
+    <FooterCrowd client:visible />
+  </div>
+
   <div class="site-foot-inner">
     <pre class="site-foot-sig" aria-hidden="true">{SIGNATURE}</pre>
     <div class="site-foot-meta">

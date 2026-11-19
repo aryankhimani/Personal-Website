@@ -21,7 +21,8 @@ export type Scene = {
   draw: (g: CanvasRenderingContext2D, t: number, dt: number, p: Pointer) => void;
 };
 
-export function useCanvasScene(make: () => Scene) {
+/** `still`: draw one settled frame and never loop (Lite). Re-mount (key) to change it. */
+export function useCanvasScene(make: () => Scene, { still = false }: { still?: boolean } = {}) {
   const canvas = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function useCanvasScene(make: () => Scene) {
     const g = c?.getContext('2d', { alpha: true });
     if (!c || !g) return;
     const scene = make();
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduced = still || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const target = { x: 0, y: 0 };
     const p: Pointer = { x: 0, y: 0, inside: false };
     let W = 0;
