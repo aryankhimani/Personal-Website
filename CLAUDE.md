@@ -10,7 +10,7 @@ Aryan's usage is limited: keep sessions small, read only what a task needs, and 
 - Phase 6 step 1 done (Nov 18): heroes 4 Astral (`AstralField.tsx`, star globe) and 5 Orbits (`OrbitSystem.tsx`, spiral galaxy), canvas 2D via `hero/canvas-loop.ts`, stills in `public/hero/`. Switcher now 1/5.
 - Phase 6 (final) plan: `_private/phase6-plan.md` (replaces the old hero-6 plan; hero 6 skipped). One step per session; read only that step. "continue Phase 6" = do the first unchecked step.
   - [x] Step 1 (Nov 18): hero DPR cap 1.5, ASCII field ~30 fps, batched Astral drawing, heading letters only layered while moving; lens only on hero 1; arcs + HUD (`hud.ts`, `HeroHud.tsx`); HUD moved clear of desktop icons on phones; tagline + clock fixed. Perf at 4x CPU: ASCII hover 39 -> 60 fps, rest already 60. First-load JS still ~285 KB raw (Step 8). Tools: `scripts/perf-hero.mjs`, `perf-scroll.mjs`, `perf-profile.mjs`. Stop old dev/preview servers before testing.
-  - [ ] Step 2: opening v3, CRT/HUD terminal boot then anime.js-style grid-cell breakdown of the name (≤5 s, skippable)
+  - [x] Step 2 (Nov 18): boot v3 in `lib/boot.ts` (canvas, no library): CRT + SVG HUD rings, name from 5x7 grid cells, breakdown on scroll or by itself at 3.25 s, done ~4.3 s; tap/any key skips. Removed `BootTitle.tsx` + `ElectricLogo.tsx` (WebGL). Test: `scripts/test-boot.mjs`.
   - [ ] Step 3: motion.dev-style orb behind the liquid-metal AK (one canvas or CSS fake)
   - [ ] Step 4: storyboard scroll, Aryan's photo travels from hero to About (GSAP Flip; phones = fade)
   - [ ] Step 5: liquid-glass folders in one row, top 3 in front + rest blurred, folder expands to #work/<folder> page

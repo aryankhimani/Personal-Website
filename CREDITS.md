@@ -18,8 +18,8 @@ Third-party work used on this site, with licenses.
 | [Atkinson Hyperlegible Next](https://www.brailleinstitute.org/freefont/) by Braille Institute | Body typeface | SIL OFL 1.1 |
 | [Bricolage Grotesque](https://github.com/ateliertriay/bricolage) by Mathieu Triay | Display typeface | SIL OFL 1.1 |
 | React Bits: Variable Proximity, Rotating Text, Faulty Terminal, Decrypted Text | Hero, copied into `src/components/rb/` | MIT + Commons Clause |
-| React Bits: Split Flap Text, Electric Logo | Boot title, ticker, logo flash; copied into `src/components/rb/` | MIT + Commons Clause |
-| [ogl](https://github.com/oframe/ogl) | Small WebGL library used by Electric Logo | Unlicense |
+| React Bits: Split Flap Text | Menu-bar clock, ticker; copied into `src/components/rb/` (Electric Logo was used for the old boot flash, removed in Phase 6) | MIT + Commons Clause |
+| [ogl](https://github.com/oframe/ogl) | Small WebGL library used by Dither Veil and Flex Carousel | Unlicense |
 | [Bencho](https://bencho.dev) ASCII Wake by Lorenzo Cabra | Idea for the ASCII hero's cursor wake (heat grid + glyph ramp); the field itself is written from scratch in `src/components/hero/AsciiField.tsx` | MIT |
 | React Bits: Gradient ASCII, Scroll Float | Ideas for the ASCII field's drift; Scroll Float's "float" effect ported to plain DOM in `src/lib/motion.ts` | MIT + Commons Clause |
 | [matthisgarnier.com](https://www.matthisgarnier.com/) | Reference for the ASCII lettering look (nothing copied) | n/a |
@@ -30,3 +30,4 @@ Third-party work used on this site, with licenses.
 | [matter-js](https://brm.io/matter-js/) | Physics for Folder Float | MIT |
 | [three.js](https://threejs.org) | Lanyard, Paper Crumple, Folding Bill | MIT |
 | React Bits Pro: Astral Shell and Binary Orbits | Inspiration for heroes 4 (Astral) and 5 (Orbits). Pro components, looked at only; `AstralField.tsx` and `OrbitSystem.tsx` are written from scratch in canvas 2D | n/a (inspiration only) |
+| [anime.js](https://animejs.com/) homepage opening | Inspiration for the boot v3 HUD rings and the grid-cell "breakdown" of the name. Looked at only, no code used; `src/lib/boot.ts` is written from scratch (no animation library) | n/a (inspiration only) |

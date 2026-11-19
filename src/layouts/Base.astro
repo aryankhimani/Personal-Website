@@ -4,7 +4,6 @@ import Dock from '../components/os/Dock';
 import Footer from '../components/os/Footer.astro';
 import MenuBar from '../components/os/MenuBar';
 import WindowManager from '../components/os/WindowManager';
-import BootTitle from '../components/os/BootTitle';
 import { getProjects, toIndexEntry } from '../lib/projects';
 import { INDEX_ELEMENT_ID } from '../lib/work';
 import heroFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
@@ -98,19 +97,32 @@ const projectCount = (await getProjects()).length;
       boot && (
         <div id="boot" aria-hidden="true">
           <div class="boot-crt">
-            <pre id="boot-log" data-projects={projectCount} />
-            <div class="boot-title">
-              <div class="boot-logo" id="boot-logo">
-                <img src="/logo.svg" alt="" width="96" height="96" />
-              </div>
-              <BootTitle client:load />
+            <svg class="boot-hud" viewBox="-500 -500 1000 1000">
+              <circle class="boot-ring boot-ring-outer" r="440" pathLength="1" />
+              <circle class="boot-ticks" r="412" pathLength="360" />
+              <circle class="boot-ticks boot-ticks-major" r="404" pathLength="360" />
+              <g class="boot-spin">
+                <circle class="boot-arc" r="468" pathLength="100" />
+              </g>
+              <g class="boot-spin boot-spin-back">
+                <circle class="boot-arc boot-arc-cream" r="380" pathLength="100" />
+              </g>
+              <circle class="boot-ring boot-ring-inner" r="150" pathLength="1" />
+              <path class="boot-cross" d="M0-500v40M0 460v40M-500 0h40M460 0h40" />
+            </svg>
+            <div class="boot-logo">
+              <img src="/logo.svg" alt="" width="96" height="96" />
             </div>
+            <pre id="boot-log" data-projects={projectCount} />
+            <p class="boot-read"><span>AK/OS · BOOT</span><span id="boot-clock">T+0.00</span></p>
             <div class="boot-progress">
               <span class="boot-progress-track"><i id="boot-bar" /></span>
               <span id="boot-pct">0%</span>
             </div>
-            <p class="boot-skip">Press any key or click to skip</p>
+            <p class="boot-skip">Scroll to enter <span class="boot-dim">· any key to skip</span></p>
+            <i class="boot-roll" />
           </div>
+          <canvas id="boot-cells" />
         </div>
       )
     }

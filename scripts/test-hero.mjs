@@ -36,9 +36,16 @@ const canvases = (page) => page.$$eval('.hero-visual canvas', (c) => c.length);
   const started = Date.now();
   check('boot screen shows on first visit', await page.evaluate(() => document.documentElement.dataset.boot === 'full'));
   check('name is in the page behind the boot screen', (await page.$eval('h1', (h) => h.textContent)).includes('Aryan Khimani'));
-  await sleep(1400);
+  await page.waitForFunction(() => /MEM: \d+ projects/.test(document.getElementById('boot-log')?.textContent ?? ''), { timeout: 2500 }).catch(() => {});
   const log = await page.$eval('#boot-log', (l) => l.textContent);
-  check('POST log is typing', log.includes('ARYAN-OS v2.0') && /MEM: \d+ projects/.test(log), JSON.stringify(log.slice(0, 60)));
+  check('POST log is typing', log.includes('ARYAN-OS v3.0') && /MEM: \d+ projects/.test(log), JSON.stringify(log.slice(0, 60)));
+  await sleep(1300);
+  check('name cells are drawn', await page.$eval('#boot-cells', (c) => {
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    let lit = 0;
+    for (let i = 3; i < d.length; i += 64) if (d[i] > 128) lit++;
+    return lit > 200;
+  }));
   check('hero canvas waits for the boot to finish', (await page.$$eval('.hero-visual canvas', (c) => c.length)) === 0);
   await page.screenshot({ path: '.shots/p2-boot.png' });
   await page.waitForFunction(() => !document.documentElement.dataset.boot, { timeout: 7000 }).catch(() => {});
