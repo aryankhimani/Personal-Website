@@ -4,6 +4,7 @@ import { HEROES, nextHero, useHero, type HeroId } from '../../lib/hero';
 import { scrollToSection } from '../../lib/scroll';
 import { Icon } from '../os/Icon';
 import { RESUME_URL } from '../os/nav';
+import HeroOrb from './HeroOrb';
 import { GITHUB_URL, LINKEDIN_URL } from './links';
 
 const NAME = 'Aryan Khimani';
@@ -63,6 +64,7 @@ export default function Hero() {
   return (
     <div ref={ref} className="hero" data-hero={hero}>
       <div className="hero-visual" data-hero-visual aria-hidden="true">
+        {hero === 'liquid-metal' && <HeroOrb area={ref} live={animated} />}
         {lite ? (
           <img key={hero} src={`/hero/${hero}.webp`} alt="" decoding="async" />
         ) : (

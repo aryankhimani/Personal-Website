@@ -865,15 +865,134 @@
   opacity: 0.25;
 }
 
-/* One soft ember glow, behind the hero logo only. */
-.hero[data-hero='liquid-metal'] .hero-visual::before {
-  content: '';
+/* ---------- The orb behind the liquid-metal AK (HeroOrb.tsx) ---------- */
+
+/* The metal canvas (or Lite still) sits in front of the orb. */
+.hero[data-hero='liquid-metal'] .hero-visual > :not(.hero-orb) {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-orb {
+  --ox: 0; /* pointer, -1..1, from HeroOrb */
+  --oy: 0;
   position: absolute;
-  inset: 12%;
-  z-index: -1;
+  top: 50%;
+  left: 50%;
+  height: 88%;
+  aspect-ratio: 1;
+  translate: calc(-50% + var(--ox) * 10px) calc(-50% + var(--oy) * 10px);
+}
+
+.hero-orb-body {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(255 74 43 / 0.16), rgb(255 74 43 / 0.05) 55%, transparent);
-  filter: blur(20px);
+  background:
+    radial-gradient(90% 90% at 34% 28%, rgb(60 78 130 / 0.55), transparent 60%),
+    radial-gradient(closest-side, var(--color-navy-800) 0%, var(--color-navy-900) 62%, var(--color-navy-950) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(242 235 221 / 0.12),
+    inset 10px 14px 28px -12px rgb(242 235 221 / 0.4),
+    inset -18px -26px 60px -20px rgb(255 74 43 / 0.32),
+    0 30px 80px -30px rgb(5 9 26 / 0.9),
+    0 0 90px -10px rgb(255 74 43 / 0.1);
+  /* Slow "liquid" breathing: a squash and a turn, transform only. */
+  animation: orb-morph 11s ease-in-out infinite alternate;
+}
+
+@keyframes orb-morph {
+  0% {
+    transform: rotate(0deg) scale(1, 1);
+  }
+  33% {
+    transform: rotate(5deg) scale(1.025, 0.98);
+  }
+  66% {
+    transform: rotate(-3deg) scale(0.985, 1.02);
+  }
+  100% {
+    transform: rotate(4deg) scale(1.015, 0.99);
+  }
+}
+
+.hero-orb i {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Ember light deep inside the glass, drifting round. */
+.hero-orb-glow {
+  inset: 18%;
+  border-radius: 50%;
+  background:
+    radial-gradient(40% 35% at 62% 70%, rgb(255 74 43 / 0.38), transparent 70%),
+    radial-gradient(30% 25% at 30% 40%, rgb(255 140 90 / 0.12), transparent 70%);
+  filter: blur(18px);
+  animation: orb-spin 26s linear infinite;
+}
+
+/* Caustics: bright arcs refracting round the rim, turning the other way. */
+.hero-orb-caustic {
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 20deg,
+    transparent 0 8%,
+    rgb(242 235 221 / 0.32) 12%,
+    transparent 17% 42%,
+    rgb(255 120 80 / 0.22) 47%,
+    transparent 52% 70%,
+    rgb(242 235 221 / 0.16) 76%,
+    transparent 82%
+  );
+  -webkit-mask: radial-gradient(closest-side, transparent 80%, #000 94%, transparent 100%);
+  mask: radial-gradient(closest-side, transparent 80%, #000 94%, transparent 100%);
+  animation: orb-spin 18s linear infinite reverse;
+}
+
+/* Specular highlight; slides away from the pointer. */
+.hero-orb-spec {
+  top: 9%;
+  left: 18%;
+  width: 38%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(242 235 221 / 0.3), transparent);
+  filter: blur(6px);
+  rotate: -28deg;
+  translate: calc(var(--ox) * -14px) calc(var(--oy) * -10px);
+}
+
+/* A ring of dust round the glass, a nod to motion.dev's particle orb. */
+.hero-orb-dust {
+  inset: -9%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(242 235 221 / 0.7) 0 0.6px, transparent 1.1px) 0 0 / 7px 7px;
+  -webkit-mask: radial-gradient(closest-side, transparent 78%, #000 84%, rgb(0 0 0 / 0.25) 93%, transparent 100%);
+  mask: radial-gradient(closest-side, transparent 78%, #000 84%, rgb(0 0 0 / 0.25) 93%, transparent 100%);
+  opacity: 0.4;
+  animation: orb-spin 60s linear infinite;
+}
+
+@keyframes orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Lite and reduced motion: the same orb, standing still. */
+.hero-orb:not([data-live]) *,
+.hero-orb:not([data-live]) .hero-orb-body {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-orb *,
+  .hero-orb .hero-orb-body {
+    animation: none;
+  }
 }
 
 /* ---------- CRT overlay on the hero (View → CRT effect) ---------- */

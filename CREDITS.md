@@ -31,3 +31,4 @@ Third-party work used on this site, with licenses.
 | [three.js](https://threejs.org) | Lanyard, Paper Crumple, Folding Bill | MIT |
 | React Bits Pro: Astral Shell and Binary Orbits | Inspiration for heroes 4 (Astral) and 5 (Orbits). Pro components, looked at only; `AstralField.tsx` and `OrbitSystem.tsx` are written from scratch in canvas 2D | n/a (inspiration only) |
 | [anime.js](https://animejs.com/) homepage opening | Inspiration for the boot v3 HUD rings and the grid-cell "breakdown" of the name. Looked at only, no code used; `src/lib/boot.ts` is written from scratch (no animation library) | n/a (inspiration only) |
+| [Motion](https://motion.dev/) homepage orb | Inspiration for the glass orb behind the hero AK. Looked at only; `HeroOrb.tsx` and `.hero-orb` CSS are written from scratch | n/a (inspiration only) |
