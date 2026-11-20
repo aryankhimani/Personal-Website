@@ -49,7 +49,7 @@ const CREDITS: [string, string, string][] = [
     'https://reactbits.dev',
     'by David Haz: dock, menus, split-flap, tech text, electric logo, folders, flip cards, carousel, and more',
   ],
-  ['Bencho', 'https://bencho.dev', 'by Lorenzo Cabra: the folding bill, and ideas for the ASCII wake and the drop box'],
+  ['Bencho', 'https://bencho.dev', 'by Lorenzo Cabra: ideas for the ASCII wake and the drop box'],
   ['Swarm', 'https://califa.github.io/swarm-site/', 'by Joel Califa, the idea behind the playground cursors (no code used)'],
   ['swarm-cursors', 'https://github.com/DhvanilPatel/swarm-cursors', 'by Dhvanil Patel, the same (no code used)'],
 ];

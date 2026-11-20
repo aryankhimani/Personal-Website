@@ -33,7 +33,7 @@ Aryan's usage is limited: keep sessions small, read only what a task needs, and 
       - [x] G5 playground: one coloured .fig, faster cursors, normal/hyper toggle
       - [x] G6 page order: Writing, Let's build something, new_message.eml, toys, footer strip
       - [x] G7 Signal line, channel-change transitions, HUD tracker, sound, ⌘K palette, arrival lock-ons, ending + uptime
-      - [ ] G8 verify old 8b-fixes all done
+      - [x] G8 verified: 8b-fixes all present; removed orphan ElectricLogo.css, FolderFloat.css, stale "folding bill" credit
       - [ ] G9 = 8c-8f below
     - [ ] 8c: accessibility (keyboard, focus rings, reduced motion, Lite, alt text, contrast table)
     - [ ] 8d: copy + colour pass (short/specific wording, list open TODO(aryan); no stray greys, accent ≤10%)
