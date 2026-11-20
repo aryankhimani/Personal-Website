@@ -80,8 +80,12 @@ const activeTick = (page) => page.$$eval('[data-journey-rail] li', (els) => els.
   await scrollToY(page, start + 0.8 * 900 * 3 + 200);
   const mid = await shown(page);
   check('scrolling moves to chapter 4, one chapter visible at a time', mid.join() === '4' && (await activeTick(page)) === 4, mid.join());
-  const dot = await page.$eval('[data-chapter]:nth-child(4) [data-chapter-photo]', (e) => getComputedStyle(e).getPropertyValue('--dot'));
-  check('the photo has finished its reveal', Number(dot) === 1, `--dot=${dot}`);
+  await new Promise((r) => setTimeout(r, 1200)); // the scrub trails the scroll by ~0.7 s
+  const on = await page.$eval('[data-chapter]:nth-child(4) [data-chapter-photo]', (e) => {
+    const pic = getComputedStyle(e.querySelector('picture'));
+    return { t: pic.transform, o: pic.opacity, lock: getComputedStyle(e.querySelector('.jhud-lock')).opacity, scan: getComputedStyle(e.querySelector('.crt-scan')).opacity };
+  });
+  check('the photo has powered on and locked', (on.t === 'none' || on.t === 'matrix(1, 0, 0, 1, 0, 0)') && on.o === '1' && on.lock === '1' && on.scan === '0', JSON.stringify(on));
   await page.screenshot({ path: '.shots/p4-journey.png' });
 
   // The link in the visible chapter opens its project window.

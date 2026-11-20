@@ -113,6 +113,14 @@ const pad = (n: number) => String(n).padStart(2, '0');
                     formats={['avif', 'webp']}
                     fallbackFormat="jpg"
                   />
+                  <span class="crt-scan" aria-hidden="true" />
+                  <span class="jhud-br jhud-br-tl" aria-hidden="true" />
+                  <span class="jhud-br jhud-br-tr" aria-hidden="true" />
+                  <span class="jhud-br jhud-br-bl" aria-hidden="true" />
+                  <span class="jhud-br jhud-br-br" aria-hidden="true" />
+                  <span class="jhud-read" aria-hidden="true">
+                    IMG_{String(i + 1).padStart(2, '0')} · {c.year} · <span class="jhud-state"><b class="jhud-nosig">NO SIGNAL</b><b class="jhud-lock">SIGNAL LOCK</b></span>
+                  </span>
                 </div>
               </figure>
             ) : (

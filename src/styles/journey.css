@@ -190,39 +190,92 @@
   height: min(58dvh, 34rem);
 }
 
-/* Photo reveal, scrubbed by scroll: --dot runs 0 to 1. */
-[data-lite='false'] .chapter-photo-img {
+/* Photo power-on (lib/journey.ts scrubs it): the photo starts as a thin bright line, opens
+   like a CRT, flickers once, the scanlines settle and HUD brackets lock on. Without the scene
+   (Lite, reduced motion) everything below simply shows, fully on. */
+.chapter-photo-img {
   position: relative;
   overflow: hidden;
 }
 
-[data-lite='false'] .chapter-photo-img::before,
-[data-lite='false'] .chapter-photo-img::after {
-  content: '';
+.chapter-photo-img picture {
+  transform-origin: 50% 50%;
+  will-change: transform, filter, opacity;
+}
+
+.crt-scan {
   position: absolute;
-  inset-inline: 0;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgb(5 9 26 / 0.45) 0 1px, transparent 1px 3px);
+  opacity: 0;
+}
+
+.jhud-br {
+  position: absolute;
+  width: 1.125rem;
+  height: 1.125rem;
+  pointer-events: none;
+  border-color: var(--color-cream-100);
+  border-style: solid;
+  border-width: 0;
+  filter: drop-shadow(0 0 3px rgb(5 9 26 / 0.8));
+}
+
+.jhud-br-tl { top: 0.625rem; left: 0.625rem; border-top-width: 2px; border-left-width: 2px; }
+.jhud-br-tr { top: 0.625rem; right: 0.625rem; border-top-width: 2px; border-right-width: 2px; }
+.jhud-br-bl { bottom: 0.625rem; left: 0.625rem; border-bottom-width: 2px; border-left-width: 2px; }
+.jhud-br-br { bottom: 0.625rem; right: 0.625rem; border-bottom-width: 2px; border-right-width: 2px; }
+
+.jhud-read {
+  position: absolute;
+  left: 2.125rem;
+  bottom: 0.875rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 2px;
+  background: rgb(11 20 48 / 0.78);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--color-cream-100);
   pointer-events: none;
 }
 
-/* Scan wipe: a cream beam draws the photo top to bottom, CRT scanlines fade out behind it. */
-[data-lite='false'] .chapter-photo-img picture {
-  --edge: calc(var(--dot, 1) * 108% - 4%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(var(--edge) - 3%), transparent var(--edge));
-  mask-image: linear-gradient(to bottom, #000 calc(var(--edge) - 3%), transparent var(--edge));
+.jhud-read b {
+  font-weight: 400;
 }
 
-[data-lite='false'] .chapter-photo-img::before {
-  inset-block: 0;
-  background: repeating-linear-gradient(to bottom, rgb(11 20 48 / 0.35) 0 1px, transparent 1px 3px);
-  opacity: calc(1 - var(--dot, 1));
+.jhud-nosig {
+  display: none;
+  color: var(--color-muted);
 }
 
-[data-lite='false'] .chapter-photo-img::after {
-  top: clamp(0%, calc(var(--dot, 1) * 104% - 3%), 100%);
-  height: 2px;
-  background: var(--color-cream-100);
-  box-shadow: 0 0 14px 3px rgb(255 106 61 / 0.55);
-  opacity: clamp(0, calc((1 - var(--dot, 1)) * 12), 1);
+.jhud-lock {
+  color: var(--color-cream-50);
+}
+
+.jhud-lock::before {
+  content: '';
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-right: 0.375rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  vertical-align: 0.05em;
+}
+
+/* While the scene runs, "NO SIGNAL" shows until the lock; both share one spot. */
+.jhud-state {
+  display: inline-grid;
+}
+
+.jhud-state b {
+  grid-area: 1 / 1;
+}
+
+[data-journey-live] .jhud-nosig {
+  display: inline;
 }
 
 [data-lite='false'] .journey-rail {

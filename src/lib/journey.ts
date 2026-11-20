@@ -1,6 +1,7 @@
 // The pinned Journey scene. The stage stays on screen while scrolling scrubs through the
-// chapters: each one's words come in one by one and its photo scans in
-// top to bottom like a CRT (journey.css).
+// chapters: each one's words come in one by one and its photo powers on like a CRT
+// (a bright line widens, opens, flickers once, scanlines settle) while HUD brackets and a
+// SIGNAL LOCK readout snap in. Scrub is smoothed so it eases behind the scroll.
 // Loaded on demand and never in Lite mode (see Journey.astro); journey.css does the layout.
 
 import gsap from 'gsap';
@@ -11,6 +12,34 @@ gsap.registerPlugin(ScrollTrigger);
 syncWithGsap(gsap, ScrollTrigger);
 
 const SCREENS_PER_CHAPTER = 0.8;
+const SMOOTH = 0.7; // seconds the scrub trails the scroll
+
+/** Adds a CRT power-on for one photo to `tl`, from `at` over `dur` timeline units. */
+function powerOn(tl: gsap.core.Timeline, el: HTMLElement, at: number, dur: number) {
+  const pic = el.querySelector('picture');
+  const scan = el.querySelector('.crt-scan');
+  const brackets = el.querySelectorAll('.jhud-br');
+  const read = el.querySelector('.jhud-read');
+  const nosig = el.querySelector('.jhud-nosig');
+  const lock = el.querySelector('.jhud-lock');
+  if (!pic) return;
+  const t = (f: number) => at + dur * f;
+  tl.fromTo(pic, { scaleX: 0.04, scaleY: 0.008, opacity: 1, filter: 'brightness(4)' }, { scaleX: 1, duration: dur * 0.22, ease: 'power2.out' }, t(0));
+  tl.to(pic, { scaleY: 1, filter: 'brightness(1.7)', duration: dur * 0.3, ease: 'expo.out' }, t(0.22));
+  // One flicker, then settle.
+  tl.to(pic, { opacity: 0.45, duration: dur * 0.03 }, t(0.54));
+  tl.to(pic, { opacity: 1, duration: dur * 0.03 }, t(0.57));
+  tl.to(pic, { opacity: 0.75, duration: dur * 0.02 }, t(0.62));
+  tl.to(pic, { opacity: 1, filter: 'brightness(1)', duration: dur * 0.16 }, t(0.64));
+  if (scan) tl.fromTo(scan, { opacity: 1 }, { opacity: 0, duration: dur * 0.35, ease: 'power1.in' }, t(0.55));
+  if (brackets.length)
+    tl.fromTo(brackets, { opacity: 0, scale: 1.8 }, { opacity: 1, scale: 1, duration: dur * 0.14, stagger: dur * 0.035, ease: 'back.out(2.2)' }, t(0.48));
+  if (read) tl.fromTo(read, { opacity: 0 }, { opacity: 1, duration: dur * 0.06 }, t(0.5));
+  if (nosig && lock) {
+    tl.fromTo(nosig, { opacity: 1 }, { opacity: 0, duration: dur * 0.02 }, t(0.86));
+    tl.fromTo(lock, { opacity: 0 }, { opacity: 1, duration: dur * 0.02 }, t(0.86));
+  }
+}
 
 function splitWords(el: HTMLElement): HTMLElement[] {
   const text = el.textContent?.trim() ?? '';
@@ -54,15 +83,16 @@ export function createJourney(section: HTMLElement): { destroy: () => void } {
   sizeSection();
   ScrollTrigger.addEventListener('refreshInit', sizeSection);
 
+  section.setAttribute('data-journey-live', '');
   const ctx = gsap.context(() => {
     gsap.set(chapters.slice(1), { opacity: 0, pointerEvents: 'none' });
 
     // Chapter 1 reveals as the section scrolls into place, before the pin takes over.
     const intro = gsap.timeline({
-      scrollTrigger: { trigger: section, start: 'top 75%', end: 'top top+=40', scrub: true },
+      scrollTrigger: { trigger: section, start: 'top 75%', end: 'top top+=40', scrub: SMOOTH },
     });
     intro.fromTo(words[0], { opacity: 0.12 }, { opacity: 1, stagger: 0.08, ease: 'none' }, 0);
-    if (photos[0]) intro.fromTo(photos[0], { '--dot': 0 }, { '--dot': 1, ease: 'power1.in', duration: 1 }, 0);
+    if (photos[0]) powerOn(intro, photos[0], 0.1, 1.4);
 
     // One unit of timeline per chapter. The stage is held in place by CSS position: sticky
     // (the section is made tall enough to scroll through), not by a GSAP pin: a pin flips the
@@ -73,7 +103,7 @@ export function createJourney(section: HTMLElement): { destroy: () => void } {
         trigger: section,
         start: () => `top top+=${menubarHeight()}`,
         end: () => `+=${last * SCREENS_PER_CHAPTER * window.innerHeight}`,
-        scrub: true,
+        scrub: SMOOTH,
         invalidateOnRefresh: true,
         onUpdate: (self) => setActive(Math.min(last, Math.floor(self.progress * last + 0.12))),
       },
@@ -85,7 +115,7 @@ export function createJourney(section: HTMLElement): { destroy: () => void } {
       tl.to(chapters[i], { opacity: 1, duration: 0.1 }, at + 0.88);
       tl.fromTo(words[i], { opacity: 0.12 }, { opacity: 1, duration: 0.2, stagger: 0.03 }, at + 0.9);
       const photo = photos[i];
-      if (photo) tl.fromTo(photo, { '--dot': 0 }, { '--dot': 1, duration: 0.4, ease: 'power1.in' }, at + 0.88);
+      if (photo) powerOn(tl, photo, at + 0.86, 0.6);
     }
     // Hold the last chapter for the rest of its unit.
     tl.to({}, { duration: 0.01 }, last);
@@ -116,6 +146,7 @@ export function createJourney(section: HTMLElement): { destroy: () => void } {
       observer.disconnect();
       section.removeEventListener('focusin', onFocus);
       ctx.revert();
+      section.removeAttribute('data-journey-live');
       ScrollTrigger.removeEventListener('refreshInit', sizeSection);
       section.style.height = '';
       lines.forEach((line) => {
