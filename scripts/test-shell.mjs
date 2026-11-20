@@ -47,10 +47,12 @@ const rectOf = (page, sel) =>
   check('clock shows a time', /^\d\d:\d\d$/.test(clock), clock);
   await page.screenshot({ path: '.shots/p1-desk.png' });
 
-  await page.click('.os-desktop-icon');
+  await page.evaluate(() => [...document.querySelectorAll('.os-menubar [role="menuitem"]')].find((b) => b.textContent.trim() === 'File').click());
+  await sleep(250);
+  await page.evaluate(() => [...document.querySelectorAll('.os-menubar button, .os-menubar a')].find((b) => b.textContent.trim() === 'Open readme.md').click());
   await page.waitForSelector('[data-window="readme"]', { timeout: 4000 }).catch(() => {});
   await sleep(1200); // let the open animation finish before measuring
-  check('clicking readme.md opens its window', await has(page, '[data-window="readme"]'));
+  check('File > Open readme.md opens its window', await has(page, '[data-window="readme"]'));
   check('URL gets the window hash', page.url().endsWith('#readme'), page.url());
   check('focus moved into the window', await page.evaluate(() => !!document.activeElement?.closest('[data-window="readme"]')));
   const before = await rectOf(page, '[data-window="readme"]');
@@ -137,7 +139,9 @@ const rectOf = (page, sel) =>
   await sleep(800);
   check('Lite choice survives a reload', (await page.$eval('html', (h) => h.dataset.lite)) === 'true');
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.click('.os-desktop-icon');
+  await page.evaluate(() => [...document.querySelectorAll('.os-menubar [role="menuitem"]')].find((b) => b.textContent.trim() === 'File').click());
+  await sleep(250);
+  await page.evaluate(() => [...document.querySelectorAll('.os-menubar button, .os-menubar a')].find((b) => b.textContent.trim() === 'Open readme.md').click());
   await sleep(500);
   check('windows still open in Lite', await has(page, '[data-window="readme"]'));
   await page.screenshot({ path: '.shots/p1-lite.png' });
@@ -161,7 +165,7 @@ const rectOf = (page, sel) =>
   const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, window.innerWidth) - document.documentElement.clientWidth);
   check('no sideways scroll on phone', overflow <= 0, `overflow=${overflow}`);
 
-  await page.tap('.os-desktop-icon');
+  await page.evaluate(() => { location.hash = 'readme'; }); // the desktop icons are gone; deep links open windows
   await page.waitForSelector('[data-window="readme"]', { timeout: 4000 }).catch(() => {});
   await sleep(600);
   const sheet = await rectOf(page, '[data-window="readme"]');

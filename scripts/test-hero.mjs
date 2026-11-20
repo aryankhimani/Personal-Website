@@ -120,7 +120,9 @@ const canvases = (page) => page.$$eval('.hero-visual canvas', (c) => c.length);
   check('hero choice survives a reload', (await heroOf(page)) === 'ascii');
 
   // Typing H inside a window must not switch hero.
-  await page.click('.os-desktop-icon');
+  await page.evaluate(() => [...document.querySelectorAll('.os-menubar [role="menuitem"]')].find((b) => b.textContent.trim() === 'File').click());
+  await sleep(250);
+  await page.evaluate(() => [...document.querySelectorAll('.os-menubar button, .os-menubar a')].find((b) => b.textContent.trim() === 'Open readme.md').click());
   await sleep(900);
   await page.keyboard.press('h');
   await sleep(300);

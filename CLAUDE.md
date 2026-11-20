@@ -4,6 +4,7 @@ Claude reads this file at the start of every session, so a fresh chat knows wher
 Aryan's usage is limited: keep sessions small, read only what a task needs, and keep messages to him short (3-5 bullets).
 
 ## Where things stand (update this at the end of every phase)
+**Phase 6 done. Only Phase 7 (launch) is left. It happens only when Aryan says 'launch it'.** (Nov 20; open questions for Aryan: `rg -n "TODO(aryan)" src`.)
 - Branch: `upgrade_01` only. Never commit to or push `main` (GitHub Pages serves it) until Aryan says "launch it".
 - Done: Phases 0-5, and Phase 5B steps 1-9 (colour system, boot v2, ASCII field, glass lens, liquid metal, project reader, React Bits/Bencho components, ~/rebuild swarm, CRT toggle, secret terminal, 404 dialog). `git log --oneline | head -20` has the details.
 - Fixed Nov 16: `npm run dev` crashed on a React type import in `src/components/rb/SplitFlapText.tsx` (now `import { type CSSProperties, type HTMLAttributes, ... }`).
@@ -34,12 +35,11 @@ Aryan's usage is limited: keep sessions small, read only what a task needs, and 
       - [x] G6 page order: Writing, Let's build something, new_message.eml, toys, footer strip
       - [x] G7 Signal line, channel-change transitions, HUD tracker, sound, ⌘K palette, arrival lock-ons, ending + uptime
       - [x] G8 verified: 8b-fixes all present; removed orphan ElectricLogo.css, FolderFloat.css, stale "folding bill" credit
-      - [ ] G9 = 8c-8f below
+      - [x] G9 = 8c-8f below
     - [x] 8c (Nov 20): accessibility. `scripts/test-a11y.mjs` (axe WCAG A/AA + landmarks, headings, alt, focus rings, Tab order, reduced motion, Lite) passes on preview; hydration-safe useReducedMotion; no infinite animations in reduced motion/Lite; contrast table in `_private/contrast-table.md`.
     - [x] 8d (Nov 20): copy + colour pass. No exclamations, hype words, emoji or stray greys; accent stays a rare hot spot. Open TODO(aryan) list: `rg -n "TODO\(aryan\)" src` (15, all facts/photos only Aryan has).
     - [x] 8e (Nov 20): Unslop audit (skills/unslop/references/signs.md). Fixed: uppercase tracked labels in the new UI, wordy palette placeholder. Kept on purpose (Aryan asked for them): glass orb behind the AK, an image per project/article, overshoot cursors, zero-padded SECTOR 02/07.
-    - [ ] 8f: hero composition (drop floating desktop icons), tighten navy gap Work→Journey, 404 dialog check, final walkthrough desktop + phone, no console errors. Then set this file to "Phase 6 done. Only Phase 7 (launch) is left. It happens only when Aryan says 'launch it'."
-  - Also from Nov 18 notes: hero composition (drop floating desktop icons), tighten navy gap between Work and Journey.
+    - [x] 8f (Nov 20): floating desktop icons gone from the hero (readme stays in File/Help menus and #readme), shorter navy gap Work→Journey, 404 passes a11y, every test-*.mjs passes on preview, dev has no console errors.
 - Open TODO(aryan) items: grep -rn "TODO(aryan)" src
 
 ## The full plan
