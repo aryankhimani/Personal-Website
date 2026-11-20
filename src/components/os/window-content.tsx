@@ -35,7 +35,7 @@ const STACK: [string, string, string][] = [
   ['GSAP', 'https://gsap.com', 'scroll scenes'],
   ['Lenis', 'https://lenis.darkroom.engineering', 'smooth scrolling'],
   ['Paper Shaders', 'https://shaders.paper.design', 'the liquid metal logo'],
-  ['three.js', 'https://threejs.org', 'the badge, the bill and the paper'],
+  ['three.js', 'https://threejs.org', 'the paper toy'],
   ['ogl', 'https://github.com/oframe/ogl', 'smaller WebGL effects'],
 ];
 
@@ -47,7 +47,7 @@ const CREDITS: [string, string, string][] = [
   [
     'React Bits',
     'https://reactbits.dev',
-    'by David Haz: dock, menus, split-flap, tech text, electric logo, folders, flip cards, carousel, lanyard, and more',
+    'by David Haz: dock, menus, split-flap, tech text, electric logo, folders, flip cards, carousel, and more',
   ],
   ['Bencho', 'https://bencho.dev', 'by Lorenzo Cabra: the folding bill, and ideas for the ASCII wake and the drop box'],
   ['Swarm', 'https://califa.github.io/swarm-site/', 'by Joel Califa, the idea behind the rebuild (no code used)'],

@@ -69,3 +69,36 @@
 [data-lite='true'] .hero-orb-body {
   animation: none !important;
 }
+
+/* CRT power-on for small OS cards ([data-crt-in], driven by lib/motion.ts). A bright line
+   opens into the card, flickers once, and the scanlines fade out. Only added when motion is on. */
+.crt-wait {
+  opacity: 0;
+  transform: scaleY(0.012);
+  filter: brightness(3);
+}
+.crt-wait.crt-on {
+  position: relative;
+  animation: crt-on 900ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--crt-delay, 0ms) both;
+}
+.crt-wait.crt-on::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: repeating-linear-gradient(0deg, rgb(5 9 26 / 0.35) 0 1px, transparent 1px 3px);
+  animation: crt-lines 1100ms ease-out var(--crt-delay, 0ms) both;
+}
+@keyframes crt-on {
+  0% { opacity: 1; transform: scaleY(0.012) scaleX(0.6); filter: brightness(4); }
+  30% { transform: scaleY(0.012) scaleX(1); filter: brightness(3); }
+  62% { transform: scaleY(1.02); filter: brightness(1.6); }
+  70% { opacity: 0.75; }
+  76% { opacity: 1; transform: scaleY(1); filter: brightness(1.1); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+@keyframes crt-lines {
+  0%, 60% { opacity: 1; }
+  100% { opacity: 0; }
+}

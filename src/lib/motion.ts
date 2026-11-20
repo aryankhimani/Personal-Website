@@ -18,7 +18,6 @@ const REVEAL = [
   '.fig',
   '.toys',
   '.finder-window',
-  '.me-window',
   '.compose',
   '.memories-inner',
   '[data-reveal]',
@@ -50,6 +49,28 @@ export function initMotion(): void {
     if (el.getBoundingClientRect().top < fold) continue;
     el.classList.add('reveal');
     io.observe(el);
+  }
+
+  // CRT power-on for small OS cards ([data-crt-in]): a thin bright line opens into the card,
+  // a quick flicker, then the scanlines settle (CSS: .crt-wait / .crt-on in global.css).
+  // Cards entering together are staggered by 120 ms.
+  const crt = new IntersectionObserver(
+    (entries) => {
+      let i = 0;
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const el = e.target as HTMLElement;
+        el.style.setProperty('--crt-delay', `${i++ * 120}ms`);
+        el.classList.add('crt-on');
+        crt.unobserve(el);
+      }
+    },
+    { rootMargin: '0px 0px -10% 0px' },
+  );
+  for (const el of document.querySelectorAll<HTMLElement>('[data-crt-in]')) {
+    if (el.getBoundingClientRect().top < fold) continue;
+    el.classList.add('crt-wait');
+    crt.observe(el);
   }
 
   const headings = [...document.querySelectorAll<HTMLElement>(FLOAT)].filter(

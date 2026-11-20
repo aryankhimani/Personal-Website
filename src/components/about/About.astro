@@ -1,23 +1,19 @@
 ---
+import { Image } from 'astro:assets';
 import TechLabel from '../os/TechLabel';
-// me.md: a short bio, skills as plain tags and a few honours.
-// Facts from Aryan's resume, LinkedIn and his answers (see memory notes); nothing invented.
-import { existsSync } from 'node:fs';
-import { getImage } from 'astro:assets';
+import { RESUME_URL } from '../os/nav';
+// me.md: photo, three short lines, a few skill tags. Then three small file cards:
+// now.txt, resume.pdf and honours.txt. Facts from Aryan's resume, LinkedIn and his answers.
+// TODO(aryan): this is the clearest portrait in the repo (SHAD, suit, looking away). Swap in a
+// smiling-at-the-camera headshot if you have one: replace the import below.
 import portrait from '../../assets/photos/shad/IMG_3240.jpg';
-import AboutDesk from './AboutDesk';
 
-// The badge photo: public/me/badge.png when it's there, else a SHAD photo.
-// TODO(aryan): drop badge.png into public/me/ (it wasn't in the repo).
-const badgePhoto = existsSync('public/me/badge.png')
-  ? '/me/badge.png'
-  : (await getImage({ src: portrait, width: 600, format: 'jpg' })).src;
+const SKILLS = ['Python', 'TypeScript', 'React', 'FastAPI', 'PyTorch', 'Hugging Face', 'OpenCV', 'SQL', 'Figma'];
 
-const SKILLS: { group: string; items: string[] }[] = [
-  { group: 'Code', items: ['Python', 'TypeScript', 'Java', 'SQL', 'Swift', 'R'] },
-  { group: 'Build', items: ['React', 'FastAPI', 'Node.js', 'Flask', 'MongoDB', 'Docker'] },
-  { group: 'Machine learning', items: ['PyTorch', 'Hugging Face', 'scikit-learn', 'OpenCV', 'SLEAP'] },
-  { group: 'Product', items: ['Figma', 'User testing', 'Onboarding design', 'Partnerships', 'Pitching'] },
+const NOW = [
+  'Building TruthLens with Western AI',
+  'Running events for the Western Founders Network',
+  'Computer Science + Ivey HBA at Western',
 ];
 
 const HONOURS = [
@@ -31,60 +27,78 @@ const HONOURS = [
 ---
 
 <section id="about" class="about" aria-labelledby="about-title">
-  <article class="me-window">
+  <div class="os-path-row"><TechLabel client:visible text="~/me.md" tone="cream" /></div>
+
+  <article class="me-window" data-crt-in>
     <div class="wp-bar">
       <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="wp-file">me.md</span>
     </div>
 
-    <div class="me-body">
+    <div class="me-card">
+      <figure class="me-photo">
+        <Image
+          src={portrait}
+          widths={[220, 440]}
+          sizes="(min-width: 768px) 220px, 140px"
+          alt="Aryan Khimani in a dark suit, standing in front of a wood-panelled wall"
+          loading="lazy"
+        />
+        <figcaption aria-hidden="true">IMG_3240 · SHAD</figcaption>
+      </figure>
 
       <div class="me-text">
-        <div class="os-path-row"><TechLabel client:visible text="~/me.md" tone="navy" /></div>
-        <h2 id="about-title" class="section-heading me-heading">Hi, I&rsquo;m Aryan.</h2>
-
-        <div class="me-prose">
-          <p>
-            I&rsquo;m studying Computer Science at Western University and business at the Ivey Business School, in the
-            dual-degree program (class of 2029).
-          </p>
-          <p>
-            I like problems where biology meets code. At Mount Sinai I built an AI tool that tracks mice for memory
-            research. With Youreka I studied genes linked to PTSD. I&rsquo;ve written about CRISPR, base editing and
-            phage biology along the way.
-          </p>
-          <p>
-            I also like starting things. I co-founded JoeyHelps, which matched Gen Z with mental health professionals,
-            and CraftNova, which helps Gen Z explore the skilled trades. Right now I&rsquo;m building TruthLens with
-            Western AI and running events for the Western Founders Network.
-          </p>
-          <!-- TODO(aryan): one line on what you're looking for (e.g. internships in ...). -->
-        </div>
-
-        <div class="me-skills">
-          {
-            SKILLS.map((s) => (
-              <div class="me-skill-row">
-                <h3>{s.group}</h3>
-                <ul class="work-tags">
-                  {s.items.map((i) => (
-                    <li>{i}</li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          }
-        </div>
-
-        <div class="me-honours">
-          <h3>Honours</h3>
-          <ul>
-            {HONOURS.map((h) => <li>{h}</li>)}
-          </ul>
-        </div>
+        <h2 id="about-title" class="me-heading">Hi, I&rsquo;m Aryan.</h2>
+        <ul class="me-lines">
+          <li>Computer Science at Western and business at Ivey, dual degree, class of 2029.</li>
+          <li>
+            I like problems where biology meets code: an AI tool that tracks mice for memory research at Mount Sinai,
+            and genes linked to PTSD with Youreka.
+          </li>
+          <li>
+            I like starting things: I co-founded JoeyHelps and CraftNova, and I&rsquo;m building TruthLens with Western
+            AI.
+          </li>
+        </ul>
+        <!-- TODO(aryan): one line on what you're looking for (e.g. internships in ...). -->
+        <ul class="work-tags me-tags" aria-label="Skills">
+          {SKILLS.map((s) => <li>{s}</li>)}
+        </ul>
       </div>
     </div>
   </article>
 
-  <AboutDesk client:visible portrait={badgePhoto} />
+  <div class="me-files">
+    <article class="file-card" data-crt-in aria-labelledby="now-title">
+      <header class="file-card-bar">
+        <span class="file-card-icon" aria-hidden="true">txt</span>
+        <h3 id="now-title">now.txt</h3>
+      </header>
+      <ul class="file-card-lines">
+        {NOW.map((n) => <li>{n}</li>)}
+      </ul>
+    </article>
+
+    <article class="file-card" data-crt-in aria-labelledby="resume-title">
+      <header class="file-card-bar">
+        <span class="file-card-icon" aria-hidden="true">pdf</span>
+        <h3 id="resume-title">resume.pdf</h3>
+      </header>
+      <p class="file-card-meta">One page, PDF.</p>
+      <a class="file-card-open" href={RESUME_URL} target="_blank" rel="noopener noreferrer">
+        Open resume.pdf <span aria-hidden="true">↗</span>
+        <span class="sr-only">(opens in a new tab)</span>
+      </a>
+    </article>
+
+    <article class="file-card" data-crt-in aria-labelledby="honours-title">
+      <header class="file-card-bar">
+        <span class="file-card-icon" aria-hidden="true">txt</span>
+        <h3 id="honours-title">honours.txt</h3>
+      </header>
+      <ul class="file-card-lines">
+        {HONOURS.map((h) => <li>{h}</li>)}
+      </ul>
+    </article>
+  </div>
 </section>

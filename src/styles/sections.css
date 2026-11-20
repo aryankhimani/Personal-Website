@@ -568,100 +568,6 @@
   }
 }
 
-/* ---------- About ---------- */
-
-.me-text {
-  padding: 1.5rem 1.25rem 2rem;
-}
-
-@media (min-width: 768px) {
-  .me-text {
-    padding: 2.5rem 3rem 3rem;
-  }
-}
-
-/* Wide screens: bio and honours on the left, skills on the right. */
-@media (min-width: 1100px) {
-  .me-text {
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    column-gap: 4rem;
-    align-items: start;
-  }
-  .me-text > :not(.me-skills) {
-    grid-column: 1;
-  }
-  .me-skills {
-    grid-column: 2;
-    grid-row: 1 / span 4;
-    margin-top: 4.5rem;
-  }
-}
-
-.me-path {
-  color: var(--color-ink-2);
-}
-
-.me-heading {
-  color: var(--color-ink);
-}
-
-.me-prose {
-  max-width: 60ch;
-  margin-top: 1.25rem;
-  font-family: var(--font-body);
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  color: var(--color-ink-2);
-}
-
-.me-prose p + p {
-  margin-top: 0.875rem;
-}
-
-.me-skills {
-  display: grid;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.me-skill-row h3,
-.me-honours h3 {
-  font-size: 0.8125rem;
-  color: var(--color-ink);
-}
-
-.me-skill-row .work-tags {
-  margin-top: 0.5rem;
-}
-
-.me-honours {
-  margin-top: 2rem;
-}
-
-.me-honours ul {
-  margin-top: 0.5rem;
-  font-family: var(--font-body);
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: var(--color-ink-2);
-}
-
-.me-honours li {
-  position: relative;
-  padding-left: 1.25rem;
-}
-
-.me-honours li + li {
-  margin-top: 0.25rem;
-}
-
-.me-honours li::before {
-  content: '-';
-  position: absolute;
-  left: 0.25rem;
-}
-
 /* ---------- Contact ---------- */
 
 .compose {
@@ -1279,77 +1185,6 @@
   color: var(--color-cream-100);
 }
 
-/* ---------- About desk ---------- */
-
-.about-desk {
-  display: grid;
-  gap: 2rem;
-  margin-top: 2.5rem;
-}
-
-@media (min-width: 1024px) {
-  .about-desk {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: center;
-  }
-}
-
-.desk-item figcaption,
-.desk-label {
-  margin-top: 0.75rem;
-  font-size: 0.75rem;
-  color: var(--color-muted);
-}
-
-.desk-label {
-  margin: 0 0 0.75rem;
-}
-
-.badge-stage {
-  display: grid;
-  place-items: center;
-  height: 30rem;
-}
-
-.badge-flat {
-  width: min(70%, 15rem);
-  height: auto;
-  border-radius: 12px;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.1),
-    0 24px 50px -24px rgb(5 9 26 / 0.9);
-  transform: rotate(-3deg);
-}
-
-.desk-now {
-  padding: 1.25rem;
-  border-radius: 12px;
-  background: var(--color-desk-2);
-  box-shadow:
-    inset 0 0 0 1px var(--color-hairline),
-    var(--shadow-raised);
-}
-
-.desk-resume {
-  margin-top: 1rem;
-}
-
-.desk-resume {
-  gap: 0.5rem;
-  background: var(--color-cream-100);
-  color: var(--color-navy-950);
-}
-
-.desk-resume:hover {
-  background: var(--color-cream-50);
-}
-
-.desk-now .thought-line,
-.desk-now .thought-line * {
-  white-space: normal;
-  max-width: 100%;
-}
-
 /* ---------- New toys: refine and ASCII drop ---------- */
 
 @media (min-width: 768px) {
@@ -1847,27 +1682,186 @@
   }
 }
 
-/* Keep the About desk inside the screen on phones. */
-.about-desk > * {
-  min-width: 0;
+
+
+/* ---------- About: me.md card + file cards ---------- */
+
+.about > * {
+  max-width: 60rem;
+  margin-inline: auto;
 }
 
-.desk-now {
+.about .os-path-row {
+  margin-bottom: 1rem;
+}
+
+
+.me-card {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: 1.25rem;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .me-card {
+    grid-template-columns: 12rem minmax(0, 1fr);
+    gap: 2rem;
+    padding: 1.75rem 2rem 2rem;
+  }
+}
+
+.me-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: 50% 18%;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgb(11 20 48 / 0.2);
+}
+
+.me-photo figcaption {
+  margin-top: 0.375rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-2);
+}
+
+.me-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.375rem);
+  font-variation-settings: 'wght' 340;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.me-lines {
+  max-width: 56ch;
+  margin-top: 0.875rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--color-ink-2);
+}
+
+.me-lines li + li {
+  margin-top: 0.375rem;
+}
+
+.me-tags {
+  margin-top: 1.25rem;
+}
+
+/* Phones: photo above the text so the lines get the full width. */
+@media (max-width: 479px) {
+  .me-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .me-photo {
+    width: 7.5rem;
+  }
+}
+
+.me-files {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  .me-files {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+.file-card {
   overflow: hidden;
+  border-radius: 10px;
+  background: var(--color-desk-2);
+  box-shadow:
+    inset 0 0 0 1px var(--color-hairline),
+    var(--shadow-raised);
+  transition: box-shadow 200ms ease;
 }
 
-.desk-now .thought-line__fold,
-.desk-now .thought-line__steps,
-.desk-now .thought-line__step {
-  width: auto !important;
-  max-width: 100% !important;
+.file-card:hover,
+.file-card:focus-within {
+  box-shadow:
+    inset 0 0 0 1px var(--color-navy-600),
+    var(--shadow-raised);
 }
 
-.desk-now .thought-line__step-text {
-  white-space: normal !important;
+.file-card-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2rem;
+  padding-inline: 0.75rem;
+  border-bottom: 1px solid var(--color-hairline);
 }
 
-/* Keep the About section from scrolling sideways on phones. */
-#about {
-  overflow-x: clip;
+.file-card-bar h3 {
+  font-size: 0.75rem;
+  color: var(--color-chrome-4);
+}
+
+.file-card-icon {
+  padding: 0.0625rem 0.3125rem;
+  border: 1px solid var(--color-navy-600);
+  border-radius: 3px;
+  font-size: 0.5625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.file-card-lines,
+.file-card-meta {
+  padding: 0.875rem 0.875rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-chrome-3);
+}
+
+.file-card-lines li {
+  position: relative;
+  padding-left: 1rem;
+}
+
+.file-card-lines li + li {
+  margin-top: 0.375rem;
+}
+
+.file-card-lines li::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  font-family: var(--font-mono);
+  color: var(--color-muted);
+}
+
+.file-card-meta {
+  padding-bottom: 0.5rem;
+  color: var(--color-muted);
+}
+
+.file-card-open {
+  display: inline-flex;
+  gap: 0.375rem;
+  margin: 0 0.875rem 1rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 6px;
+  background: var(--color-cream-100);
+  font-size: 0.8125rem;
+  color: var(--color-navy-950);
+  transition: background-color 150ms ease;
+}
+
+.file-card-open:hover {
+  background: var(--color-cream-50);
 }
