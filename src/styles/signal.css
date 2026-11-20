@@ -1,21 +1,78 @@
-/* The scroll journey (lib/signal/*): the Signal line, the phone trace, channel flash,
+/* The scroll journey (lib/signal/*): the Signal conduit, channel flash,
    HUD tracker, title lock-ons, and the end line. All pointer-transparent except the HUD. */
 
-/* ---------- Signal line ---------- */
+/* ---------- Signal conduit (line.ts) ---------- */
 
-.signal-layer {
+/* Fixed in the left gutter, under every overlay (and hidden while one is open). */
+.conduit {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 25;
+  pointer-events: none;
+  transition: opacity 160ms ease, visibility 0s linear 0s;
+}
+
+.conduit[data-off] {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 120ms ease, visibility 0s linear 120ms;
+}
+
+.conduit-cv {
+  display: block;
+}
+
+.conduit-spark {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+.sig-next {
+  position: absolute;
+  top: 0;
+  left: calc(var(--cx, 40px) - 30px);
+  display: grid;
+  gap: 1px;
+  padding: 3px 6px 4px;
+  border-radius: 4px;
+  background: rgb(11 20 48 / 0.72);
+  box-shadow: inset 0 0 0 1px rgb(242 235 221 / 0.12);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  line-height: 1.25;
+  color: var(--color-cream-100);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 240ms ease;
+  will-change: transform;
+}
+
+.sig-next[data-on] {
+  opacity: 1;
+}
+
+.sig-next-k {
+  color: var(--color-accent);
+}
+
+.sig-next-p b {
+  display: inline-block;
+  font-weight: 400;
+  animation: sig-flap 380ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+
+.signal-sig {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 30;
-  width: 100%;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.signal-svg {
-  display: block;
+  z-index: 25;
   overflow: visible;
+  pointer-events: none;
 }
 
 .signal-glow,
@@ -26,10 +83,14 @@
   stroke-linejoin: round;
 }
 
+.signal-sig.draw path {
+  transition: stroke-dashoffset 1500ms cubic-bezier(0.45, 0, 0.3, 1);
+}
+
 .signal-glow {
   stroke: var(--color-ember-500);
   stroke-width: 6;
-  stroke-opacity: 0.16;
+  stroke-opacity: 0.22;
 }
 
 .signal-case {
@@ -41,34 +102,17 @@
 .signal-core {
   stroke: var(--color-cream-50);
   stroke-width: 1.4;
-  stroke-opacity: 0.85;
-}
-
-.signal-pen {
-  fill: var(--color-cream-50);
-  filter: drop-shadow(0 0 4px var(--color-ember-500)) drop-shadow(0 0 10px rgb(255 74 43 / 0.6));
-  transition: opacity 200ms ease;
-}
-
-/* On a sector change the trace stutters once, like the channel just flipped. */
-.signal-svg.flick {
-  animation: signal-flick 340ms steps(1) 1;
-}
-
-@keyframes signal-flick {
-  0% { opacity: 1; }
-  15% { opacity: 0.25; }
-  30% { opacity: 1; }
-  55% { opacity: 0.55; }
-  70% { opacity: 1; }
+  stroke-opacity: 0.9;
 }
 
 .signal-end {
   position: absolute;
+  z-index: 25;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--color-muted);
   white-space: nowrap;
+  pointer-events: none;
 }
 
 .signal-end[data-on]::after {
@@ -80,28 +124,6 @@
 
 @keyframes signal-caret {
   50% { opacity: 0; }
-}
-
-/* Phones (and touch screens): a straight progress trace down the right edge. */
-.signal-trace {
-  position: fixed;
-  top: var(--menubar-h, 2rem);
-  right: 3px;
-  bottom: 0;
-  z-index: 30;
-  width: 2px;
-  pointer-events: none;
-}
-
-.signal-trace i {
-  display: block;
-  height: 100%;
-  border-radius: 2px;
-  background: var(--color-cream-50);
-  box-shadow: 0 0 6px rgb(255 74 43 / 0.6);
-  transform: scaleY(var(--p, 0));
-  transform-origin: top;
-  opacity: 0.7;
 }
 
 /* ---------- Channel change flash ---------- */
@@ -309,8 +331,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .lock-box,
-  .channel-flash {
+  .channel-flash,
+  .conduit-spark {
     display: none;
+  }
+  .sig-next-p b {
+    animation: none;
   }
   .signal-end[data-on]::after {
     animation: none;

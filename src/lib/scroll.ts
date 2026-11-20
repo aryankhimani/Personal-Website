@@ -14,7 +14,9 @@ let lenis: Lenis | null = null;
 let locks = 0;
 let raf = 0;
 let gsapRef: { gsap: Gsap; ST: ST } | null = null;
-const tick = (time: number) => lenis?.raf(time * 1000);
+// GSAP's ticker time starts at 0 when GSAP loads, but Lenis has been running on the page clock;
+// feeding it GSAP's time mid-scroll would send its clock backwards and freeze a jump. Use one clock.
+const tick = () => lenis?.raf(performance.now());
 
 function ownLoop(t: number) {
   lenis?.raf(t);

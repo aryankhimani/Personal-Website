@@ -1,6 +1,6 @@
 // The one place the scroll "journey" pieces talk to each other. When the visitor crosses
 // into a new sector, `sector` fires once, and every piece reacts to the same moment:
-//   - the Signal line flickers (line.ts)
+//   - the Signal conduit surges and sparks into the title (line.ts)
 //   - the HUD tracker flips to the new number (hud.ts)
 //   - the section title locks on (arrive.ts)
 //   - the channel click plays, if sound is on (sound.ts)

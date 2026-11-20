@@ -2,8 +2,8 @@
 import { Image } from 'astro:assets';
 import TechLabel from '../os/TechLabel';
 import { RESUME_URL } from '../os/nav';
-// me.md: photo, three short lines, a few skill tags. Then three small file cards:
-// now.txt, resume.pdf and honours.txt. Facts from Aryan's resume, LinkedIn and his answers.
+// me.md: photo, three short lines, a few skill tags. Then now.txt, resume.pdf and
+// honours.txt as hologram cards orbiting a plasma core. Facts from Aryan's resume, LinkedIn and his answers.
 // TODO(aryan): this is the clearest portrait in the repo (SHAD, suit, looking away). Swap in a
 // smiling-at-the-camera headshot if you have one: replace the import below.
 import portrait from '../../assets/photos/shad/IMG_3240.jpg';
@@ -68,37 +68,63 @@ const HONOURS = [
     </div>
   </article>
 
-  <div class="me-files">
-    <article class="file-card" data-crt-in aria-labelledby="now-title">
-      <header class="file-card-bar">
-        <span class="file-card-icon" aria-hidden="true">txt</span>
-        <h3 id="now-title">now.txt</h3>
-      </header>
-      <ul class="file-card-lines">
-        {NOW.map((n) => <li>{n}</li>)}
-      </ul>
-    </article>
+  <!-- now.txt, resume.pdf and honours.txt as glass hologram cards orbiting a plasma core
+       (script below, CSS .holo-* in sections.css). To screen readers it's a plain list. -->
+  <div class="holo" data-holo>
+    <div class="holo-core" aria-hidden="true">
+      <span class="holo-core-glow"></span>
+      <span class="holo-core-name">ARYAN</span>
+    </div>
+    <span class="holo-ring" aria-hidden="true"></span>
+    <ul class="holo-list" aria-label="Files">
+      <li class="holo-item" data-holo-item>
+        <article class="file-card holo-card" aria-labelledby="now-title">
+          <header class="file-card-bar">
+            <span class="file-card-icon" aria-hidden="true">txt</span>
+            <h3 id="now-title">
+              <button type="button" class="holo-btn" aria-expanded="false">now.txt</button>
+            </h3>
+          </header>
+          <ul class="file-card-lines">
+            {NOW.map((n) => <li>{n}</li>)}
+          </ul>
+        </article>
+      </li>
 
-    <article class="file-card" data-crt-in aria-labelledby="resume-title">
-      <header class="file-card-bar">
-        <span class="file-card-icon" aria-hidden="true">pdf</span>
-        <h3 id="resume-title">resume.pdf</h3>
-      </header>
-      <p class="file-card-meta">One page, PDF.</p>
-      <a class="file-card-open" href={RESUME_URL} target="_blank" rel="noopener noreferrer">
-        Open resume.pdf <span aria-hidden="true">↗</span>
-        <span class="sr-only">(opens in a new tab)</span>
-      </a>
-    </article>
+      <li class="holo-item" data-holo-item>
+        <article class="file-card holo-card" aria-labelledby="resume-title">
+          <header class="file-card-bar">
+            <span class="file-card-icon" aria-hidden="true">pdf</span>
+            <h3 id="resume-title">
+              <button type="button" class="holo-btn" aria-expanded="false">resume.pdf</button>
+            </h3>
+          </header>
+          <p class="file-card-meta">One page, PDF.</p>
+          <a class="file-card-open" href={RESUME_URL} target="_blank" rel="noopener noreferrer">
+            Open resume.pdf <span aria-hidden="true">↗</span>
+            <span class="sr-only">(opens in a new tab)</span>
+          </a>
+        </article>
+      </li>
 
-    <article class="file-card" data-crt-in aria-labelledby="honours-title">
-      <header class="file-card-bar">
-        <span class="file-card-icon" aria-hidden="true">txt</span>
-        <h3 id="honours-title">honours.txt</h3>
-      </header>
-      <ul class="file-card-lines">
-        {HONOURS.map((h) => <li>{h}</li>)}
-      </ul>
-    </article>
+      <li class="holo-item" data-holo-item>
+        <article class="file-card holo-card" aria-labelledby="honours-title">
+          <header class="file-card-bar">
+            <span class="file-card-icon" aria-hidden="true">txt</span>
+            <h3 id="honours-title">
+              <button type="button" class="holo-btn" aria-expanded="false">honours.txt</button>
+            </h3>
+          </header>
+          <ul class="file-card-lines">
+            {HONOURS.map((h) => <li>{h}</li>)}
+          </ul>
+        </article>
+      </li>
+    </ul>
   </div>
 </section>
+
+<script>
+  import { initHolo } from '../../lib/holo';
+  initHolo();
+</script>

@@ -1,4 +1,4 @@
-// The scroll journey as one system: Signal line, HUD tracker, channel changes, lock-ons,
+// The scroll journey as one system: Signal conduit, HUD tracker, channel changes, lock-ons,
 // sound (off by default, no AudioContext until turned on), the ⌘K palette and the ending.
 // Usage: node scripts/test-signal.mjs [baseUrl]
 import puppeteer from 'puppeteer-core';
@@ -36,29 +36,57 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
 // ---------- desktop ----------
 {
   const { page, errors } = await open();
-  const s = await page.evaluate(() => ({
-    d: document.querySelector('.signal-core')?.getAttribute('d')?.length ?? 0,
-    sub: (document.querySelector('.signal-core')?.getAttribute('d') ?? '').slice(1).search(/[Mmz]/),
-    notches: document.querySelectorAll('.sig-hud-notch').length,
-    sound: document.documentElement.dataset.sound,
-    ac: window.__ac,
-  }));
-  check('the Signal is one continuous path (no sub-paths)', s.d > 1000 && s.sub === -1, `len ${s.d}`);
+  const s = await page.evaluate(() => {
+    const cv = document.querySelector('.conduit-cv')?.getBoundingClientRect();
+    const workLeft = Math.min(...[...document.querySelectorAll('#work .gf-body, #work h2, #about .me-window')].map((e) => e.getBoundingClientRect().left));
+    return {
+      mode: document.querySelector('.conduit')?.dataset.mode,
+      right: cv?.right ?? 999,
+      workLeft,
+      old: document.querySelectorAll('.signal-layer, .signal-trace').length,
+      notches: document.querySelectorAll('.sig-hud-notch').length,
+      sound: document.documentElement.dataset.sound,
+      ac: window.__ac,
+    };
+  });
+  check('the conduit lives in the left gutter only (never over cards or text)', s.mode === 'wide' && s.right <= s.workLeft && s.old === 0, JSON.stringify(s));
   check('HUD tracker has a notch per sector', s.notches === 7);
   check('sound is off by default and no AudioContext exists', s.sound === 'off' && s.ac === 0);
 
-  const off0 = await page.$eval('.signal-core', (e) => parseFloat(e.style.strokeDashoffset));
+  const next0 = await page.$eval('.sig-next-p', (e) => e.textContent);
   await page.evaluate(() => document.getElementById('journey').scrollIntoView());
-  await sleep(1500);
+  await sleep(250);
+  const spark = await page.evaluate(() => !document.querySelector('.conduit-spark').hidden);
+  await sleep(1300);
   const after = await page.evaluate(() => ({
-    off: parseFloat(document.querySelector('.signal-core').style.strokeDashoffset),
+    next: document.querySelector('.sig-next-p').textContent,
     num: document.querySelector('.sig-hud-num b').textContent,
     path: document.querySelector('.sig-hud-path').textContent,
     lock: !!document.querySelector('#journey .lock-box.on'),
+    opacity: getComputedStyle(document.querySelector('.conduit')).opacity,
   }));
-  check('scrolling draws more of the line', after.off < off0, `${off0.toFixed(0)} -> ${after.off.toFixed(0)}`);
+  check('the NEXT label updates per sector', next0 === '~/me.md' && after.next === '~/playground.fig', `${next0} -> ${after.next}`);
+  check('a spark arcs into the arriving title', spark);
+  check('the conduit stays visible through channel changes', after.opacity === '1', after.opacity);
   check('the HUD ticks to the Journey sector', after.num === '04' && after.path === '~/journey', `${after.num} ${after.path}`);
   check('the Journey title locks on', after.lock);
+
+  // Overlays: the conduit hides under any open folder page or reader.
+  for (const hash of ['#work/ventures', '#work/jobby']) {
+    await page.evaluate((h) => (location.hash = h), hash);
+    await sleep(1200);
+    const hid = await page.evaluate(() => ({
+      dialog: !!document.querySelector('[role="dialog"]'),
+      vis: getComputedStyle(document.querySelector('.conduit')).visibility,
+    }));
+    check(`${hash}: no conduit over the overlay`, hid.dialog && hid.vis === 'hidden', JSON.stringify(hid));
+    await page.keyboard.press('Escape');
+    await sleep(600);
+  }
+  await page.evaluate(() => history.replaceState(null, '', location.pathname));
+  await page.keyboard.press('Escape');
+  await sleep(600);
+  check('the conduit comes back when the overlay closes', await page.$eval('.conduit', (e) => getComputedStyle(e).visibility === 'visible'));
 
   await page.click('.sig-hud-notch[aria-label^="Sector 03"]');
   await sleep(2600);
@@ -98,10 +126,10 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
   await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
   await sleep(4500);
   const end = await page.evaluate(() => ({
-    off: parseFloat(document.querySelector('.signal-core').style.strokeDashoffset),
+    off: parseFloat(document.querySelector('.signal-sig .signal-core').style.strokeDashoffset),
     text: document.querySelector('.signal-end').textContent,
   }));
-  check('at the bottom the line finishes and the end line types', end.off < 3 && end.text.startsWith('> end of transmission'), JSON.stringify(end));
+  check('at the bottom it signs Aryan and the end line types', end.off < 3 && end.text.startsWith('> end of transmission'), JSON.stringify(end));
   const up = await page.$eval('.systray-up', (e) => e.textContent);
   check('menu bar shows uptime', /^uptime \d\d:\d\d/.test(up), up);
   check('no console errors (desktop)', errors.length === 0, errors.slice(0, 2).join(' | '));
@@ -112,10 +140,11 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
 {
   const { page, errors } = await open({ motion: 'reduce' });
   const r = await page.evaluate(() => ({
-    off: parseFloat(document.querySelector('.signal-core').style.strokeDashoffset),
+    off: parseFloat(document.querySelector('.signal-sig .signal-core').style.strokeDashoffset),
     end: document.querySelector('.signal-end').textContent,
+    spark: getComputedStyle(document.querySelector('.conduit-spark')).display,
   }));
-  check('reduced motion: the whole line is drawn, still', r.off === 0 && r.end.length > 10, JSON.stringify(r));
+  check('reduced motion: signature drawn, still, no sparks', r.off === 0 && r.end.length > 10 && r.spark === 'none', JSON.stringify(r));
   await page.evaluate(() => document.getElementById('writing').scrollIntoView());
   await sleep(800);
   const styled = await page.evaluate(() => [...document.querySelectorAll('main > section')].some((s) => s.style.transform || s.style.clipPath));
@@ -128,12 +157,13 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
 {
   const { page, errors } = await open({ width: 390, height: 844, touch: true });
   const m = await page.evaluate(() => ({
-    layer: document.querySelector('.signal-layer')?.hidden,
-    trace: document.querySelector('.signal-trace')?.hidden,
+    mode: document.querySelector('.conduit')?.dataset.mode,
+    w: document.querySelector('.conduit-cv').getBoundingClientRect().width,
+    label: document.querySelector('.sig-next').hidden,
     hud: getComputedStyle(document.querySelector('.sig-hud')).display,
     wide: document.documentElement.scrollWidth,
   }));
-  check('phone: progress trace instead of the full line, no HUD, no sideways scroll', m.layer === true && m.trace === false && m.hud === 'none' && m.wide === 390, JSON.stringify(m));
+  check('phone: thin progress conduit on the left edge, no label, no HUD, no sideways scroll', m.mode === 'thin' && m.w <= 14 && m.label && m.hud === 'none' && m.wide === 390, JSON.stringify(m));
   check('no console errors (phone)', errors.length === 0, errors.slice(0, 2).join(' | '));
   await page.close();
 }
