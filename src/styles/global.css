@@ -10,6 +10,7 @@
 @import './journey.css';
 @import './sections.css';
 @import './colour.css';
+@import './signal.css';
 
 :root {
   --menubar-h: 2.75rem;

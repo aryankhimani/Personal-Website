@@ -13,6 +13,7 @@
 //
 // Any key or a tap/click skips. In Lite / reduced motion it's a single 0.5s fade (CSS only).
 
+import { sound } from './sound';
 import { lockScroll, unlockScroll } from './scroll';
 
 export type BootPhase = 'post' | 'title' | 'ready' | 'off';
@@ -49,6 +50,9 @@ export function runBoot(): void {
   const boot = document.getElementById('boot');
   const mode = root.dataset.boot;
   if (!mode || !boot) return;
+  // Soft CRT power-on, if sound is on (silent until the visitor's first tap or key: browsers
+  // don't allow audio before that).
+  sound.crtOn();
 
   let done = false;
   let leaving = false;

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { setLite } from '../../lib/device-tier';
 import { setHero, HEROES } from '../../lib/hero';
 import { closeWindow, openWindow } from '../../lib/windows';
+import { sound } from '../../lib/sound';
 import { FOLDERS } from '../../lib/work';
 import { WORK_INDEX } from './window-list';
 
@@ -132,6 +133,7 @@ export default function SecretTerminal() {
           className="term-input"
           value={value}
           onChange={(e) => setValue(e.target.value)}
+          onKeyDown={() => sound.type()}
           autoComplete="off"
           autoCapitalize="off"
           spellCheck={false}

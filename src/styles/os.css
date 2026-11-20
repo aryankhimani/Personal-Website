@@ -423,3 +423,46 @@
 .os-window .term :focus-visible {
   outline: none;
 }
+
+/* Speaker toggle (SoundToggle.tsx). */
+.os-sound {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.5rem;
+  border-radius: 5px;
+  color: var(--color-muted);
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.os-sound:hover {
+  background: rgb(242 235 221 / 0.08);
+  color: var(--color-chrome-4);
+}
+
+.os-sound[aria-pressed='true'] {
+  color: var(--color-chrome-4);
+}
+
+.os-sound:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.os-sound-on-cream {
+  display: inline-flex;
+  gap: 0.5rem;
+  width: auto;
+  height: auto;
+  padding: 0.25rem 0;
+  align-self: flex-start;
+  color: var(--color-ink-2);
+}
+
+.os-sound-on-cream[aria-pressed='true'],
+.os-sound-on-cream:hover {
+  background: none;
+  color: var(--color-ink);
+}

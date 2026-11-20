@@ -5,6 +5,7 @@ import Footer from '../components/os/Footer.astro';
 import MenuBar from '../components/os/MenuBar';
 import WindowManager from '../components/os/WindowManager';
 import BootTitle from '../components/os/BootTitle';
+import CommandPalette from '../components/os/CommandPalette';
 import { getProjects, toIndexEntry } from '../lib/projects';
 import { INDEX_ELEMENT_ID } from '../lib/work';
 import heroFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
@@ -162,6 +163,7 @@ const ogImage = new URL('/og.jpg', Astro.site).href;
     <Footer bare={bareFoot} />
     <WindowManager client:idle />
     <Dock client:idle />
+    <CommandPalette client:idle />
     <script type="application/json" id={INDEX_ELEMENT_ID} set:html={workIndex} />
 
     <script>
@@ -170,12 +172,17 @@ const ogImage = new URL('/og.jpg', Astro.site).href;
       import { bindWindowLinks } from '../lib/windows';
       import { initMotion } from '../lib/motion';
       import { initEasterEgg } from '../lib/easter';
+      import { initSound } from '../lib/sound';
       import '../components/os/window-list';
+      initSound();
       initScroll();
       initMotion();
       initEasterEgg();
       runBoot();
       bindWindowLinks();
+      // The scroll journey (Signal line, channel changes, HUD, lock-ons) loads when the page is idle.
+      const idle = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 600));
+      idle(() => void import('../lib/signal').then((m) => m.initSignal()));
     </script>
   </body>
 </html>

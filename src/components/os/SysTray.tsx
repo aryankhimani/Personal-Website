@@ -41,8 +41,8 @@ export default function SysTray() {
 
   return (
     <p className="systray" aria-hidden="true">
-      <span title="Time on this page" className="systray-up">
-        up {uptime}
+      <span title="How long you have been on the site" className="systray-up">
+        uptime {uptime}
       </span>
       <span title={battery ? `Battery ${Math.round(battery.level * 100)}%` : 'Power'} className="systray-batt">
         {battery ? (

@@ -4,6 +4,7 @@ import { openWindow } from '../../lib/windows';
 import StaggeredMenu, { type StaggeredMenuItem } from '../rb/StaggeredMenu';
 import Clock from './Clock';
 import LiteToggle from './LiteToggle';
+import SoundToggle from './SoundToggle';
 import { RESUME_URL, SECTIONS } from './nav';
 import { ember, navy, cream } from '../../lib/palette';
 
@@ -46,6 +47,7 @@ export default function MobileMenu({ brand }: { brand: React.ReactNode }) {
       footer={
         <div className="flex flex-col gap-4 border-t border-black/15 pt-5 text-sm">
           <LiteToggle className="os-switch-on-cream self-start" />
+          <SoundToggle withLabel className="os-sound-on-cream" />
           <Clock className="os-clock-on-cream flex-wrap text-xs" flaps={false} />
         </div>
       }

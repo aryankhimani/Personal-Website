@@ -8,6 +8,8 @@ import Clock from './Clock';
 import SysTray from './SysTray';
 import { Icon } from './Icon';
 import LiteToggle from './LiteToggle';
+import SoundToggle, { useSound } from './SoundToggle';
+import { setSound } from '../../lib/sound';
 import { RESUME_URL } from './nav';
 import { WORK_INDEX } from './window-list';
 import { FOLDERS } from '../../lib/work';
@@ -67,6 +69,7 @@ export default function MenuBar() {
   const lite = useLite();
   const hero = useHero();
   const crt = useCrt();
+  const sound = useSound();
   const [open, setOpen] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
@@ -92,6 +95,7 @@ export default function MenuBar() {
         })),
         { label: 'CRT effect', checked: crt, divider: true, onSelect: () => setCrt(!crt) },
         { label: 'Lite mode', checked: lite, onSelect: () => setLite(!lite) },
+        { label: 'Sound', checked: sound, onSelect: () => setSound(!sound) },
       ],
     },
     {
@@ -110,6 +114,7 @@ export default function MenuBar() {
       entries: [
         { label: 'About Aryan OS', onSelect: (t) => openWindow('about-this-site', t) },
         { label: 'Read me', onSelect: (t) => openWindow('readme', t) },
+        { label: 'Command palette  ⌘K', onSelect: () => window.dispatchEvent(new Event('aryan-os:palette')) },
       ],
     },
   ];
@@ -301,6 +306,7 @@ export default function MenuBar() {
         <div className="ml-auto flex items-center gap-5">
           <SysTray />
           <Clock className="text-chrome-3" />
+          <SoundToggle />
           <LiteToggle />
         </div>
       </div>
