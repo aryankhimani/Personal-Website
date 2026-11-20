@@ -9,11 +9,17 @@ import { useEffect, useRef } from 'react';
 export const HERO_DPR = 1.5;
 
 export type Pointer = {
-  /** Pointer position as -1..1 across the canvas, eased; 0,0 when away. */
+  /** Pointer position as -1..1 across the canvas, eased; 0,0 when away. For slow effects
+   *  (tilt, parallax), never for anything drawn at the cursor. */
   x: number;
   y: number;
+  /** The real pointer position in canvas px, read fresh every frame (no easing, no lag). */
+  mx: number;
+  my: number;
   /** True while the pointer is over the hero. */
   inside: boolean;
+  /** 0..1, eases in when the pointer arrives and out when it leaves: effect strength. */
+  on: number;
 };
 
 export type Scene = {
@@ -37,7 +43,11 @@ export function useCanvasScene(make: () => Scene, { still = false, pixel = false
     const scene = make();
     const reduced = still || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const target = { x: 0, y: 0 };
-    const p: Pointer = { x: 0, y: 0, inside: false };
+    const p: Pointer = { x: 0, y: 0, mx: -1e4, my: -1e4, inside: false, on: 0 };
+    // Last pointer position in client px; turned into canvas px each frame, so it stays right
+    // while the page scrolls under a still mouse.
+    let clientX = 0;
+    let clientY = 0;
     let W = 0;
     let H = 0;
     let raf = 0;
@@ -67,9 +77,17 @@ export function useCanvasScene(make: () => Scene, { still = false, pixel = false
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       t += dt;
+      if (p.inside) {
+        const r = c.getBoundingClientRect();
+        p.mx = clientX - r.left;
+        p.my = clientY - r.top;
+        target.x = Math.max(-1, Math.min(1, (p.mx / r.width) * 2 - 1));
+        target.y = Math.max(-1, Math.min(1, (p.my / r.height) * 2 - 1));
+      }
       const k = 1 - Math.exp(-dt * 3);
       p.x += (target.x - p.x) * k;
       p.y += (target.y - p.y) * k;
+      p.on += ((p.inside ? 1 : 0) - p.on) * (1 - Math.exp(-dt * 9));
       paint(dt);
       if (visible) raf = requestAnimationFrame(frame);
     };
@@ -88,9 +106,14 @@ export function useCanvasScene(make: () => Scene, { still = false, pixel = false
 
     const hero = c.closest('.hero') ?? c;
     const onMove = (e: PointerEvent) => {
-      const r = c.getBoundingClientRect();
-      target.x = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
-      target.y = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
+      clientX = e.clientX;
+      clientY = e.clientY;
+      if (!p.inside) {
+        // Arriving: jump straight to the pointer instead of sweeping in from the last spot.
+        const r = c.getBoundingClientRect();
+        p.mx = clientX - r.left;
+        p.my = clientY - r.top;
+      }
       p.inside = true;
     };
     const onLeave = () => {

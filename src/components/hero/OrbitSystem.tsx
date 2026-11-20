@@ -14,14 +14,25 @@ import { arcs, frame, reticle } from './hud';
 const TWIST = 3.4; // how far the ellipses turn from core to rim, in radians
 const SQUASH = 0.58; // ellipse minor/major ratio: lower = stronger arms
 const LENS = 90; // pointer lens radius, px
+const LEVELS = 3; // brightness steps (by distance from the core)
+const DUST = 5; // tone index of the soft arm dust
 
-type Star = { r: number; t: number; w: number; jx: number; jy: number; size: number; tone: number };
+type Star = { r: number; t: number; w: number; jx: number; jy: number; size: number; tone: number; tc: number; ts: number };
 
 function galaxy(): Scene {
   const rand = rng(7);
-  const tones = [cream['50'], cream['200'], navy['300'], ember['400']].map(rgb);
+  // cream core, cream arms, navy rim, ember hot stars, cream highlights, dust.
+  const tones = [cream['50'], cream['200'], navy['300'], ember['400'], cream['50'], navy['300']].map(rgb);
+  const alpha = (tone: number, level: number) =>
+    tone === 3 ? 0.9 : tone === 4 ? 0.95 : tone === DUST ? 0.05 + level * 0.025 : 0.42 + level * 0.26;
   let stars: Star[] = [];
-  let sky: { x: number; y: number; s: number }[] = [];
+  // Stars are sorted by colour bucket; bucket b runs from start[b] to start[b + 1].
+  let start: number[] = [];
+  const LAYERS = [
+    { n: 260, s: [0.4, 0.7], a: 0.14, shift: 5 },
+    { n: 130, s: [0.6, 1.1], a: 0.22, shift: 12 },
+  ];
+  let sky: { x: number; y: number; s: number; tw: number }[][] = [];
   let W = 0;
   let H = 0;
   let cx = 0;
@@ -35,11 +46,12 @@ function galaxy(): Scene {
     if (!stars.length) return null;
     for (let tries = 0; tries < 6; tries++) {
       const a = Math.floor(Math.random() * stars.length);
-      if (stars[a].r < 0.2 || stars[a].r > 0.75) continue;
+      if (stars[a].tone === DUST || stars[a].r < 0.2 || stars[a].r > 0.75) continue;
       let best = -1;
       let bd = Infinity;
       for (let k = 0; k < 260; k++) {
         const b = Math.floor(Math.random() * stars.length);
+        if (stars[b].tone === DUST) continue;
         const d = Math.hypot(px[b] - px[a], py[b] - py[a]);
         if (d > 14 && d < 52 && d < bd) {
           bd = d;
@@ -51,24 +63,41 @@ function galaxy(): Scene {
     return null;
   });
 
-  const seed = (count: number) => {
-    stars = Array.from({ length: count }, () => {
-      // More stars near the middle, a thin halo out to the rim.
-      const r = 0.04 + rand() ** 1.25 * 0.96;
-      const hot = r > 0.25 && r < 0.75 && rand() < 0.05;
+  const levelOf = (r: number) => Math.min(LEVELS - 1, Math.floor((1 - r) * LEVELS));
+  const seed = (count: number, dust: number) => {
+    const make = (isDust: boolean): Star => {
+      // More stars near the middle, a thin halo out to the rim. Dust stays in the arms.
+      const r = isDust ? 0.14 + rand() * 0.7 : 0.04 + rand() ** 1.25 * 0.96;
+      const hot = !isDust && r > 0.25 && r < 0.75 && rand() < 0.05;
+      const bright = !isDust && !hot && rand() < 0.012;
+      const phi = r * TWIST;
       return {
         r,
         t: rand() * Math.PI * 2,
         w: 0.16 / Math.sqrt(r + 0.08), // inner stars orbit faster
-        jx: (rand() - 0.5) * 0.035,
-        jy: (rand() - 0.5) * 0.035,
-        size: 0.5 + rand() ** 4 * 1.6,
-        tone: hot ? 3 : r < 0.18 ? 0 : r < 0.55 ? 1 : 2,
+        jx: (rand() - 0.5) * (isDust ? 0.05 : 0.035),
+        jy: (rand() - 0.5) * (isDust ? 0.05 : 0.035),
+        size: isDust ? 2.2 + rand() * 2.6 : bright ? 1.8 + rand() * 0.8 : 0.5 + rand() ** 4 * 1.6,
+        tone: isDust ? DUST : hot ? 3 : bright ? 4 : r < 0.18 ? 0 : r < 0.55 ? 1 : 2,
+        tc: Math.cos(phi),
+        ts: Math.sin(phi),
       };
+    };
+    stars = [...Array.from({ length: count }, () => make(false)), ...Array.from({ length: dust }, () => make(true))];
+    // Dust first so the stars draw over it.
+    const key = (s: Star) => (s.tone === DUST ? -1 : s.tone) * LEVELS + levelOf(s.r);
+    stars.sort((x, y) => key(x) - key(y));
+    start = [];
+    let prev = -Infinity;
+    stars.forEach((s, i) => {
+      const k = key(s);
+      if (k !== prev) start.push(i);
+      prev = k;
     });
-    px = new Float32Array(count);
-    py = new Float32Array(count);
-    sky = Array.from({ length: 140 }, () => ({ x: rand(), y: rand(), s: 0.4 + rand() * 0.7 }));
+    start.push(stars.length);
+    px = new Float32Array(stars.length);
+    py = new Float32Array(stars.length);
+    sky = LAYERS.map((L) => Array.from({ length: L.n }, () => ({ x: rand(), y: rand(), s: L.s[0] + rand() * (L.s[1] - L.s[0]), tw: rand() * 6.3 })));
   };
 
   return {
@@ -84,42 +113,64 @@ function galaxy(): Scene {
         cy = h * 0.27;
         R = Math.min(w * 0.55, h * 0.3);
       }
-      const count = w >= 768 ? 3600 : 1800;
-      if (stars.length !== count) seed(count);
+      const count = w >= 768 ? 5600 : 2600;
+      const dust = w >= 768 ? 900 : 400;
+      if (stars.length !== count + dust) seed(count, dust);
     },
     draw(g, t, dt, p) {
+      // Far sky, two parallax layers that twinkle in two steps.
       const [sr, sg, sb] = tones[2];
-      g.fillStyle = `rgba(${sr},${sg},${sb},0.18)`;
-      for (const s of sky) g.fillRect(s.x * W, s.y * H, s.s, s.s);
+      for (let l = 0; l < LAYERS.length; l++) {
+        const L = LAYERS[l];
+        const ox = -p.x * L.shift;
+        const oy = -p.y * L.shift * 0.6;
+        for (let lv = 0; lv < 2; lv++) {
+          g.beginPath();
+          for (const st of sky[l]) {
+            if ((Math.sin(t * 0.9 + st.tw) > 0 ? 1 : 0) !== lv) continue;
+            g.rect(st.x * W + ox, st.y * H + oy, st.s, st.s);
+          }
+          g.fillStyle = `rgba(${sr},${sg},${sb},${(L.a * (0.6 + lv * 0.6)).toFixed(3)})`;
+          g.fill();
+        }
+      }
 
       const spin = t * 0.025;
+      const cs = Math.cos(spin);
+      const ss = Math.sin(spin);
       const tilt = 1.08 + p.y * 0.18; // ~62° from face-on
       const roll = -0.32 + p.x * 0.12;
       const ct = Math.cos(tilt);
       const cr = Math.cos(roll);
       const sr2 = Math.sin(roll);
-      const hx = cx + p.x * R * 0.9;
-      const hy = cy + p.y * R * 0.6;
+      // The lens sits exactly on the pointer; only its strength (p.on) eases.
+      const hx = p.mx;
+      const hy = p.my;
+      const lens = p.on > 0.01 ? 22 * p.on : 0;
 
       for (let i = 0; i < stars.length; i++) {
         const s = stars[i];
         s.t += s.w * dt;
-        const phi = s.r * TWIST + spin;
+        // Each ellipse is turned by r * TWIST (stored) plus the slow spin (shared).
+        const pc = s.tc * cs - s.ts * ss;
+        const ps = s.ts * cs + s.tc * ss;
         const ex = Math.cos(s.t) * s.r + s.jx;
         const ey = Math.sin(s.t) * s.r * SQUASH + s.jy;
         // Turn the ellipse, tilt the disc, roll it on screen.
-        const gx = ex * Math.cos(phi) - ey * Math.sin(phi);
-        const gy = (ex * Math.sin(phi) + ey * Math.cos(phi)) * ct;
+        const gx = ex * pc - ey * ps;
+        const gy = (ex * ps + ey * pc) * ct;
         let x = cx + (gx * cr - gy * sr2) * R;
         let y = cy + (gx * sr2 + gy * cr) * R;
-        if (p.inside) {
+        if (lens) {
           const dx = x - hx;
           const dy = y - hy;
-          const d = Math.hypot(dx, dy);
-          if (d < LENS && d > 0.001) {
-            const push = (1 - d / LENS) ** 2 * 22;
-            x += (dx / d) * push;
-            y += (dy / d) * push;
+          if (dx > -LENS && dx < LENS && dy > -LENS && dy < LENS) {
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < LENS && d > 0.001) {
+              const push = (1 - d / LENS) ** 2 * lens;
+              x += (dx / d) * push;
+              y += (dy / d) * push;
+            }
           }
         }
         px[i] = x;
@@ -137,23 +188,17 @@ function galaxy(): Scene {
 
       g.save();
       g.globalCompositeOperation = 'lighter';
-      // One path per colour and brightness step keeps fillStyle changes to a dozen a frame.
-      for (let tone = 0; tone < tones.length; tone++) {
-        const [r, gg, b] = tones[tone];
-        for (let level = 0; level < 3; level++) {
-          g.beginPath();
-          for (let i = 0; i < stars.length; i++) {
-            const s = stars[i];
-            if (s.tone !== tone) continue;
-            const fade = 1 - s.r; // dimmer towards the rim
-            const lv = fade > 0.66 ? 2 : fade > 0.33 ? 1 : 0;
-            if (lv !== level) continue;
-            const z = s.size;
-            g.rect(px[i] - z / 2, py[i] - z / 2, z, z);
-          }
-          g.fillStyle = `rgba(${r},${gg},${b},${tone === 3 ? 0.9 : 0.42 + level * 0.26})`;
-          g.fill();
+      // One path per colour bucket keeps fillStyle changes to ~15 a frame.
+      for (let b = 0; b < start.length - 1; b++) {
+        const s0 = stars[start[b]];
+        const [r, gg, bl] = tones[s0.tone];
+        g.beginPath();
+        for (let i = start[b]; i < start[b + 1]; i++) {
+          const z = stars[i].size;
+          g.rect(px[i] - z / 2, py[i] - z / 2, z, z);
         }
+        g.fillStyle = `rgba(${r},${gg},${bl},${alpha(s0.tone, levelOf(s0.r))})`;
+        g.fill();
       }
       // A tiny hot centre.
       const [er, eg, eb] = rgb(ember['200']);
@@ -170,12 +215,11 @@ function galaxy(): Scene {
       reticle(
         g,
         p,
-        W,
-        H,
+        dt,
         px,
         py,
         stars.length,
-        (i) => stars[i].size > 1.1 || stars[i].tone === 3,
+        (i) => stars[i].tone === 3 || stars[i].tone === 4 || (stars[i].tone !== DUST && stars[i].size > 1.1),
         (i) => `STAR ${String(i).padStart(4, '0')} · R ${(stars[i].r * 15).toFixed(1)} KPC`,
       );
     },

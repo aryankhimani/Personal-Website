@@ -174,15 +174,18 @@ export function frame(g: CanvasRenderingContext2D, cx: number, cy: number, R: nu
   g.restore();
 }
 
+// The lock brackets glide to a new star (the effect eases); the crosshair never does.
+const lockAnim = { x: 0, y: 0, k: 0, star: -1 };
+
 /**
  * The pointer's reticle, locked on to the nearest star within reach. `count` stars at px/py;
- * `bright(i)` says which ones are worth locking on to.
+ * `bright(i)` says which ones are worth locking on to. Drawn at the real pointer position
+ * (p.mx/p.my), faded in and out with p.on.
  */
 export function reticle(
   g: CanvasRenderingContext2D,
   p: Pointer,
-  W: number,
-  H: number,
+  dt: number,
   px: ArrayLike<number>,
   py: ArrayLike<number>,
   count: number,
@@ -190,25 +193,32 @@ export function reticle(
   label: (i: number) => string,
 ) {
   hudState.lock = -1;
-  if (!p.inside) return;
-  const mx = ((p.x + 1) / 2) * W;
-  const my = ((p.y + 1) / 2) * H;
+  if (p.on < 0.02) {
+    lockAnim.star = -1;
+    lockAnim.k = 0;
+    return;
+  }
+  const mx = p.mx;
+  const my = p.my;
   let best = -1;
-  let bd = 70 * 70;
-  for (let i = 0; i < count; i++) {
-    if (!bright(i)) continue;
-    const dx = px[i] - mx;
-    const dy = py[i] - my;
-    const d = dx * dx + dy * dy;
-    if (d < bd) {
-      bd = d;
-      best = i;
+  if (p.inside) {
+    let bd = 70 * 70;
+    for (let i = 0; i < count; i++) {
+      if (!bright(i)) continue;
+      const dx = px[i] - mx;
+      const dy = py[i] - my;
+      const d = dx * dx + dy * dy;
+      if (d < bd) {
+        bd = d;
+        best = i;
+      }
     }
   }
+  const a = p.on;
 
   g.save();
   g.lineWidth = 1;
-  // The free crosshair at the pointer.
+  // The free crosshair, exactly at the pointer.
   g.beginPath();
   g.arc(mx, my, 11, 0, Math.PI * 2);
   for (const [dx, dy] of [
@@ -220,17 +230,37 @@ export function reticle(
     g.moveTo(mx + dx * 15, my + dy * 15);
     g.lineTo(mx + dx * 22, my + dy * 22);
   }
-  g.strokeStyle = `rgba(${CR},${CG},${CB},0.45)`;
+  g.strokeStyle = `rgba(${CR},${CG},${CB},${0.45 * a})`;
   g.stroke();
+  g.fillStyle = `rgba(${CR},${CG},${CB},${0.7 * a})`;
+  g.fillRect(mx - 0.75, my - 0.75, 1.5, 1.5);
 
   if (best >= 0) {
-    const x = px[best];
-    const y = py[best];
     hudState.lock = best;
-    hudState.lockX = x;
-    hudState.lockY = y;
+    hudState.lockX = px[best];
+    hudState.lockY = py[best];
+    if (lockAnim.star < 0) {
+      // First lock: brackets start wide round the pointer and close in.
+      lockAnim.x = mx;
+      lockAnim.y = my;
+      lockAnim.k = 0;
+    } else if (lockAnim.star !== best) lockAnim.k = Math.min(lockAnim.k, 0.5);
+    lockAnim.star = best;
+    const e = 1 - Math.exp(-dt * 22);
+    lockAnim.x += (px[best] - lockAnim.x) * e;
+    lockAnim.y += (py[best] - lockAnim.y) * e;
+    lockAnim.k += (1 - lockAnim.k) * (1 - Math.exp(-dt * 14));
+  } else {
+    lockAnim.star = -1;
+    lockAnim.k = 0;
+  }
+
+  if (lockAnim.star >= 0) {
+    const x = lockAnim.x;
+    const y = lockAnim.y;
+    const k = lockAnim.k;
     // Square lock brackets and a leader line out to the label.
-    const s = 9;
+    const s = 9 + (1 - k) * 12;
     const l = 4;
     g.beginPath();
     for (const [sx, sy] of [
@@ -243,19 +273,19 @@ export function reticle(
       g.lineTo(x + sx * s, y + sy * s);
       g.lineTo(x + sx * s - sx * l, y + sy * s);
     }
-    g.strokeStyle = `rgba(${ER},${EG},${EB},0.95)`;
+    g.strokeStyle = `rgba(${ER},${EG},${EB},${0.95 * a * k})`;
     g.stroke();
     const lx = x + 34;
     const ly = y - 26;
     g.beginPath();
     g.moveTo(x + s, y - s);
     g.lineTo(lx - 6, ly);
-    g.lineTo(lx + 92, ly);
-    g.strokeStyle = `rgba(${CR},${CG},${CB},0.35)`;
+    g.lineTo(lx + 92 * k, ly);
+    g.strokeStyle = `rgba(${CR},${CG},${CB},${0.35 * a * k})`;
     g.stroke();
     g.font = `10px ${MONO}`;
-    g.fillStyle = `rgba(${CR},${CG},${CB},0.85)`;
-    g.fillText(label(best), lx, ly - 5);
+    g.fillStyle = `rgba(${CR},${CG},${CB},${0.85 * a * k})`;
+    g.fillText(label(lockAnim.star), lx, ly - 5);
   }
   g.restore();
 }
