@@ -3,13 +3,33 @@ import TechLabel from '../os/TechLabel';
 // ~/writing: every article, newsletter and talk as a Finder list, newest first, with filters.
 // Dates come from the Medium and Substack feeds and YouTube; the two oldest Medium dates
 // come from LinkedIn.
+// Each piece has an image: its own header image (photo:<file> in src/assets/photos) or, when
+// there isn't one, a blueprint drawing of the topic (bp:<id>, scripts/make-blueprints.mjs).
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
 import writing from '../../data/writing.json';
 import { Icon } from '../os/Icon';
 import WritingCarousel from './WritingCarousel';
 
 type Kind = 'article' | 'newsletter' | 'talk';
-const items = (writing as { title: string; kind: Kind; date: string; where: string; href: string }[]).toSorted((a, b) =>
-  b.date.localeCompare(a.date),
+type Raw = { title: string; kind: Kind; date: string; where: string; href: string; image: string };
+
+const photos = import.meta.glob<{ default: ImageMetadata }>('../../assets/photos/*.{jpg,JPG,jpeg,png}', { eager: true });
+const blueprints = import.meta.glob<{ default: ImageMetadata }>('../../assets/blueprints/*.svg', { eager: true });
+async function resolve(key: string) {
+  const [kind, name] = key.split(':');
+  const src =
+    kind === 'photo' ? photos[`../../assets/photos/${name}`]?.default : blueprints[`../../assets/blueprints/${name}.svg`]?.default;
+  if (!src) throw new Error(`writing.json: no image for ${key}`);
+  const [big, small] = await Promise.all([
+    getImage({ src, width: 640, format: 'webp' }),
+    getImage({ src, width: 160, format: 'webp' }),
+  ]);
+  return { img: big.src, thumb: small.src, bp: kind === 'bp' };
+}
+
+const items = await Promise.all(
+  (writing as Raw[]).toSorted((a, b) => b.date.localeCompare(a.date)).map(async (it) => ({ ...it, ...(await resolve(it.image)) })),
 );
 
 const KINDS: { id: Kind | 'all'; label: string }[] = [
@@ -72,6 +92,9 @@ const fmt = (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${d.slice(0, 4)
             <tr data-kind={it.kind}>
               <td>
                 <a href={it.href} target="_blank" rel="noopener noreferrer" class="writing-link">
+                  <span class="writing-thumb" data-bp={it.bp ? '' : undefined} aria-hidden="true">
+                    <img src={it.thumb} alt="" width="80" height="54" loading="lazy" decoding="async" />
+                  </span>
                   <Icon name={it.kind === 'talk' ? 'play' : it.kind === 'newsletter' ? 'mail' : 'file-text'} className="writing-icon" />
                   <span>
                     {it.title}

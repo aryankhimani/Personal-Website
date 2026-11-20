@@ -1,6 +1,6 @@
 // Articles and newsletters as React Bits' Flex Carousel (a WebGL strip of cards that bends
-// as you drag it). There are no cover images, so each card is drawn here as a typographic
-// cover in the palette. Picking the card in focus opens the piece in a new tab.
+// as you drag it). Each card is drawn here: the piece's image on top (photos as a navy/cream
+// duotone with a grid, blueprints as they are), then the title in the palette. Picking the card in focus opens the piece in a new tab.
 // The Finder list below stays the accessible, complete version; this is the browsable one.
 // Not shown in Lite mode.
 import { lazy, Suspense, useEffect, useState } from 'react';
@@ -11,7 +11,7 @@ import type { FlexCarouselItem } from '../rb/FlexCarousel';
 
 const FlexCarousel = lazy(() => import('../rb/FlexCarousel'));
 
-type Piece = { title: string; kind: 'article' | 'newsletter' | 'talk'; date: string; where: string; href: string };
+type Piece = { title: string; kind: 'article' | 'newsletter' | 'talk'; date: string; where: string; href: string; img: string; bp: boolean };
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const when = (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${d.slice(0, 4)}`;
@@ -30,36 +30,64 @@ function wrap(g: CanvasRenderingContext2D, text: string, max: number): string[] 
   return lines;
 }
 
-/** A 600×800 cover: navy (articles) or cream (newsletters), the title set large, an ember rule. */
-function cover(p: Piece, i: number): string {
+const load = (src: string) =>
+  new Promise<HTMLImageElement | null>((res) => {
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = () => res(null);
+    im.src = src;
+  });
+
+const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+
+/** A 600×800 cover: the image on top (cropped to fill), then the title, an ember rule and the source. */
+function cover(p: Piece, i: number, im: HTMLImageElement | null): string {
   const W = 600;
   const H = 800;
+  const IH = 400;
   const c = document.createElement('canvas');
   c.width = W;
   c.height = H;
-  const g = c.getContext('2d')!;
-  const dark = p.kind === 'article';
-  g.fillStyle = dark ? navy['900'] : cream['100'];
+  const g = c.getContext('2d', { willReadFrequently: true })!;
+  g.fillStyle = navy['900'];
   g.fillRect(0, 0, W, H);
-  // A blueprint grid, the site's motif.
-  g.strokeStyle = dark ? 'rgba(242,235,221,0.07)' : 'rgba(11,20,48,0.07)';
-  g.lineWidth = 1;
-  for (let x = 0; x <= W; x += 30) (g.beginPath(), g.moveTo(x + 0.5, 0), g.lineTo(x + 0.5, H), g.stroke());
-  for (let y = 0; y <= H; y += 30) (g.beginPath(), g.moveTo(0, y + 0.5), g.lineTo(W, y + 0.5), g.stroke());
-  const ink = dark ? cream['50'] : navy['950'];
-  const quiet = dark ? navy['300'] : navy['700'];
-  g.fillStyle = quiet;
-  g.font = `22px 'Departure Mono', monospace`;
-  g.fillText(`${p.kind === 'article' ? 'article.md' : 'newsletter.txt'}  ·  ${String(i + 1).padStart(2, '0')}`, 44, 70);
-  g.fillStyle = ember[dark ? '500' : '700'];
-  g.fillRect(44, 98, 64, 6);
-  g.fillStyle = ink;
-  g.font = `400 54px 'Bricolage Grotesque Variable', sans-serif`;
-  const lines = wrap(g, p.title, W - 88).slice(0, 7);
-  lines.forEach((l, n) => g.fillText(l, 44, 190 + n * 60));
-  g.fillStyle = quiet;
-  g.font = `22px 'Departure Mono', monospace`;
-  g.fillText(`${p.where}  ·  ${when(p.date)}`, 44, H - 56);
+  if (im) {
+    const s = Math.max(W / im.naturalWidth, IH / im.naturalHeight);
+    const sw = W / s;
+    const sh = IH / s;
+    g.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) / 2, sw, sh, 0, 0, W, IH);
+    if (!p.bp) {
+      // Duotone: luminance mapped from navy-900 to cream-100.
+      const [a, b] = [hex(navy['900']), hex(cream['100'])];
+      const d = g.getImageData(0, 0, W, IH);
+      const px = d.data;
+      for (let k = 0; k < px.length; k += 4) {
+        const l = Math.min(1, ((0.2126 * px[k] + 0.7152 * px[k + 1] + 0.0722 * px[k + 2]) / 255) * 1.08);
+        px[k] = a[0] + (b[0] - a[0]) * l;
+        px[k + 1] = a[1] + (b[1] - a[1]) * l;
+        px[k + 2] = a[2] + (b[2] - a[2]) * l;
+      }
+      g.putImageData(d, 0, 0);
+      g.strokeStyle = 'rgba(242,235,221,0.1)';
+      g.lineWidth = 1;
+      for (let x = 0; x <= W; x += 24) (g.beginPath(), g.moveTo(x + 0.5, 0), g.lineTo(x + 0.5, IH), g.stroke());
+      for (let y = 0; y <= IH; y += 24) (g.beginPath(), g.moveTo(0, y + 0.5), g.lineTo(W, y + 0.5), g.stroke());
+    }
+  }
+  g.fillStyle = 'rgba(242,235,221,0.35)';
+  g.fillRect(0, IH, W, 1);
+  g.fillStyle = navy['300'];
+  g.font = `20px 'Departure Mono', monospace`;
+  g.fillText(`${p.kind === 'article' ? 'article.md' : 'newsletter.txt'}  ·  ${String(i + 1).padStart(2, '0')}`, 40, IH + 52);
+  g.fillStyle = ember['500'];
+  g.fillRect(40, IH + 70, 56, 5);
+  g.fillStyle = cream['50'];
+  g.font = `400 42px 'Bricolage Grotesque Variable', sans-serif`;
+  const lines = wrap(g, p.title, W - 80).slice(0, 4);
+  lines.forEach((l, n) => g.fillText(l, 40, IH + 130 + n * 48));
+  g.fillStyle = navy['300'];
+  g.font = `20px 'Departure Mono', monospace`;
+  g.fillText(`${p.where}  ·  ${when(p.date)}`, 40, H - 40);
   return c.toDataURL('image/jpeg', 0.86);
 }
 
@@ -70,12 +98,14 @@ export default function WritingCarousel({ pieces }: { pieces: Piece[] }) {
   useEffect(() => {
     if (lite) return;
     let alive = true;
-    const make = () => {
+    const make = async () => {
       if (!alive) return;
       const list = pieces.filter((p) => p.kind !== 'talk');
+      const imgs = await Promise.all(list.map((p) => load(p.img)));
+      if (!alive) return;
       setItems(
         list.map((p, i) => ({
-          src: cover(p, i),
+          src: cover(p, i, imgs[i]),
           alt: p.title,
           title: p.title,
           subtitle: `${p.where} · ${when(p.date)}`,
