@@ -107,3 +107,9 @@
 .flip-card[data-fade='back'] .flip-card__face--back {
   opacity: 1;
 }
+
+/* Keyboard focus: the card itself has no outline, so draw the site ring. */
+.flip-card:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}

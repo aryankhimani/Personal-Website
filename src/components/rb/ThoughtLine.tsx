@@ -2,7 +2,8 @@
 'use client';
 
 import React, { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { animate, useReducedMotion, type AnimationPlaybackControls } from 'motion/react';
+import { animate, type AnimationPlaybackControls } from 'motion/react';
+import { useReducedMotion } from '../../lib/device-tier';
 import { HugeiconsIcon } from './hugeicons-shim';
 import { ArrowDown01Icon, SparklesIcon, Tick02Icon } from './hugeicons-shim';
 import './ThoughtLine.css';

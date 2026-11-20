@@ -31,3 +31,17 @@ export function onLiteChange(listener: () => void): () => void {
 export function useLite(): boolean {
   return useSyncExternalStore(onLiteChange, isLite, () => false);
 }
+
+const REDUCE = '(prefers-reduced-motion: reduce)';
+function onReduceChange(listener: () => void): () => void {
+  const mq = window.matchMedia(REDUCE);
+  mq.addEventListener('change', listener);
+  return () => mq.removeEventListener('change', listener);
+}
+
+/** Like motion's useReducedMotion, but hydration-safe: `false` on the server and during
+ *  hydration, then the real value (motion's hook reads it on the first client render,
+ *  so reduced-motion visitors got a hydration mismatch). */
+export function useReducedMotion(): boolean {
+  return useSyncExternalStore(onReduceChange, () => window.matchMedia(REDUCE).matches, () => false);
+}

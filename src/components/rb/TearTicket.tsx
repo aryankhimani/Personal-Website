@@ -11,7 +11,8 @@ import React, {
   type PointerEvent,
   type ReactNode
 } from 'react';
-import { motion, useMotionTemplate, useReducedMotion, useSpring, useTransform } from 'motion/react';
+import { motion, useMotionTemplate, useSpring, useTransform } from 'motion/react';
+import { useReducedMotion } from '../../lib/device-tier';
 
 export type TearTicketOrientation = 'horizontal' | 'vertical';
 

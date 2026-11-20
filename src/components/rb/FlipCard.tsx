@@ -16,12 +16,12 @@ import {
   motion,
   useMotionTemplate,
   useMotionValue,
-  useReducedMotion,
   useSpring,
   useTransform,
   type AnimationPlaybackControls,
   type MotionStyle
 } from 'motion/react';
+import { useReducedMotion } from '../../lib/device-tier';
 
 import './FlipCard.css';
 

@@ -16,13 +16,13 @@ import {
   MotionConfig,
   animate as animateValue,
   useMotionValue,
-  useReducedMotion,
   type AnimationPlaybackControls,
   type Transition,
   type VariantLabels,
   type Target,
   type TargetAndTransition
 } from 'motion/react';
+import { useReducedMotion } from '../../lib/device-tier';
 
 function cn(...classes: (string | undefined | null | boolean)[]): string {
   return classes.filter(Boolean).join(' ');

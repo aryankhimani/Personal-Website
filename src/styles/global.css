@@ -48,3 +48,24 @@
     cursor: pointer;
   }
 }
+
+/* Reduced motion and Lite: no looping animations anywhere. The component files stop most
+   of them; these are the ones whose own rules lost on specificity or only slowed down. */
+@media (prefers-reduced-motion: reduce) {
+  .thought-line__breath[data-shimmer],
+  .thought-line__pulse,
+  .refine-frame__media,
+  .refine-frame__sweep {
+    animation: none !important;
+  }
+}
+
+[data-lite='true'] .thought-line__breath[data-shimmer],
+[data-lite='true'] .thought-line__pulse,
+[data-lite='true'] .refine-frame__media,
+[data-lite='true'] .refine-frame__sweep,
+[data-lite='true'] .refine-frame__mark,
+[data-lite='true'] .hero-orb *,
+[data-lite='true'] .hero-orb-body {
+  animation: none !important;
+}
