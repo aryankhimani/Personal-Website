@@ -413,9 +413,7 @@
   content: attr(data-head);
   position: absolute;
   margin-top: -1.625rem;
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.6875rem;
   color: var(--color-navy-300);
 }
 

@@ -36,8 +36,8 @@ Aryan's usage is limited: keep sessions small, read only what a task needs, and 
       - [x] G8 verified: 8b-fixes all present; removed orphan ElectricLogo.css, FolderFloat.css, stale "folding bill" credit
       - [ ] G9 = 8c-8f below
     - [x] 8c (Nov 20): accessibility. `scripts/test-a11y.mjs` (axe WCAG A/AA + landmarks, headings, alt, focus rings, Tab order, reduced motion, Lite) passes on preview; hydration-safe useReducedMotion; no infinite animations in reduced motion/Lite; contrast table in `_private/contrast-table.md`.
-    - [ ] 8d: copy + colour pass (short/specific wording, list open TODO(aryan); no stray greys, accent ≤10%)
-    - [ ] 8e: Unslop anti-AI audit (https://github.com/heydamir/unslop), fix what it flags
+    - [x] 8d (Nov 20): copy + colour pass. No exclamations, hype words, emoji or stray greys; accent stays a rare hot spot. Open TODO(aryan) list: `rg -n "TODO\(aryan\)" src` (15, all facts/photos only Aryan has).
+    - [x] 8e (Nov 20): Unslop audit (skills/unslop/references/signs.md). Fixed: uppercase tracked labels in the new UI, wordy palette placeholder. Kept on purpose (Aryan asked for them): glass orb behind the AK, an image per project/article, overshoot cursors, zero-padded SECTOR 02/07.
     - [ ] 8f: hero composition (drop floating desktop icons), tighten navy gap Work→Journey, 404 dialog check, final walkthrough desktop + phone, no console errors. Then set this file to "Phase 6 done. Only Phase 7 (launch) is left. It happens only when Aryan says 'launch it'."
   - Also from Nov 18 notes: hero composition (drop floating desktop icons), tighten navy gap between Work and Journey.
 - Open TODO(aryan) items: grep -rn "TODO(aryan)" src

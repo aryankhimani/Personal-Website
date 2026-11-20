@@ -132,7 +132,7 @@ export default function PaletteDialog({ open, onClose }: { open: boolean; onClos
             aria-controls={`${uid}-list`}
             aria-activedescendant={shown[active] ? `${uid}-${active}` : undefined}
             aria-autocomplete="list"
-            placeholder="Jump to a section, open a project, toggle sound…"
+            placeholder="Search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             spellCheck={false}
