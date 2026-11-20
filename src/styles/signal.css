@@ -312,6 +312,13 @@
   .channel-flash {
     display: none;
   }
+  .signal-end[data-on]::after {
+    animation: none;
+  }
+}
+
+[data-lite='true'] .signal-end[data-on]::after {
+  animation: none;
 }
 
 [data-lite='true'] .lock-box,

@@ -13,7 +13,7 @@ export function initHud(): () => void {
   const n = SECTORS.length;
   const nav = document.createElement('nav');
   nav.className = 'sig-hud';
-  nav.setAttribute('aria-label', 'Sections');
+  nav.setAttribute('aria-label', 'Page progress');
   nav.innerHTML = `
     <p class="sig-hud-read" aria-hidden="true">
       <span class="sig-hud-k">SECTOR</span>

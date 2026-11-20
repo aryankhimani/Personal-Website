@@ -35,7 +35,7 @@ Aryan's usage is limited: keep sessions small, read only what a task needs, and 
       - [x] G7 Signal line, channel-change transitions, HUD tracker, sound, ⌘K palette, arrival lock-ons, ending + uptime
       - [x] G8 verified: 8b-fixes all present; removed orphan ElectricLogo.css, FolderFloat.css, stale "folding bill" credit
       - [ ] G9 = 8c-8f below
-    - [ ] 8c: accessibility (keyboard, focus rings, reduced motion, Lite, alt text, contrast table)
+    - [x] 8c (Nov 20): accessibility. `scripts/test-a11y.mjs` (axe WCAG A/AA + landmarks, headings, alt, focus rings, Tab order, reduced motion, Lite) passes on preview; hydration-safe useReducedMotion; no infinite animations in reduced motion/Lite; contrast table in `_private/contrast-table.md`.
     - [ ] 8d: copy + colour pass (short/specific wording, list open TODO(aryan); no stray greys, accent ≤10%)
     - [ ] 8e: Unslop anti-AI audit (https://github.com/heydamir/unslop), fix what it flags
     - [ ] 8f: hero composition (drop floating desktop icons), tighten navy gap Work→Journey, 404 dialog check, final walkthrough desktop + phone, no console errors. Then set this file to "Phase 6 done. Only Phase 7 (launch) is left. It happens only when Aryan says 'launch it'."
