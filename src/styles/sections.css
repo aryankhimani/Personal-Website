@@ -282,6 +282,55 @@
   stroke-linejoin: round;
 }
 
+.fig-cursor svg,
+.fig-cursor span {
+  animation: fig-bob 2.6s ease-in-out infinite;
+  animation-delay: var(--bob, 0s);
+  animation-play-state: paused;
+}
+
+/* Parked cursors bob gently while the canvas is on screen (and not mid-build). */
+[data-onscreen]:not([data-playing]) .fig-cursor svg,
+[data-onscreen]:not([data-playing]) .fig-cursor span {
+  animation-play-state: running;
+}
+
+[data-cursor='researcher'] { --bob: -0.7s; }
+[data-cursor='engineer'] { --bob: -1.4s; }
+[data-cursor='founder'] { --bob: -2s; }
+
+@keyframes fig-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 2px -3px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fig-cursor svg,
+  .fig-cursor span {
+    animation: none;
+  }
+}
+
+[data-lite='true'] .fig-cursor svg,
+[data-lite='true'] .fig-cursor span {
+  animation: none;
+}
+
+.fig-size {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 3px;
+  background: var(--color-ember-500);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--color-navy-950);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 .fig-cursor span {
   margin: 14px 0 0 -2px;
   padding: 0.125rem 0.375rem;
@@ -1351,382 +1400,6 @@
   transition: none;
   animation: none;
 }
-
-/* ---------- ~/rebuild (lib/swarm.ts) ---------- */
-
-/* Lives inside the playground.fig window as its "hyper speed" canvas: no frame of its own. */
-.rebuild {
-  overflow: hidden;
-}
-
-.rebuild-canvas {
-  position: relative;
-  padding: clamp(1rem, 3vw, 2.5rem);
-  background-color: var(--color-cream-200);
-  background-image: radial-gradient(circle, rgb(11 20 48 / 0.14) 1px, transparent 1.5px);
-  background-size: 18px 18px;
-  isolation: isolate;
-}
-
-.swarm-finale {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.swarm-finale-fx,
-.swarm-finale .gl-gate > * {
-  width: 100%;
-  height: 100%;
-}
-
-.rb-panel {
-  position: relative;
-  z-index: 1;
-  max-width: 62rem;
-  margin-inline: auto;
-  padding: clamp(1.25rem, 3vw, 2.25rem);
-  border-radius: 12px;
-  background: var(--color-navy-950);
-  color: var(--color-cream-100);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.06),
-    0 24px 50px -28px rgb(5 9 26 / 0.8);
-}
-
-.rb-kicker {
-  font-size: 0.75rem;
-  color: var(--color-ember-400);
-}
-
-.rb-title {
-  max-width: 24ch;
-  margin-top: 0.5rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.625rem, 3.4vw, 2.5rem);
-  font-variation-settings: 'wght' 350;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-  color: var(--color-cream-50);
-}
-
-.rb-grid {
-  display: grid;
-  gap: 1rem;
-  margin-top: 1.75rem;
-}
-
-@media (min-width: 768px) {
-  .rb-grid {
-    grid-template-columns: 1.2fr 1.2fr 0.8fr;
-  }
-}
-
-.rb-card {
-  padding: 1rem;
-  border-radius: 10px;
-  background: var(--color-navy-900);
-  box-shadow:
-    inset 0 0 0 1px var(--color-hairline),
-    var(--shadow-raised);
-}
-
-.rb-label {
-  font-size: 0.6875rem;
-  color: var(--color-navy-300);
-}
-
-.rb-swatches {
-  display: grid;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-}
-
-.rb-swatches li {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  font-size: 0.75rem;
-}
-
-.rb-swatch {
-  width: 2.25rem;
-  height: 1.5rem;
-  border-radius: 5px;
-  background: var(--fill);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
-}
-
-.rb-type {
-  margin-top: 0.5rem;
-  color: var(--color-cream-50);
-}
-
-.rb-type-display {
-  font-family: var(--font-display);
-  font-size: 1.375rem;
-  font-variation-settings: 'wght' 400;
-}
-
-.rb-type-body {
-  font-family: var(--font-body);
-  font-size: 1rem;
-}
-
-.rb-type-mono {
-  font-size: 0.875rem;
-}
-
-.rb-card-logo {
-  display: grid;
-  place-items: center;
-  align-content: center;
-  gap: 0.5rem;
-}
-
-.rb-card-logo img {
-  width: 4.5rem;
-  height: 4.5rem;
-  filter: invert(94%) sepia(9%) saturate(300%) hue-rotate(5deg);
-}
-
-.rb-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.rb-stats li {
-  display: grid;
-  gap: 0.25rem;
-  padding: 0.875rem 1rem;
-  border-radius: 10px;
-  background: var(--color-navy-900);
-  box-shadow: inset 0 0 0 1px var(--color-hairline);
-}
-
-.rb-stats strong {
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
-  font-weight: 400;
-  line-height: 1;
-  color: var(--color-ember-500);
-}
-
-.rb-stats span {
-  font-size: 0.6875rem;
-  color: var(--color-navy-300);
-}
-
-.rebuild-foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem 1.5rem;
-  padding: 0.875rem 1rem;
-  border-top: 1px solid rgb(11 20 48 / 0.12);
-}
-
-.rebuild-foot .toy-button {
-  background: var(--color-navy-950);
-  color: var(--color-cream-50);
-}
-
-.rebuild-foot .toy-button:hover {
-  background: var(--color-navy-800);
-}
-
-.rebuild-video {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: var(--color-cream-200);
-}
-
-/* While building: pieces are hidden in place, so nothing moves. */
-.rb-hidden {
-  opacity: 0 !important;
-}
-
-.rb-building .rb-panel {
-  box-shadow: none;
-}
-
-.rb-pop {
-  animation: rb-pop 320ms var(--ease-out);
-}
-
-@keyframes rb-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.985);
-  }
-}
-
-.rb-sweep {
-  animation: rb-sweep 520ms var(--ease-out);
-}
-
-@keyframes rb-sweep {
-  from {
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    clip-path: inset(0);
-  }
-}
-
-.rb-flood {
-  animation: rb-flood 420ms var(--ease-out);
-}
-
-@keyframes rb-flood {
-  from {
-    clip-path: circle(0% at 50% 50%);
-  }
-  to {
-    clip-path: circle(75% at 50% 50%);
-  }
-}
-
-.rb-typing::after {
-  content: '';
-  display: inline-block;
-  width: 2px;
-  height: 1em;
-  margin-left: 1px;
-  vertical-align: -0.12em;
-  background: var(--color-ember-500);
-  animation: rb-caret 700ms steps(1) infinite;
-}
-
-@keyframes rb-caret {
-  50% {
-    opacity: 0;
-  }
-}
-
-/* The cursor layer and the frames the cursors drag out. */
-.rb-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 0;
-}
-
-.rb-layer[data-on] {
-  opacity: 1;
-}
-
-.rb-cursor {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: flex-start;
-  gap: 2px;
-  will-change: transform;
-}
-
-.rb-cursor svg {
-  fill: var(--c);
-  stroke: var(--color-cream-50);
-  stroke-width: 1.2;
-  transition: transform 90ms;
-  filter: drop-shadow(0 2px 3px rgb(5 9 26 / 0.35));
-}
-
-.rb-cursor span {
-  margin-top: 14px;
-  padding: 2px 6px;
-  border-radius: 4px 9px 9px;
-  background: var(--c);
-  color: var(--color-navy-950);
-  font-size: 0.625rem;
-  white-space: nowrap;
-}
-
-.rb-cursor[data-press] svg {
-  transform: scale(0.82);
-}
-
-.rb-cursor[data-tool='cross'] svg,
-.rb-cursor[data-tool='beam'] svg,
-.rb-cursor[data-tool='bucket'] svg {
-  opacity: 0.35;
-}
-
-.rb-cursor[data-tool]::before {
-  position: absolute;
-  top: -9px;
-  left: -9px;
-  width: 18px;
-  height: 18px;
-  display: grid;
-  place-items: center;
-  color: var(--c);
-  font-size: 18px;
-  line-height: 1;
-  text-shadow: 0 0 2px var(--color-cream-50);
-}
-
-.rb-cursor[data-tool='cross']::before {
-  content: '+';
-}
-
-.rb-cursor[data-tool='beam']::before {
-  content: 'I';
-  font-size: 16px;
-}
-
-.rb-cursor[data-tool='bucket']::before {
-  content: '◉';
-  font-size: 14px;
-}
-
-.rb-ph {
-  position: absolute;
-  top: 0;
-  left: 0;
-  border: 1.5px dashed var(--c);
-  background: color-mix(in srgb, var(--c) 10%, transparent);
-  transition: opacity 260ms;
-}
-
-.rb-ph-out {
-  opacity: 0;
-}
-
-.rb-badge {
-  position: absolute;
-  bottom: -1.5rem;
-  left: 50%;
-  translate: -50% 0;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--c);
-  color: var(--color-navy-950);
-  font-size: 0.625rem;
-  white-space: nowrap;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rb-pop,
-  .rb-sweep,
-  .rb-flood {
-    animation: none;
-  }
-}
-
-
 
 /* ---------- About: me.md card + file cards ---------- */
 

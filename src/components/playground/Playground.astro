@@ -1,9 +1,8 @@
 ---
 import TechLabel from '../os/TechLabel';
-// ~/playground.fig: one Figma-style window with a pace toggle. "normal pace" (the default):
-// four cursors build a card (lib/playground.ts). "hyper speed": a swarm wipes and redraws a
-// panel about this site (Rebuild.astro, lib/swarm.ts). The toys live in Toys.astro, after Writing.
-import Rebuild from './Rebuild.astro';
+// ~/playground.fig: one Figma-style canvas where four cursors (four sides of me) build a card
+// (lib/playground.ts). The title-bar toggle sets the pace: normal (default) or hyper speed.
+// The toys live in ToysSection.astro, near the bottom of the page.
 import { ember, tags } from '../../lib/palette';
 
 const CURSORS = [
@@ -30,14 +29,14 @@ const LAYERS = [
   <div class="fig" data-pace-root>
     <div class="wp-bar fig-bar">
       <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
-      <span class="wp-file" data-pace-file>playground.fig</span>
+      <span class="wp-file">playground.fig</span>
       <div class="fig-pace" role="group" aria-label="Pace">
-        <button type="button" data-pace="normal" aria-pressed="true">normal pace</button>
+        <button type="button" data-pace="normal" aria-pressed="true">normal</button>
         <button type="button" data-pace="hyper" aria-pressed="false">hyper speed</button>
       </div>
     </div>
 
-    <div data-fig data-pace-panel="normal">
+    <div data-fig data-pace="normal">
 
       <div class="fig-toolbar">
         <span class="fig-tools" aria-hidden="true">
@@ -110,31 +109,20 @@ const LAYERS = [
         <button type="button" class="fig-replay" data-replay hidden>Replay</button>
       </div>
     </div>
-
-    <div data-pace-panel="hyper" hidden>
-      <Rebuild />
-    </div>
   </div>
 </section>
 
 <script>
-  import { initPlayground } from '../../lib/playground';
+  import { initPlayground, type Pace } from '../../lib/playground';
   const fig = document.querySelector<HTMLElement>('[data-fig]');
-  if (fig) initPlayground(fig);
-
-  // Pace toggle: shows one canvas at a time. A hidden canvas is display: none, so its own
-  // IntersectionObservers stop it, and it plays when shown.
   const root = document.querySelector<HTMLElement>('[data-pace-root]');
-  if (root) {
-    const file = root.querySelector<HTMLElement>('[data-pace-file]')!;
-    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-pace]')];
-    const panels = [...root.querySelectorAll<HTMLElement>('[data-pace-panel]')];
+  if (fig && root) {
+    const pg = initPlayground(fig);
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('button[data-pace]')];
     buttons.forEach((b) =>
       b.addEventListener('click', () => {
-        const pace = b.dataset.pace!;
         buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-        panels.forEach((p) => (p.hidden = p.dataset.pacePanel !== pace));
-        file.textContent = pace === 'hyper' ? 'this-site.fig' : 'playground.fig';
+        pg.setPace(b.dataset.pace as Pace);
       }),
     );
   }

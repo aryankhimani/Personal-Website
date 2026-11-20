@@ -30,7 +30,7 @@ Aryan's usage is limited: keep sessions small, read only what a task needs, and 
       - [x] G2 project reader typography (TL;DR, headings, pull-quote) + an image per project (own photos, else blueprint SVG)
       - [x] G3 writing cards: image per article (own header, else blueprint SVG)
       - [x] G4 journey photos: CRT power-on + HUD brackets/readout, slower, scroll-tied
-      - [ ] G5 playground: one coloured .fig, faster cursors, normal/hyper toggle
+      - [x] G5 playground: one coloured .fig, faster cursors, normal/hyper toggle
       - [ ] G6 page order: Writing, Let's build something, new_message.eml, toys, footer strip
       - [ ] G7 Signal line, channel-change transitions, HUD tracker, sound, ⌘K palette, arrival lock-ons, ending + uptime
       - [ ] G8 verify old 8b-fixes all done

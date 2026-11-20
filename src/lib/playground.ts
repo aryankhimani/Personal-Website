@@ -6,17 +6,24 @@
 // reduced motion, visitors see the end result with the cursors parked. The animation plays
 // once when the canvas is mostly on screen, stops (and snaps to the end) if it scrolls away,
 // and can be replayed.
+//
+// Pace: "normal" (default, about 1.7x the original timing) or "hyper speed" (about 3.5x, and
+// it loops while on screen). Moves overshoot a little and parked cursors bob, so they feel
+// alive. While the frame is dragged out it shows a live W x H badge (from the old swarm
+// rebuild, which this replaces).
 
 import { isLite, onLiteChange } from './device-tier';
 
 type Box = { x: number; y: number; w: number; h: number };
 type Who = 'designer' | 'researcher' | 'engineer' | 'founder';
 
-const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+const EASE = 'cubic-bezier(0.34, 1.32, 0.64, 1)'; // a small overshoot
+export type Pace = 'normal' | 'hyper';
+const SPEED: Record<Pace, number> = { normal: 1.7, hyper: 3.5 };
 
 class Aborted extends Error {}
 
-export function initPlayground(root: HTMLElement): void {
+export function initPlayground(root: HTMLElement): { setPace: (p: Pace) => void } {
   const canvas = root.querySelector<HTMLElement>('[data-canvas]')!;
   const card = root.querySelector<HTMLElement>('[data-el="card"]')!;
   const heading = root.querySelector<HTMLElement>('[data-el="heading"]')!;
@@ -36,6 +43,15 @@ export function initPlayground(root: HTMLElement): void {
 
   let controller: AbortController | null = null;
   let played = false;
+  let pace: Pace = 'normal';
+  let onScreen = false;
+  let loopTimer = 0;
+  const T = (ms: number) => ms / SPEED[pace];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const badge = document.createElement('span');
+  badge.className = 'fig-size';
+  badge.hidden = true;
+  canvas.append(badge);
 
   // ---------- helpers ----------
 
@@ -51,14 +67,14 @@ export function initPlayground(root: HTMLElement): void {
 
   const wait = (ms: number, signal: AbortSignal) =>
     new Promise<void>((resolve, reject) => {
-      const t = window.setTimeout(resolve, ms);
+      const t = window.setTimeout(resolve, T(ms));
       signal.addEventListener('abort', () => (window.clearTimeout(t), reject(new Aborted())), { once: true });
     });
 
   /** Animate to a keyframe, then keep it as the element's own style. */
   async function to(el: HTMLElement, frame: Keyframe, ms: number, signal: AbortSignal, easing = EASE) {
     check(signal);
-    const anim = el.animate([frame], { duration: ms, easing, fill: 'forwards' });
+    const anim = el.animate([frame], { duration: T(ms), easing, fill: 'forwards' });
     signal.addEventListener('abort', () => anim.cancel(), { once: true });
     try {
       await anim.finished;
@@ -124,6 +140,8 @@ export function initPlayground(root: HTMLElement): void {
 
   /** The finished card: what everyone sees without the animation. */
   function finish() {
+    window.clearTimeout(loopTimer);
+    badge.hidden = true;
     controller?.abort();
     controller = null;
     root.removeAttribute('data-playing');
@@ -190,10 +208,21 @@ export function initPlayground(root: HTMLElement): void {
     await moveTo('designer', c.x, c.y, 250, signal);
     showLayer('frame');
     const drag = 900;
+    badge.hidden = false;
+    const t0 = performance.now();
+    let raf = requestAnimationFrame(function size() {
+      const k = Math.min(1, (performance.now() - t0) / T(drag));
+      const e = 1 - Math.pow(1 - k, 3);
+      badge.textContent = `${Math.round(c.w * e)} × ${Math.round(c.h * e)}`;
+      badge.style.transform = `translate(${c.x + c.w * e + 10}px, ${c.y + c.h * e + 10}px)`;
+      if (k < 1) raf = requestAnimationFrame(size);
+    });
+    signal.addEventListener('abort', () => cancelAnimationFrame(raf), { once: true });
     await Promise.all([
       moveTo('designer', c.x + c.w, c.y + c.h, drag, signal),
-      to(card, { clipPath: 'inset(0 0% 0% 0 round 10px)' }, drag, signal),
+      to(card, { clipPath: 'inset(0 0% 0% 0 round 10px)' }, drag, signal, 'cubic-bezier(0.22, 1, 0.36, 1)'),
     ]);
+    badge.hidden = true;
     selectBox(c, 'designer');
     showProps([
       ['Frame', 'hi-card'],
@@ -259,10 +288,13 @@ export function initPlayground(root: HTMLElement): void {
     props.innerHTML = finalProps;
     replay.hidden = false;
     controller = null;
+    // Hyper speed keeps going while it's on screen.
+    if (pace === 'hyper' && onScreen) loopTimer = window.setTimeout(start, 900);
   }
 
   function start() {
-    if (isLite()) return finish();
+    window.clearTimeout(loopTimer);
+    if (isLite() || reduced.matches) return finish();
     controller?.abort();
     const c = new AbortController();
     controller = c;
@@ -278,7 +310,9 @@ export function initPlayground(root: HTMLElement): void {
 
   new IntersectionObserver(
     ([entry]) => {
-      if (entry.intersectionRatio >= 0.55 && !played && !isLite()) start();
+      onScreen = entry.intersectionRatio >= 0.1;
+      root.toggleAttribute('data-onscreen', onScreen);
+      if (entry.intersectionRatio >= 0.55 && !played && !isLite() && !reduced.matches) start();
       // Scrolled away mid-build: stop and show the finished card, and build it again from the
       // start next time it's on screen (it never got to finish).
       else if (entry.intersectionRatio < 0.1 && controller) {
@@ -296,4 +330,14 @@ export function initPlayground(root: HTMLElement): void {
     window.clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => !controller && parkCursors(), 150);
   });
+
+  return {
+    setPace(p: Pace) {
+      pace = p;
+      root.dataset.pace = p;
+      if (isLite() || reduced.matches) return;
+      if (onScreen) start();
+      else played = false;
+    },
+  };
 }

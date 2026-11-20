@@ -99,25 +99,25 @@ const insideCanvas = (page) =>
   const away = await state(page);
   check('scrolling away stops it at the finished card', !away.playing && away.heading === 'hi, I’m Aryan', JSON.stringify(away));
 
-  // Pace toggle: one window, normal pace by default; hyper speed swaps in the swarm rebuild.
+  // Pace toggle: one canvas, normal by default; hyper speed replays the same build faster.
   await goTo(page, '[data-pace-root]', -80);
   const pace = () =>
     page.evaluate(() => ({
-      normal: !document.querySelector('[data-pace-panel="normal"]').hidden,
-      hyper: !document.querySelector('[data-pace-panel="hyper"]').hidden,
-      file: document.querySelector('[data-pace-file]').textContent,
+      pace: document.querySelector('[data-fig]').dataset.pace,
+      pressed: document.querySelector('button[data-pace="hyper"]').getAttribute('aria-pressed'),
       windows: document.querySelectorAll('#playground .fig').length,
+      canvases: document.querySelectorAll('#playground [data-canvas]').length,
     }));
   const p0 = await pace();
-  check('one cursor window, normal pace by default', p0.windows === 1 && p0.normal && !p0.hyper, JSON.stringify(p0));
-  await click(page, '[data-pace="hyper"]');
-  await sleep(1500);
+  check('one cursor window and canvas, normal by default', p0.windows === 1 && p0.canvases === 1 && p0.pace === 'normal', JSON.stringify(p0));
+  await page.$eval('button[data-pace="hyper"]', (el) => el.click());
+  await sleep(400);
   const p1 = await pace();
-  const swarmOn = await page.evaluate(() => document.querySelector('[data-rebuild-layer]').hasAttribute('data-on'));
-  check('hyper speed shows the swarm rebuild and it runs', !p1.normal && p1.hyper && p1.file === 'this-site.fig' && swarmOn, JSON.stringify(p1));
-  await click(page, '[data-pace="normal"]');
+  const playing = await page.evaluate(() => document.querySelector('[data-fig]').hasAttribute('data-playing'));
+  check('hyper speed restarts the build at the faster pace', p1.pace === 'hyper' && p1.pressed === 'true' && playing, JSON.stringify(p1));
+  await page.$eval('button[data-pace="normal"]', (el) => el.click());
   await sleep(300);
-  check('normal pace switches back', (await pace()).normal);
+  check('normal switches back', (await pace()).pace === 'normal');
 
   // Toys: their own section, after Writing.
   const order = await page.evaluate(() => {
@@ -179,7 +179,7 @@ const insideCanvas = (page) =>
   const ext = await page.$$eval('[data-writing] a', (els) => els.every((a) => a.target === '_blank' && a.rel.includes('noopener')));
   check('writing links open in a new tab, safely', ext);
 
-  check('me.md has a heading and skills; the desk has the badge and a resume link', (await page.$eval('#about h2', (e) => e.textContent)) === 'Hi, I’m Aryan.' && (await page.$$('#about .work-tags li')).length >= 15 && Boolean(await page.$('#about .desk-badge')) && Boolean(await page.$('#about a.desk-resume')));
+  check('me.md is a compact card: photo, heading, a few skill tags; no badge; three file cards incl. resume', (await page.$eval('#about h2', (e) => e.textContent)) === 'Hi, I’m Aryan.' && Boolean(await page.$('#about .me-photo img[alt]')) && (await page.$$('#about .me-tags li')).length <= 10 && !(await page.$('#about .desk-badge')) && (await page.$$('#about .file-card')).length === 3 && Boolean(await page.$('#about a.file-card-open')));
   check('no photo stack or folding resume in About', (await page.$('#about .card-swap, #about .bill-stage, #about [data-photo-slot]')) === null);
 
   // Compose: Send builds a mailto link from the fields.
