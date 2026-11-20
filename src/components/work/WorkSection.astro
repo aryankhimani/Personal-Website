@@ -62,7 +62,7 @@ const folders = FOLDERS.map((f) => ({
                     </a>
                   </div>
                 </div>
-                <div class:list={['fcard-cover', d.cover ? `pw-cover-${d.coverFit}` : 'fcard-cover-empty']}>
+                <div class:list={['fcard-cover', d.cover ? `pw-cover-${d.coverFit}` : 'fcard-cover-empty']} data-bp={d.cover?.format === 'svg' ? '' : undefined}>
                   <FlipCover client:visible title={d.title}>
                     <div slot="front" class="fcard-face">
                       {d.cover ? (

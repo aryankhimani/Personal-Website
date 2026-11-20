@@ -6,6 +6,8 @@ folder: programs
 start: '2023-08'
 role: Player, Illume 2023
 summary: Earned a place on Team Canada after the national chess round robin.
+cover: ../../assets/blueprints/illume.svg
+coverAlt: "Blueprint drawing of a chessboard with a knight's path, from the national round robin to a place on Team Canada"
 tags: [Chess]
 ---
 

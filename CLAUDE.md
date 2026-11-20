@@ -25,6 +25,16 @@ Aryan's usage is limited: keep sessions small, read only what a task needs, and 
       - [x] Group 3 (Nov 19): playground. One playground.fig window with a "normal pace" (default, four-cursor card build) / "hyper speed" (swarm rebuild, Rebuild.astro now frameless inside it) toggle in the title bar (`[data-pace]` script in Playground.astro, `.fig-pace` in sections.css). Toys moved to their own `#toys` section after Writing (`ToysSection.astro`). test-sections covers both.
       - [x] Group 4 (Nov 19, Aryan approved the screenshots): footer is now a CRT tube like the boot (scanlines, vignette, roll band, HUD rings that fade before the street, AK/OS · CONTACT + LIVE readouts, blinking caret, bracket HUD buttons). Pixel street (`FooterCrowd.tsx`): one 3px art pixel everywhere, whole-number pixel ratio (`pixel: true` option on `useCanvasScene`), positions snapped to device pixels, no ghosts/gradients; 8x16 walkers with a 4-frame cycle in navy-to-cream tones by depth, pre-drawn pixel skyline + blinking ember beacon, Aryan 10x19 in an ember hoodie with blink + ember HUD corners.
       - [x] Group 5 (Nov 19): heroes 4 + 5. `canvas-loop.ts` Pointer now has `mx/my` (real pointer px, read each frame, no easing) and `on` (eased 0..1 strength); `x/y` stay eased for tilt/parallax only. Reticle crosshair, Astral hover light and Orbits lens sit exactly on the cursor; only lock brackets glide. Astral: 340 stars, 520-star 3-layer parallax sky, signal trails (pre-drawn glow sprite), rare shooting star. Orbits: 5600 stars + 900 arm dust (phone 2600 + 400), presorted colour buckets, parallax sky. Both 60 fps hovering at 4x CPU; Lite stills regenerated.
+    - FINAL PUSH (Nov 20, Aryan's one-session brief: all groups in order, commit + push + tick after each, no check-ins; questions become TODO(aryan) in the final summary). "continue" = first unchecked group.
+      - [x] G1 me.md compact card (photo shad/IMG_3240, 3 lines, tags) + now.txt/resume.pdf/honours.txt file cards with CRT power-on (`[data-crt-in]`, motion.ts + global.css). Lanyard/ThoughtLine/AboutDesk deleted.
+      - [x] G2 project reader typography (TL;DR, headings, pull-quote) + an image per project (own photos, else blueprint SVG)
+      - [ ] G3 writing cards: image per article (own header, else blueprint SVG)
+      - [ ] G4 journey photos: CRT power-on + HUD brackets/readout, slower, scroll-tied
+      - [ ] G5 playground: one coloured .fig, faster cursors, normal/hyper toggle
+      - [ ] G6 page order: Writing, Let's build something, new_message.eml, toys, footer strip
+      - [ ] G7 Signal line, channel-change transitions, HUD tracker, sound, ⌘K palette, arrival lock-ons, ending + uptime
+      - [ ] G8 verify old 8b-fixes all done
+      - [ ] G9 = 8c-8f below
     - [ ] 8c: accessibility (keyboard, focus rings, reduced motion, Lite, alt text, contrast table)
     - [ ] 8d: copy + colour pass (short/specific wording, list open TODO(aryan); no stray greys, accent ≤10%)
     - [ ] 8e: Unslop anti-AI audit (https://github.com/heydamir/unslop), fix what it flags

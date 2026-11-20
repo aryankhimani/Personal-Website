@@ -16,7 +16,9 @@ coverFit: contain
 
 ## What it is
 
-CraftNova helps Gen Z explore careers in the skilled trades. I co-founded it because AI was making the job market feel uncertain, and a lot of people my age didn't know where to start. We built it in the JA Company Program, backed by Deloitte, and it turns career research into clear guidance anyone can read for free.
+CraftNova helps Gen Z explore careers in the skilled trades.
+
+I co-founded it because AI was making the job market feel uncertain, and a lot of people my age didn't know where to start. We built it in the JA Company Program, backed by Deloitte, and it turns career research into clear guidance anyone can read for free.
 
 ## What I did
 

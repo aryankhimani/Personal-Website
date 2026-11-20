@@ -31,3 +31,4 @@ Third-party work used on this site, with licenses.
 | [anime.js](https://animejs.com/) homepage opening | Inspiration for the boot v3 HUD rings and the grid-cell "breakdown" of the name. Looked at only, no code used; `src/lib/boot.ts` is written from scratch (no animation library) | n/a (inspiration only) |
 | [Motion](https://motion.dev/) homepage orb | Inspiration for the glass orb behind the hero AK. Looked at only; `HeroOrb.tsx` and `.hero-orb` CSS are written from scratch | n/a (inspiration only) |
 | [aswinpanengal.me](https://www.aswinpanengal.me/) folders, React Bits Folder Float (earlier version) | Inspiration for the liquid-glass folders. Looked at only; `FolderDesk.tsx` and `FolderPage.tsx` are written from scratch | n/a (inspiration only) |
+| Blueprint drawings (project covers, article images) | Made for this site by `scripts/make-blueprints.mjs`; no outside art | - |

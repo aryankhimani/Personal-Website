@@ -174,24 +174,31 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
                 <h2 id={titleId} className="reader-title">
                   {d.title}
                 </h2>
-                <p className="reader-summary">{d.summary}</p>
-
-                {(d.role || d.result) && (
-                  <dl className="work-facts reader-facts">
+                <section className="tldr" aria-label="TL;DR">
+                  <p className="tldr-tag" aria-hidden="true">
+                    TL;DR
+                  </p>
+                  <dl>
+                    <div>
+                      <dt>what</dt>
+                      <dd>{d.summary}</dd>
+                    </div>
                     {d.role && (
                       <div>
-                        <dt>role</dt>
+                        <dt>my role</dt>
                         <dd>{d.role}</dd>
                       </div>
                     )}
-                    {d.result && (
-                      <div>
-                        <dt>result</dt>
-                        <dd>{d.result}</dd>
-                      </div>
-                    )}
                   </dl>
-                )}
+                  {d.result && (
+                    <figure className="pull">
+                      <blockquote>
+                        <p>{d.result}</p>
+                      </blockquote>
+                      <figcaption>result</figcaption>
+                    </figure>
+                  )}
+                </section>
 
                 <div className="reader-prose" dangerouslySetInnerHTML={{ __html: demoteHeadings(d.html) }} />
               </div>

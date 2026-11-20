@@ -38,7 +38,7 @@ export type ProjectDetail = IndexEntry & {
   summary: string;
   result?: string;
   tags: string[];
-  cover?: Img & { fit: 'cover' | 'contain' };
+  cover?: Img & { fit: 'cover' | 'contain'; blueprint?: boolean };
   clip?: string;
   photos: (Img & { caption?: string })[];
   links: { label: string; href: string }[];

@@ -26,6 +26,9 @@ export default defineConfig({
   site: 'https://aryankhimani.com',
   integrations: [react()],
   redirects: legacyRedirects,
+  // Only our own SVGs go through astro:assets (src/assets/blueprints, made by
+  // scripts/make-blueprints.mjs), so rasterizing them to WebP/AVIF is safe.
+  image: { dangerouslyProcessSVG: true },
   vite: {
     plugins: [tailwindcss()],
   },

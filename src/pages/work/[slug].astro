@@ -1,7 +1,7 @@
 ---
 // One static page per project: the same content as its window, for sharing and search.
 import { getImage, Picture } from 'astro:assets';
-import { render } from 'astro:content';
+import { emphasize } from '../../lib/prose';
 import Base from '../../layouts/Base.astro';
 import { Icon } from '../../components/os/Icon';
 import { getProjects, whenOf, type Project } from '../../lib/projects';
@@ -22,7 +22,6 @@ interface Props {
 
 const { project, newer, older } = Astro.props;
 const d = project.data;
-const { Content } = await render(project);
 const when = whenOf(project);
 const poster = d.clip && d.cover ? (await getImage({ src: d.cover, width: 1100, format: 'webp' })).src : undefined;
 ---
@@ -66,30 +65,23 @@ const poster = d.clip && d.cover ? (await getImage({ src: d.cover, width: 1100, 
           {when && <time>{when}</time>}
         </p>
         <h1 class="wp-title">{d.title}</h1>
-        <p class="wp-summary">{d.summary}</p>
+        <section class="tldr" aria-label="TL;DR">
+          <p class="tldr-tag" aria-hidden="true">TL;DR</p>
+          <dl>
+            <div><dt>what</dt><dd>{d.summary}</dd></div>
+            {d.role && (<div><dt>my role</dt><dd>{d.role}</dd></div>)}
+          </dl>
+          {
+            d.result && (
+              <figure class="pull">
+                <blockquote><p>{d.result}</p></blockquote>
+                <figcaption>result</figcaption>
+              </figure>
+            )
+          }
+        </section>
 
-        {
-          (d.role || d.result) && (
-            <dl class="work-facts">
-              {d.role && (
-                <div>
-                  <dt>role</dt>
-                  <dd>{d.role}</dd>
-                </div>
-              )}
-              {d.result && (
-                <div>
-                  <dt>result</dt>
-                  <dd>{d.result}</dd>
-                </div>
-              )}
-            </dl>
-          )
-        }
-
-        <div class="os-prose work-prose">
-          <Content />
-        </div>
+        <div class="os-prose work-prose reader-prose" set:html={emphasize(project.rendered?.html ?? '')} />
 
         {
           d.photos.length > 0 && (

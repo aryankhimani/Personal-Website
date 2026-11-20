@@ -8,6 +8,8 @@ end: present
 role: Developer on a 5-person Western AI team
 summary: A Chrome extension and web app that flags misinformation and explains its verdict.
 result: The team raised backtest accuracy from 40% to 90%.
+cover: ../../assets/blueprints/truthlens.svg
+coverAlt: "Blueprint drawing of how TruthLens works: a browser extension sends a claim to a FastAPI backend and a fine-tuned RoBERTa model, which returns a verdict and its reasons"
 tags: [React, TypeScript, FastAPI, PyTorch, MongoDB]
 featured: 1
 links:

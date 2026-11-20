@@ -96,7 +96,7 @@ export default function FolderPage({ folder, win, mobile, lite }: Props) {
               return (
                 <li key={p.id} className={top.has(p.id) ? 'fp-top' : undefined}>
                   <a href={`/work/${p.id}/`} data-open-window={p.id} className="fp-card" aria-haspopup="dialog">
-                    <span className="fp-cover" aria-hidden="true">
+                    <span className="fp-cover" aria-hidden="true" data-bp={d?.cover?.blueprint ? '' : undefined}>
                       {d?.cover ? (
                         <img
                           src={d.cover.src}

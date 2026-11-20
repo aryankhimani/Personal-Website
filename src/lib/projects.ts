@@ -3,6 +3,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import { emphasize } from './prose';
 import { formatWhen, sortKey, type Img, type IndexEntry, type ProjectDetail } from './work';
 
 export type Project = CollectionEntry<'projects'>;
@@ -54,13 +55,13 @@ export async function toDetail(p: Project): Promise<ProjectDetail> {
     result: d.result,
     tags: d.tags,
     cover: d.cover
-      ? { ...(await img(d.cover, d.coverAlt ?? '', [480, 760, 1100])), fit: d.coverFit }
+      ? { ...(await img(d.cover, d.coverAlt ?? '', [480, 760, 1100])), fit: d.coverFit, blueprint: d.cover.format === 'svg' }
       : undefined,
     clip: d.clip,
     photos: await Promise.all(
       d.photos.map(async (ph) => ({ ...(await img(ph.src, ph.alt, [320, 560])), caption: ph.caption })),
     ),
     links: d.links,
-    html: p.rendered?.html ?? '',
+    html: emphasize(p.rendered?.html ?? ''),
   };
 }

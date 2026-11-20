@@ -8,6 +8,8 @@ end: present
 role: Industry Director
 summary: Events that connect Western students with founders, recruiters and mentors.
 result: Helped raise $2,391 across 3 events.
+cover: ../../assets/blueprints/western-founders-network.svg
+coverAlt: "Blueprint drawing of students linked through three events to founders and mentors"
 tags: [Events, Partnerships]
 ---
 

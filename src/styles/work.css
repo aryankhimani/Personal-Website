@@ -1675,3 +1675,187 @@ figcaption {
     animation: none;
   }
 }
+
+/* ---------- Reader typography (final push G2) ----------
+   TL;DR box up top (what / my role), the result as a pull-quote, real section headings,
+   ~65ch measure, numbers and list lead-ins in bold (lib/prose.ts). Same on /work/<slug>/. */
+
+.tldr {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem 1.25rem;
+  border: 1px solid rgb(11 20 48 / 0.16);
+  border-radius: 10px;
+  background: var(--color-window-2);
+}
+
+.tldr-tag {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  background: var(--color-navy-950);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--color-cream-50);
+}
+
+.tldr dl {
+  display: grid;
+  gap: 0.625rem;
+  margin-top: 0.875rem;
+}
+
+.tldr dl > div {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.tldr dt {
+  padding-top: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.tldr dd {
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--color-ink);
+}
+
+@media (max-width: 479px) {
+  .tldr dl > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.125rem;
+  }
+}
+
+.pull {
+  margin-top: 1.25rem;
+  padding: 0.25rem 0 0.25rem 1.125rem;
+  border-left: 3px solid var(--color-accent);
+}
+
+.pull blockquote p {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+  font-variation-settings: 'wght' 420;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+.pull figcaption {
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent-ink);
+}
+
+.reader-prose {
+  max-width: 65ch;
+  margin-top: 2.25rem;
+}
+
+.reader-prose p {
+  max-width: 65ch;
+}
+
+.reader-prose h4,
+.work-prose.reader-prose h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(11 20 48 / 0.14);
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2vw, 1.625rem);
+  font-weight: 400;
+  font-variation-settings: 'wght' 480;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+.reader-prose h4:first-child,
+.work-prose.reader-prose h2:first-child {
+  margin-top: 0;
+}
+
+.reader-prose h4 + *,
+.work-prose.reader-prose h2 + * {
+  margin-top: 0.75rem;
+}
+
+.reader-prose strong {
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.reader-prose ul li::before {
+  content: '';
+  top: 0.75em;
+  left: 0.125rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 1px;
+  background: var(--color-navy-600);
+}
+
+.wp-body .reader-prose {
+  font-size: clamp(1.125rem, 1.25vw, 1.25rem);
+  line-height: 1.7;
+}
+
+/* Blueprint thumbnails: photos on cards read as navy/cream duotone with a faint grid, so the
+   set matches the blueprint drawings. Hover or focus brings the colour back; the reader and
+   the project pages always show full colour. */
+.fcard-cover:not([data-bp]) picture,
+.fp-cover:not([data-bp]):has(img) {
+  position: relative;
+  isolation: isolate;
+  background: var(--color-cream-100);
+}
+
+.fcard-cover:not([data-bp]) picture img,
+.fp-cover:not([data-bp]) img {
+  filter: grayscale(1) contrast(1.08);
+  mix-blend-mode: multiply;
+  transition: filter 400ms ease;
+}
+
+.fcard-cover:not([data-bp]) picture::after,
+.fp-cover:not([data-bp]):has(img)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgb(242 235 221 / 0.1) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgb(242 235 221 / 0.1) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--color-navy-900);
+  mix-blend-mode: lighten;
+  transition: opacity 400ms ease;
+}
+
+.fcard:hover .fcard-cover picture::after,
+.fcard:focus-within .fcard-cover picture::after,
+.fp-card:hover .fp-cover::after,
+.fp-card:focus-visible .fp-cover::after {
+  opacity: 0;
+}
+
+.fcard:hover .fcard-cover picture img,
+.fcard:focus-within .fcard-cover picture img,
+.fp-card:hover .fp-cover img,
+.fp-card:focus-visible .fp-cover img {
+  filter: none;
+  mix-blend-mode: normal;
+}
