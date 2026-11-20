@@ -792,8 +792,16 @@
 /* The footer is a CRT tube, the same one the boot sequence runs on: navy glass, scanlines,
    vignette, a rolling refresh band, HUD rings behind the title and readouts in the corners. */
 
-.site-foot {
-  padding: 4rem 0 8rem;
+.site-foot-crt {
+  padding: 5rem 0 2rem;
+}
+
+.site-foot-strip {
+  padding: 2rem 0 8rem;
+}
+
+.site-foot-strip > .site-foot-crt {
+  padding: 2rem 0 0;
 }
 
 .foot-crt {

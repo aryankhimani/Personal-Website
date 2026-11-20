@@ -11,9 +11,10 @@ import ToysSection from '../components/playground/ToysSection.astro';
 import WorkSection from '../components/work/WorkSection.astro';
 import Writing from '../components/writing/Writing.astro';
 import Ticker from '../components/ticker/Ticker.astro';
+import FootCrt from '../components/os/FootCrt.astro';
 ---
 
-<Base boot>
+<Base boot bareFoot>
   <section id="home" class="relative">
     <ul class="absolute top-4 left-2 z-10 flex gap-1 md:top-6 md:left-4 md:flex-col md:gap-2">
       <li><DesktopIcon id="readme" client:idle /></li>
@@ -29,6 +30,7 @@ import Ticker from '../components/ticker/Ticker.astro';
   <Memories />
   <Playground />
   <Writing />
-  <ToysSection />
+  <FootCrt />
   <Contact />
+  <ToysSection />
 </Base>

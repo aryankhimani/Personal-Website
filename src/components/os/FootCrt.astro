@@ -1,0 +1,52 @@
+---
+// The CRT tube from the boot screen: "Let's build something.", the contact links and the
+// pixel street (Aryan stands still while the world walks past). On the homepage it sits right
+// after Writing (index.astro); on other pages the footer shows it (Footer.astro).
+import FooterCrowd from './FooterCrowd';
+import { Icon } from './Icon';
+import { RESUME_URL } from './nav';
+import { EMAIL, GITHUB_URL, LINKEDIN_URL } from '../hero/links';
+---
+
+<section id="build" class="site-foot site-foot-crt" aria-labelledby="build-title">
+  <div class="foot-crt" data-reveal>
+    <span class="foot-roll" aria-hidden="true"></span>
+    <svg class="foot-rings" viewBox="-500 -500 1000 1000" aria-hidden="true">
+      <circle class="foot-ring" r="440" />
+      <circle class="foot-ring foot-ring-inner" r="300" />
+      <circle class="foot-ticks" r="470" pathLength="360" />
+      <g class="foot-spin">
+        <circle class="foot-arc" r="440" pathLength="100" />
+        <circle class="foot-arc foot-arc-cream" r="300" pathLength="100" />
+      </g>
+    </svg>
+
+    <div class="foot-hud" aria-hidden="true">
+      <span>AK/OS · CONTACT</span>
+      <span class="foot-hud-live"><i></i>LIVE</span>
+    </div>
+
+    <div class="foot-cta">
+      <p class="foot-kicker"><span aria-hidden="true">&gt; </span>~/contact --open<span class="foot-caret" aria-hidden="true"></span></p>
+      <h2 id="build-title" class="foot-title">Let&rsquo;s build something.</h2>
+      <ul class="foot-links">
+        <li><a href={`mailto:${EMAIL}`}><Icon name="mail" />{EMAIL}</a></li>
+        <li>
+          <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer"><Icon name="linkedin" />LinkedIn<span class="sr-only"> (opens in a new tab)</span></a>
+        </li>
+        <li>
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer"><Icon name="github" />GitHub<span class="sr-only"> (opens in a new tab)</span></a>
+        </li>
+        <li>
+          <a href={RESUME_URL} target="_blank" rel="noopener noreferrer"><Icon name="file-text" />resume.pdf<span class="sr-only"> (opens in a new tab)</span></a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="foot-crowd">
+      <FooterCrowd client:visible />
+      <span class="foot-cam" aria-hidden="true">CAM 01 · STREET</span>
+    </div>
+  </div>
+
+</section>

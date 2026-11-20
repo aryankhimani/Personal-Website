@@ -125,6 +125,10 @@ const insideCanvas = (page) =>
     return !!w && !!t && !!(w.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING) && !document.querySelector('#playground .toys');
   });
   check('toys sit after the Writing section', order);
+  const seq = await page.evaluate(() =>
+    [...document.querySelectorAll('main > section[id], footer')].map((e) => e.id || e.tagName.toLowerCase()).slice(-5).join(' > '),
+  );
+  check('bottom of the page: writing > build > contact > toys > footer', seq === 'writing > build > contact > toys > footer', seq);
   await goTo(page, '.toys');
   await sleep(1200);
   check('the sticker is a live canvas', await page.$('.toy-stage-sticker canvas').then(Boolean));

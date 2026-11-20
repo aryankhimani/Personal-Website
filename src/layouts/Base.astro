@@ -15,6 +15,8 @@ interface Props {
   /** Show the boot sequence on a visitor's first page of the session. */
   boot?: boolean;
   noindex?: boolean;
+  /** The page places the CRT "Let's build something." block itself (the homepage). */
+  bareFoot?: boolean;
 }
 
 const {
@@ -22,6 +24,7 @@ const {
   description = 'Aryan Khimani: student researcher and builder working across gene editing, AI and ventures.',
   boot = false,
   noindex = false,
+  bareFoot = false,
 } = Astro.props;
 
 // Every project's id, title, folders and dates (about 2 KB), so windows, menus and shared
@@ -156,7 +159,7 @@ const ogImage = new URL('/og.jpg', Astro.site).href;
     <main id="main" class="pt-(--menubar-h)">
       <slot />
     </main>
-    <Footer />
+    <Footer bare={bareFoot} />
     <WindowManager client:idle />
     <Dock client:idle />
     <script type="application/json" id={INDEX_ELEMENT_ID} set:html={workIndex} />
