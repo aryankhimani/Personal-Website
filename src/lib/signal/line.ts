@@ -53,8 +53,19 @@ export function initSignalLine(): () => void {
   end.textContent = END_TEXT;
   document.body.append(line, sig, end);
 
+  // The head: a HUD reticle (core, rotating arc, crosshair ticks), data pulses flowing into it,
+  // two flickering electric arcs just above it, and a progress readout.
   const head = document.createElement('i');
   head.className = 'conduit-head';
+  head.innerHTML =
+    '<span class="ch-flow"></span>' +
+    '<svg class="ch-arc" viewBox="-8 -96 16 92" width="16" height="92">' +
+    '<polyline points="0,-96 3,-84 -2,-74 4,-60 -3,-48 2,-36 -4,-24 1,-12 0,-4"/>' +
+    '<polyline points="0,-96 -3,-86 2,-72 -4,-62 3,-50 -2,-40 4,-28 -2,-16 0,-4"/></svg>' +
+    '<span class="ch-ring"></span><span class="ch-cross"></span><span class="ch-core"></span>' +
+    '<b class="ch-read">00%</b>';
+  const read = head.querySelector<HTMLElement>('.ch-read')!;
+  let lastPct = -1;
 
   let off = false;
   let lastKey = '';
@@ -163,6 +174,11 @@ export function initSignalLine(): () => void {
       if (Math.abs(p - g.p) < 0.0005) continue;
       g.p = p;
       g.fill.style.transform = `scaleY(${p.toFixed(4)})`;
+    }
+    const pct = Math.round(((y - lineTop) / Math.max(1, lineBottom - lineTop)) * 100);
+    if (pct !== lastPct) {
+      lastPct = pct;
+      read.textContent = `${String(pct).padStart(2, '0')}%`;
     }
     const done = y >= lineBottom - 2;
     if (done !== lit) {

@@ -24,106 +24,226 @@
 .conduit-seg {
   position: absolute;
   left: 0;
-  width: 1.5px;
-  border-radius: 2px;
-  /* The dim track ahead of you. Navy casing keeps it visible on cream sections. */
-  background: rgb(250 246 239 / 0.16);
-  box-shadow: 0 0 0 1px rgb(11 20 48 / 0.22);
+  width: 1px;
+  /* The wire ahead of you: dim and dotted, like a path not yet powered. */
+  background: repeating-linear-gradient(to bottom, rgb(250 246 239 / 0.24) 0 2px, transparent 2px 7px);
 }
 
-/* The lit part behind the head: scaled from the top on scroll (transform only). */
+/* Ruler ticks along the whole wire: minor every 48px, major every 240px. Static. */
+.conduit-seg::before,
+.conduit-seg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.conduit-seg::before {
+  left: -3px;
+  width: 7px;
+  background: repeating-linear-gradient(to bottom, rgb(250 246 239 / 0.16) 0 1px, transparent 1px 48px);
+}
+
+.conduit-seg::after {
+  left: -7px;
+  width: 6px;
+  background: repeating-linear-gradient(to bottom, rgb(250 246 239 / 0.3) 0 1px, transparent 1px 240px);
+}
+
+/* The powered wire behind the head: a crisp cream core, scaled from the top on scroll. */
 .conduit-fill {
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: rgb(250 246 239 / 0.92);
+  inset: 0 -0.25px;
+  background: var(--color-cream-50);
   box-shadow:
-    0 0 6px 1px rgb(255 74 43 / 0.55),
-    0 0 16px 2px rgb(255 74 43 / 0.2);
+    0 0 0 0.5px rgb(11 20 48 / 0.4),
+    0 0 4px rgb(255 74 43 / 0.45);
   transform: scaleY(0);
   transform-origin: top;
   will-change: transform;
 }
 
-/* The head: rides at the middle of the screen as you scroll, with a short comet tail. */
+/* ---- The head: a HUD reticle riding at mid-screen ---- */
 .conduit-head {
   position: absolute;
   top: 0;
-  left: 0.75px;
-  width: 9px;
-  height: 9px;
-  margin-top: -4.5px;
-  border-radius: 50%;
-  background: var(--color-cream-50);
-  box-shadow:
-    0 0 0 1px rgb(11 20 48 / 0.35),
-    0 0 8px 2px rgb(255 74 43 / 0.75),
-    0 0 22px 6px rgb(255 74 43 / 0.28);
+  left: 0.5px;
+  width: 0;
+  height: 0;
   transform: translate3d(-50%, 0, 0);
   will-change: transform;
 }
 
-.conduit-head::before {
-  content: '';
+.conduit-head > * {
   position: absolute;
-  bottom: 50%;
-  left: 50%;
-  width: 3px;
-  height: 56px;
-  translate: -50% 0;
-  border-radius: 3px;
-  background: linear-gradient(to top, rgb(255 140 110 / 0.9), rgb(255 74 43 / 0));
+  pointer-events: none;
 }
 
-.conduit-head::after {
+.ch-core {
+  left: -3px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1.5px var(--color-navy-950), 0 0 6px rgb(255 74 43 / 0.8);
+  transform: rotate(45deg);
+}
+
+.ch-ring {
+  left: -11px;
+  top: -11px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgb(250 246 239 / 0.75);
+  border-right-color: transparent;
+  border-left-color: transparent;
+  animation: ch-spin 3.2s linear infinite;
+}
+
+.ch-ring::after {
   content: '';
   position: absolute;
   inset: -5px;
   border-radius: 50%;
-  box-shadow: 0 0 0 1px rgb(255 74 43 / 0.5);
-  opacity: 0;
-  animation: conduit-ping 2.4s ease-out infinite;
+  border: 1px dashed rgb(250 246 239 / 0.28);
+  animation: ch-spin 9s linear infinite reverse;
 }
 
-@keyframes conduit-ping {
-  0% { opacity: 0.9; transform: scale(0.6); }
-  100% { opacity: 0; transform: scale(2.2); }
+/* Crosshair ticks left and right of the reticle. */
+.ch-cross {
+  left: -19px;
+  top: -0.5px;
+  width: 38px;
+  height: 1px;
+  background: linear-gradient(to right, rgb(250 246 239 / 0.7) 0 5px, transparent 5px calc(100% - 5px), rgb(250 246 239 / 0.7) calc(100% - 5px));
 }
 
-.conduit[data-mode='thin'] .conduit-seg {
-  width: 1px;
-  box-shadow: none;
-}
-
-.conduit[data-mode='thin'] .conduit-fill {
-  box-shadow: 0 0 4px rgb(255 74 43 / 0.45);
-}
-
-.conduit[data-mode='thin'] .conduit-head {
-  left: 0.5px;
-  width: 6px;
-  height: 6px;
-  margin-top: -3px;
-}
-
-.conduit[data-mode='thin'] .conduit-head::before {
+/* Data pulses flowing down the powered wire into the head. */
+.ch-flow {
+  left: -0.5px;
+  top: -150px;
   width: 2px;
-  height: 32px;
+  height: 140px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 70%);
+  mask-image: linear-gradient(to bottom, transparent, #000 70%);
 }
 
-.conduit[data-mode='thin'] .conduit-head::after,
-.conduit[data-still] .conduit-head::after {
+.ch-flow::before {
+  content: '';
+  position: absolute;
+  inset: -40px 0 0;
+  background: repeating-linear-gradient(to bottom, transparent 0 32px, var(--color-cream-50) 32px 38px, transparent 38px 40px);
+  animation: ch-flow 0.9s linear infinite;
+}
+
+/* Two jagged electric arcs that flicker in turn (opacity steps only). */
+.ch-arc {
+  left: -8px;
+  top: -96px;
+  overflow: visible;
+}
+
+.ch-arc polyline {
+  fill: none;
+  stroke: rgb(250 246 239 / 0.85);
+  stroke-width: 0.8;
+  stroke-linejoin: bevel;
+  opacity: 0;
+  animation: ch-zap 1.7s steps(1) infinite;
+}
+
+.ch-arc polyline:last-child {
+  stroke: rgb(255 120 90 / 0.8);
+  animation-duration: 2.3s;
+  animation-delay: -0.8s;
+}
+
+/* Progress readout beside the reticle. */
+.ch-read {
+  left: 16px;
+  top: -0.5em;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: rgb(250 246 239 / 0.7);
+  white-space: nowrap;
+}
+
+.ch-read::before {
+  content: 'sig ';
+  color: rgb(250 246 239 / 0.4);
+}
+
+@keyframes ch-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ch-flow {
+  to { transform: translateY(40px); }
+}
+
+@keyframes ch-zap {
+  0%, 100% { opacity: 0; }
+  6% { opacity: 1; }
+  9% { opacity: 0.2; }
+  12% { opacity: 0.9; }
+  16% { opacity: 0; }
+}
+
+/* Phones / narrow gutters: just the wire, a small core and the pulses. */
+.conduit[data-mode='thin'] .conduit-seg::before,
+.conduit[data-mode='thin'] .conduit-seg::after,
+.conduit[data-mode='thin'] .ch-ring,
+.conduit[data-mode='thin'] .ch-cross,
+.conduit[data-mode='thin'] .ch-arc,
+.conduit[data-mode='thin'] .ch-read {
+  display: none;
+}
+
+.conduit[data-mode='thin'] .ch-core {
+  left: -2px;
+  top: -2px;
+  width: 4px;
+  height: 4px;
+}
+
+/* Lite / reduced motion: a still reticle, no pulses or arcs. */
+.conduit[data-still] .ch-ring,
+.conduit[data-still] .ch-ring::after,
+.conduit[data-still] .ch-flow::before {
   animation: none;
+}
+
+.conduit[data-still] .ch-arc {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .conduit-head::after {
+  .ch-ring,
+  .ch-ring::after,
+  .ch-flow::before {
     animation: none;
+  }
+  .ch-arc {
+    display: none;
   }
 }
 
-[data-lite='true'] .conduit-head::after {
+[data-lite='true'] .ch-ring,
+[data-lite='true'] .ch-ring::after,
+[data-lite='true'] .ch-flow::before {
   animation: none;
+}
+
+[data-lite='true'] .ch-arc {
+  display: none;
 }
 
 .signal-sig {

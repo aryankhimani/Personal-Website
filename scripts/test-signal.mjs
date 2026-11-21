@@ -66,7 +66,7 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
   check('the line runs the full page, hero to signature, in every section', cover.n > 0 && cover.top - cover.heroTop < 20 && cover.missing.length === 0 && cover.sigDrawn, JSON.stringify(cover));
   const pos0 = await page.$eval('.conduit-seg', (e) => e.getBoundingClientRect().top + scrollY);
   const lit = () => page.evaluate(() => ({
-    head: Math.round(document.querySelector('.conduit-head').getBoundingClientRect().top + 4.5),
+    head: Math.round(document.querySelector('.conduit-head').getBoundingClientRect().top),
     fill: [...document.querySelectorAll('.conduit-fill')].reduce((n, f) => n + f.getBoundingClientRect().height, 0),
     sig: document.querySelector('.signal-sig').hasAttribute('data-lit'),
   }));
