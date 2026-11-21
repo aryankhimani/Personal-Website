@@ -5,10 +5,10 @@ import { readStored, writeStored } from './storage';
 
 export const HEROES = [
   { id: 'liquid-metal', label: 'Liquid metal' },
-  { id: 'ascii', label: 'ASCII' },
-  { id: 'terminal', label: 'Terminal' },
-  { id: 'astral', label: 'Astral' },
   { id: 'orbits', label: 'Orbits' },
+  { id: 'ascii', label: 'ASCII' },
+  { id: 'astral', label: 'Astral' },
+  { id: 'terminal', label: 'Terminal' },
 ] as const;
 
 export type HeroId = (typeof HEROES)[number]['id'];

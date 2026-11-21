@@ -82,27 +82,28 @@ const canvases = (page) => page.$$eval('.hero-visual canvas', (c) => c.length);
   const line2 = await page.$eval('.hero-line', (p) => p.innerText.replace(/\s+/g, ' '));
   check('tagline rotates', line1 !== line2 && line2.startsWith('I '), `${line1} -> ${line2}`);
 
-  await page.click('.hero-switch');
-  await sleep(2500);
-  check('switch button moves to the ASCII hero', (await heroOf(page)) === 'ascii');
-  check('still only one canvas after switching', (await canvases(page)) === 1, `canvases=${await canvases(page)}`);
-  await page.keyboard.press('h');
-  await sleep(2500);
-  check('H key moves to the terminal hero', (await heroOf(page)) === 'terminal');
-  check('one canvas in the terminal hero', (await canvases(page)) === 1, `canvases=${await canvases(page)}`);
-  for (const id of ['astral', 'orbits']) {
-    await page.keyboard.press('h');
-    await sleep(1500);
-    check(`H key moves to the ${id} hero`, (await heroOf(page)) === id);
-    check(`one canvas in the ${id} hero`, (await canvases(page)) === 1, `canvases=${await canvases(page)}`);
-    const drawn = await page.$eval('.hero-visual canvas', (c) => {
+  // Order: liquid metal, orbits, ASCII, astral, terminal.
+  const starsDrawn = () =>
+    page.$eval('.hero-visual canvas', (c) => {
       const g = c.getContext('2d');
       const d = g.getImageData(0, 0, c.width, c.height).data;
       let lit = 0;
       for (let i = 3; i < d.length; i += 4 * 97) if (d[i] > 40) lit++;
       return lit;
     });
-    check(`${id} hero draws stars`, drawn > 50, `lit samples=${drawn}`);
+  await page.click('.hero-switch');
+  await sleep(2500);
+  check('switch button moves to the orbits hero', (await heroOf(page)) === 'orbits');
+  check('still only one canvas after switching', (await canvases(page)) === 1, `canvases=${await canvases(page)}`);
+  for (const id of ['ascii', 'astral', 'terminal']) {
+    await page.keyboard.press('h');
+    await sleep(id === 'astral' ? 1500 : 2500);
+    check(`H key moves to the ${id} hero`, (await heroOf(page)) === id);
+    check(`one canvas in the ${id} hero`, (await canvases(page)) === 1, `canvases=${await canvases(page)}`);
+    if (id === 'astral') {
+      const drawn = await starsDrawn();
+      check('astral hero draws stars', drawn > 50, `lit samples=${drawn}`);
+    }
   }
 
   await page.click('[data-menu-trigger="view"]');
@@ -117,7 +118,7 @@ const canvases = (page) => page.$$eval('.hero-visual canvas', (c) => c.length);
   await sleep(300);
   await page.reload({ waitUntil: 'networkidle2' });
   await sleep(1500);
-  check('hero choice survives a reload', (await heroOf(page)) === 'ascii');
+  check('hero choice survives a reload', (await heroOf(page)) === 'orbits');
 
   // Typing H inside a window must not switch hero.
   await page.evaluate(() => [...document.querySelectorAll('.os-menubar [role="menuitem"]')].find((b) => b.textContent.trim() === 'File').click());
@@ -126,7 +127,7 @@ const canvases = (page) => page.$$eval('.hero-visual canvas', (c) => c.length);
   await sleep(900);
   await page.keyboard.press('h');
   await sleep(300);
-  check('H is ignored while a window has focus', (await heroOf(page)) === 'ascii');
+  check('H is ignored while a window has focus', (await heroOf(page)) === 'orbits');
   await page.keyboard.press('Escape');
   await sleep(400);
 
@@ -146,7 +147,7 @@ const canvases = (page) => page.$$eval('.hero-visual canvas', (c) => c.length);
     loaded: document.querySelector('.hero-visual img')?.naturalWidth > 0,
     line: document.querySelector('.hero-line').innerText,
   }));
-  check('Lite swaps the canvas for a still image', lite.canvases === 0 && lite.img === '/hero/ascii.webp' && lite.loaded, JSON.stringify(lite));
+  check('Lite swaps the canvas for a still image', lite.canvases === 0 && lite.img === '/hero/orbits.webp' && lite.loaded, JSON.stringify(lite));
   check('Lite shows the full tagline as plain text', lite.line === 'I research gene editing, build AI tools and start ventures.', lite.line);
   await page.screenshot({ path: '.shots/p2-lite.png' });
   await page.close();
