@@ -1,8 +1,11 @@
-// The Signal: a static electric line down the LEFT margin of the whole homepage, from the top
-// of the hero to the "Aryan" signature above the footer, already drawn. It never moves with
-// the scroll; it's part of the page. Cheap by design:
+// The Signal: an electric line down the LEFT margin of the whole homepage, from the top of
+// the hero to the "Aryan" signature above the footer. The track is drawn dim; as you scroll,
+// it lights up behind a glowing head that rides along at the middle of the screen, and the
+// signature lights when the head reaches it. Cheap by design:
 //   - a few absolutely positioned segments (one per stretch between full-width bands, like
 //     the ticker, which it skips), measured only when the page resizes
+//   - on scroll, one rAF writes transforms only (each segment's fill scaleY + the head's
+//     translateY), reading the cached scroll position (no layout reads)
 //   - a cream core with a navy casing (so it reads on cream sections too) and an ember glow
 //     on its own layer that breathes very slowly (opacity only, so no repaints)
 // It sits in the page gutter, so it never crosses text, cards or images, and it hides
@@ -10,6 +13,7 @@
 // Phones and narrow gutters get a thin line on the left edge. Lite / reduced motion: no glow pulse.
 
 import { still } from './bus';
+import { pageHeight, scrollPos, viewHeight } from '../scroll';
 
 const NS = 'http://www.w3.org/2000/svg';
 const END_TEXT = '> end of transmission. thanks for scrolling.';
@@ -49,8 +53,17 @@ export function initSignalLine(): () => void {
   end.textContent = END_TEXT;
   document.body.append(line, sig, end);
 
+  const head = document.createElement('i');
+  head.className = 'conduit-head';
+
   let off = false;
   let lastKey = '';
+  /** Current segments in page px, with their fill elements. */
+  let segEls: { a: number; b: number; fill: HTMLElement; p: number }[] = [];
+  let lineTop = 0;
+  let lineBottom = 0;
+  let lastHead = -1;
+  let lit = false;
 
   const measure = () => {
     const hero = document.getElementById('home');
@@ -93,15 +106,26 @@ export function initSignalLine(): () => void {
     lastKey = key;
     line.dataset.mode = wide ? 'wide' : 'thin';
     line.style.left = `${X}px`;
+    segEls = segs.map(([a, b]) => {
+      const fill = document.createElement('b');
+      fill.className = 'conduit-fill';
+      return { a: Math.round(a), b: Math.round(b), fill, p: -1 };
+    });
     line.replaceChildren(
-      ...segs.map(([a, b]) => {
+      ...segEls.map(({ a, b, fill }) => {
         const s = document.createElement('i');
         s.className = 'conduit-seg';
-        s.style.top = `${Math.round(a)}px`;
-        s.style.height = `${Math.round(b - a)}px`;
+        s.style.top = `${a}px`;
+        s.style.height = `${b - a}px`;
+        s.append(fill);
         return s;
       }),
+      head,
     );
+    lineTop = segEls[0]?.a ?? top;
+    lineBottom = segEls[segEls.length - 1]?.b ?? bottom;
+    lastHead = -1;
+    paint();
 
     sig.style.display = signed ? '' : 'none';
     end.style.display = sig.style.display;
@@ -113,6 +137,45 @@ export function initSignalLine(): () => void {
     end.style.left = `${sx + 250}px`;
     end.style.top = `${sy + 78}px`;
   };
+
+  // Scroll: the head sits a little below the middle of the screen; everything above it is lit.
+  let raf = 0;
+  function paint() {
+    raf = 0;
+    const vh = viewHeight() || innerHeight;
+    const sy = scrollPos();
+    let y = sy + vh * 0.55;
+    // Over the last screen of scrolling, ease the head down so it reaches the signature
+    // exactly when the page ends (the signature sits below the middle of the last screen).
+    const max = Math.max(1, pageHeight() - vh);
+    const t = Math.min(1, Math.max(0, (sy - (max - vh)) / vh));
+    if (lineBottom > y) y += (lineBottom - (max + vh * 0.55)) * t * t;
+    y = Math.min(lineBottom, Math.max(lineTop, y));
+    // Inside a skipped band (the ticker): wait at the end of the segment above it.
+    const seg = segEls.find((g) => y <= g.b);
+    if (seg && y < seg.a) y = segEls[segEls.indexOf(seg) - 1]?.b ?? seg.a;
+    y = Math.round(y);
+    if (y === lastHead) return;
+    lastHead = y;
+    head.style.transform = `translate3d(-50%, ${y}px, 0)`;
+    for (const g of segEls) {
+      const p = Math.min(1, Math.max(0, (y - g.a) / Math.max(1, g.b - g.a)));
+      if (Math.abs(p - g.p) < 0.0005) continue;
+      g.p = p;
+      g.fill.style.transform = `scaleY(${p.toFixed(4)})`;
+    }
+    const done = y >= lineBottom - 2;
+    if (done !== lit) {
+      lit = done;
+      sig.toggleAttribute('data-lit', done);
+      end.toggleAttribute('data-lit', done);
+    }
+  }
+  const onScroll = () => {
+    if (!raf) raf = requestAnimationFrame(paint);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
 
   // Overlays: hide completely while any dialog, menu or the palette is open. A cheap poll
   // (a handful of matches, 4x a second) instead of watching every DOM change.
@@ -138,6 +201,9 @@ export function initSignalLine(): () => void {
 
   return () => {
     ro.disconnect();
+    cancelAnimationFrame(raf);
+    window.removeEventListener('scroll', onScroll);
+    window.removeEventListener('resize', onScroll);
     window.clearInterval(overlayTimer);
     desktop.removeEventListener('change', measure);
     line.remove();

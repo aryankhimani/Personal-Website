@@ -26,51 +26,103 @@
   left: 0;
   width: 1.5px;
   border-radius: 2px;
-  background: linear-gradient(to bottom, rgb(250 246 239 / 0.35), rgb(250 246 239 / 0.9) 3rem, rgb(250 246 239 / 0.9) calc(100% - 3rem), rgb(250 246 239 / 0.35));
-  /* Navy casing keeps it visible on cream sections. */
-  box-shadow: 0 0 0 1px rgb(11 20 48 / 0.3);
+  /* The dim track ahead of you. Navy casing keeps it visible on cream sections. */
+  background: rgb(250 246 239 / 0.16);
+  box-shadow: 0 0 0 1px rgb(11 20 48 / 0.22);
 }
 
-/* The ember glow on its own layer, breathing slowly (opacity only: no repaint). */
-.conduit-seg::after {
+/* The lit part behind the head: scaled from the top on scroll (transform only). */
+.conduit-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgb(250 246 239 / 0.92);
+  box-shadow:
+    0 0 6px 1px rgb(255 74 43 / 0.55),
+    0 0 16px 2px rgb(255 74 43 / 0.2);
+  transform: scaleY(0);
+  transform-origin: top;
+  will-change: transform;
+}
+
+/* The head: rides at the middle of the screen as you scroll, with a short comet tail. */
+.conduit-head {
+  position: absolute;
+  top: 0;
+  left: 0.75px;
+  width: 9px;
+  height: 9px;
+  margin-top: -4.5px;
+  border-radius: 50%;
+  background: var(--color-cream-50);
+  box-shadow:
+    0 0 0 1px rgb(11 20 48 / 0.35),
+    0 0 8px 2px rgb(255 74 43 / 0.75),
+    0 0 22px 6px rgb(255 74 43 / 0.28);
+  transform: translate3d(-50%, 0, 0);
+  will-change: transform;
+}
+
+.conduit-head::before {
   content: '';
   position: absolute;
-  inset: 0 -1px;
-  border-radius: inherit;
-  box-shadow:
-    0 0 6px 1px rgb(255 74 43 / 0.5),
-    0 0 16px 2px rgb(255 74 43 / 0.18);
-  opacity: 0.75;
-  animation: conduit-breathe 7s ease-in-out infinite;
-  will-change: opacity;
+  bottom: 50%;
+  left: 50%;
+  width: 3px;
+  height: 56px;
+  translate: -50% 0;
+  border-radius: 3px;
+  background: linear-gradient(to top, rgb(255 140 110 / 0.9), rgb(255 74 43 / 0));
 }
 
-@keyframes conduit-breathe {
-  50% { opacity: 1; }
+.conduit-head::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(255 74 43 / 0.5);
+  opacity: 0;
+  animation: conduit-ping 2.4s ease-out infinite;
+}
+
+@keyframes conduit-ping {
+  0% { opacity: 0.9; transform: scale(0.6); }
+  100% { opacity: 0; transform: scale(2.2); }
 }
 
 .conduit[data-mode='thin'] .conduit-seg {
   width: 1px;
   box-shadow: none;
-  opacity: 0.6;
 }
 
-.conduit[data-mode='thin'] .conduit-seg::after {
-  box-shadow: 0 0 4px rgb(255 74 43 / 0.4);
-  animation: none;
+.conduit[data-mode='thin'] .conduit-fill {
+  box-shadow: 0 0 4px rgb(255 74 43 / 0.45);
 }
 
-.conduit[data-still] .conduit-seg::after {
+.conduit[data-mode='thin'] .conduit-head {
+  left: 0.5px;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+}
+
+.conduit[data-mode='thin'] .conduit-head::before {
+  width: 2px;
+  height: 32px;
+}
+
+.conduit[data-mode='thin'] .conduit-head::after,
+.conduit[data-still] .conduit-head::after {
   animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .conduit-seg::after {
+  .conduit-head::after {
     animation: none;
   }
 }
 
-[data-lite='true'] .conduit-seg::after {
+[data-lite='true'] .conduit-head::after {
   animation: none;
 }
 
@@ -107,6 +159,25 @@
   stroke: var(--color-cream-50);
   stroke-width: 1.4;
   stroke-opacity: 0.9;
+}
+
+/* Until the head arrives, the signature waits dim, like the track. */
+.signal-sig .signal-glow,
+.signal-sig .signal-core,
+.signal-end {
+  transition: stroke-opacity 600ms ease, opacity 600ms ease;
+}
+
+.signal-sig:not([data-lit]) .signal-glow {
+  stroke-opacity: 0;
+}
+
+.signal-sig:not([data-lit]) .signal-core {
+  stroke-opacity: 0.25;
+}
+
+.signal-end:not([data-lit]) {
+  opacity: 0.35;
 }
 
 .signal-end {

@@ -65,6 +65,12 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
   });
   check('the line runs the full page, hero to signature, in every section', cover.n > 0 && cover.top - cover.heroTop < 20 && cover.missing.length === 0 && cover.sigDrawn, JSON.stringify(cover));
   const pos0 = await page.$eval('.conduit-seg', (e) => e.getBoundingClientRect().top + scrollY);
+  const lit = () => page.evaluate(() => ({
+    head: Math.round(document.querySelector('.conduit-head').getBoundingClientRect().top + 4.5),
+    fill: [...document.querySelectorAll('.conduit-fill')].reduce((n, f) => n + f.getBoundingClientRect().height, 0),
+    sig: document.querySelector('.signal-sig').hasAttribute('data-lit'),
+  }));
+  const lit0 = await lit();
   await page.evaluate(() => document.getElementById('journey').scrollIntoView());
   await sleep(1500);
   const after = await page.evaluate(() => ({
@@ -74,7 +80,12 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
     lock: !!document.querySelector('#journey .lock-box.on'),
     opacity: getComputedStyle(document.querySelector('.conduit')).opacity,
   }));
-  check('the line is static: part of the page, scrolling does not move or blink it', Math.abs(after.pos - pos0) < 1 && after.opacity === '1', `${pos0} ${after.pos} ${after.opacity}`);
+  const lit1 = await lit();
+  check('the track stays put; the head follows you on screen and the line lights up behind it', Math.abs(after.pos - pos0) < 1 && after.opacity === '1' && lit1.fill > lit0.fill + 500 && lit1.head > 200 && lit1.head < 700 && !lit1.sig, JSON.stringify({ pos0, pos: after.pos, lit0, lit1 }));
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await sleep(1500);
+  const lit2 = await lit();
+  check('at the end of the page the head reaches the signature and it lights', lit2.sig, JSON.stringify(lit2));
   check('the HUD ticks to the Journey sector', after.num === '04' && after.path === '~/journey', `${after.num} ${after.path}`);
   check('the Journey title locks on', after.lock);
 
