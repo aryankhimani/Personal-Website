@@ -767,7 +767,7 @@ const TechText = ({
         sizeDirty = false;
         width = Math.max(1, container.clientWidth);
         height = Math.max(1, container.clientHeight);
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        dpr = Math.min(window.devicePixelRatio || 1, 1.5);
         const pixelWidth = Math.round(width * dpr);
         const pixelHeight = Math.round(height * dpr);
         if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
@@ -1073,7 +1073,7 @@ const TechText = ({
 
   return (
     <div ref={containerRef} className={`tech-text ${className}`.trim()} style={style} role="img" aria-label={text}>
-      <canvas ref={canvasRef} className="tech-text-canvas" />
+      <canvas ref={canvasRef} className="tech-text-canvas" aria-hidden="true" />
     </div>
   );
 };

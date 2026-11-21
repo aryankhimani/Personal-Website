@@ -54,7 +54,12 @@ const activeTick = (page) => page.$$eval('[data-journey-rail] li', (els) => els.
 // ---------- Desktop: pinned scene ----------
 {
   const { page, requests } = await newPage({ width: 1440, height: 900 });
-  check('GSAP is not downloaded on first load', !requests.some((u) => /\/journey\.[^/]*\.js$/.test(u)));
+  // The scene (and GSAP) is built in idle time after load, so it's ready before you scroll there.
+  const early = await page.evaluate(() => {
+    const nav = performance.getEntriesByType('navigation')[0];
+    return performance.getEntriesByType('resource').filter((r) => /\/journey\.[^/]*\.js$/.test(r.name) && r.startTime < nav.loadEventEnd).length;
+  });
+  check('GSAP is not downloaded before the page has loaded', early === 0, String(early));
   check('seven chapters', (await page.$$('[data-chapter]')).length === 7);
 
   await scrollToY(page, (await topOf(page, '#journey')) - 600);

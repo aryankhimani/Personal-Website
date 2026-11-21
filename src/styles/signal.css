@@ -1,16 +1,33 @@
-/* The scroll journey (lib/signal/*): the Signal conduit, channel flash,
+/* The scroll journey (lib/signal/*): the Signal line, channel flash,
    HUD tracker, title lock-ons, and the end line. All pointer-transparent except the HUD. */
 
-/* ---------- Signal conduit (line.ts) ---------- */
+/* ---------- Signal conduit (line.ts): a static electric line in the left gutter ---------- */
 
-/* Fixed in the left gutter, under every overlay (and hidden while one is open). */
+/* Fixed, under every overlay (and hidden while one is open). Doesn't react to scrolling. */
 .conduit {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: var(--menubar-h, 2rem);
+  bottom: 0;
+  left: 40px;
   z-index: 25;
+  width: 1.5px;
+  overflow: hidden;
   pointer-events: none;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, rgb(250 246 239 / 0.25), rgb(250 246 239 / 0.85) 18%, rgb(250 246 239 / 0.85) 82%, rgb(250 246 239 / 0.3));
+  /* Navy casing keeps it visible on cream sections; ember glow on navy ones. */
+  box-shadow:
+    0 0 0 1px rgb(11 20 48 / 0.35),
+    0 0 6px 1px rgb(255 74 43 / 0.45),
+    0 0 16px 2px rgb(255 74 43 / 0.16);
+  contain: strict;
   transition: opacity 160ms ease, visibility 0s linear 0s;
+}
+
+.conduit[data-mode='thin'] {
+  width: 1px;
+  box-shadow: 0 0 4px rgb(255 74 43 / 0.4);
+  opacity: 0.6;
 }
 
 .conduit[data-off] {
@@ -19,51 +36,35 @@
   transition: opacity 120ms ease, visibility 0s linear 120ms;
 }
 
-.conduit-cv {
-  display: block;
-}
-
-.conduit-spark {
-  position: fixed;
-  inset: 0;
-  z-index: 25;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-}
-
-.sig-next {
+/* The slow idle shimmer: one soft bright band drifting down the line. */
+.conduit::after {
+  content: '';
   position: absolute;
+  left: 0;
+  right: 0;
   top: 0;
-  left: calc(var(--cx, 40px) - 30px);
-  display: grid;
-  gap: 1px;
-  padding: 3px 6px 4px;
-  border-radius: 4px;
-  background: rgb(11 20 48 / 0.72);
-  box-shadow: inset 0 0 0 1px rgb(242 235 221 / 0.12);
-  font-family: var(--font-mono);
-  font-size: 0.625rem;
-  line-height: 1.25;
-  color: var(--color-cream-100);
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 240ms ease;
+  height: 22vh;
+  background: linear-gradient(to bottom, transparent, rgb(255 255 255 / 0.95), transparent);
+  transform: translateY(-25vh);
+  animation: conduit-shimmer 9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   will-change: transform;
 }
 
-.sig-next[data-on] {
-  opacity: 1;
+@keyframes conduit-shimmer {
+  0% { transform: translateY(-25vh); opacity: 0; }
+  10% { opacity: 1; }
+  70% { transform: translateY(105vh); opacity: 1; }
+  100% { transform: translateY(105vh); opacity: 0; }
 }
 
-.sig-next-k {
-  color: var(--color-accent);
+@media (prefers-reduced-motion: reduce) {
+  .conduit::after {
+    display: none;
+  }
 }
 
-.sig-next-p b {
-  display: inline-block;
-  font-weight: 400;
-  animation: sig-flap 380ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
+[data-lite='true'] .conduit::after {
+  display: none;
 }
 
 .signal-sig {
@@ -296,6 +297,14 @@
   pointer-events: none;
 }
 
+/* Phones: titles can span the full width, so the brackets stay inside it sideways (they
+   pushed the page 2px wider than the screen). */
+@media (max-width: 767px) {
+  .lock-box {
+    inset: -0.35em 0;
+  }
+}
+
 .lock-box i {
   position: absolute;
   width: 0.45em;
@@ -331,12 +340,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .lock-box,
-  .channel-flash,
-  .conduit-spark {
+  .channel-flash {
     display: none;
-  }
-  .sig-next-p b {
-    animation: none;
   }
   .signal-end[data-on]::after {
     animation: none;

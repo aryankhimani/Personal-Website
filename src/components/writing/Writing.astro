@@ -48,14 +48,14 @@ const fmt = (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${d.slice(0, 4)
 
 <section id="writing" class="writing" aria-labelledby="writing-title">
   <header class="writing-head">
-    <div class="os-path-row"><TechLabel client:visible text="~/writing" tone="cream" /></div>
+    <div class="os-path-row"><TechLabel client:calm text="~/writing" tone="cream" /></div>
     <h2 id="writing-title" class="section-heading">Things I wrote and said out loud.</h2>
     <p class="section-lede">
       Articles on gene editing, synthetic biology and AI, a newsletter I kept in high school, and two talks.
     </p>
   </header>
 
-  <WritingCarousel client:visible pieces={items} />
+  <WritingCarousel client:calm pieces={items} />
 
   <div class="finder-window" data-writing>
     <div class="wp-bar">

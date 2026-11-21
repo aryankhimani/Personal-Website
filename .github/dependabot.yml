@@ -1,0 +1,16 @@
+# Dependabot: weekly update PRs for npm packages and GitHub Actions (security fixes come as
+# soon as an advisory lands, once "Dependabot security updates" is on in the repo settings).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

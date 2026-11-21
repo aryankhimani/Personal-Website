@@ -43,6 +43,18 @@ const ogImage = new URL('/og.jpg', Astro.site).href;
 <html lang="en" data-wants-boot={boot ? '' : undefined}>
   <head>
     <meta charset="utf-8" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <!-- Clickjacking guard: GitHub Pages can't send frame-ancestors / X-Frame-Options, so if
+         another site loads this page in a frame, try to break out of it, and either way don't
+         show anything inside the frame (browsers often refuse the break-out silently). -->
+    <script is:inline>
+      if (window.top !== window.self) {
+        document.documentElement.style.display = 'none';
+        try {
+          window.top.location.replace(window.location.href);
+        } catch (e) {}
+      }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}

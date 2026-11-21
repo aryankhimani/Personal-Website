@@ -5,7 +5,7 @@
 
 import { SECTORS, onSector, still } from './bus';
 import { sectorTarget } from './channel';
-import { scrollToSection } from '../scroll';
+import { pageHeight, scrollPos, scrollToSection, viewHeight } from '../scroll';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -56,8 +56,8 @@ export function initHud(): () => void {
 
   const frame = () => {
     raf = 0;
-    const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
-    fill.style.transform = `scaleY(${Math.min(1, scrollY / max).toFixed(4)})`;
+    const max = Math.max(1, pageHeight() - viewHeight());
+    fill.style.transform = `scaleY(${Math.min(1, scrollPos() / max).toFixed(4)})`;
     if (SECTORS[current].id === 'journey') year.textContent = rail?.querySelector('[data-active]')?.textContent ?? '';
   };
   const tick = () => {

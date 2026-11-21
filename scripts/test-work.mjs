@@ -138,7 +138,7 @@ check('project data has every project', index.length === 21, `${index.length} pr
   await sleep(500);
   await page.tap('[data-folder="code"] .gf-front');
   await page.waitForSelector('[data-window="code"]', { timeout: 4000 }).catch(() => {});
-  await sleep(500);
+  await sleep(1000);
   const r = await page.$eval('[data-window="code"]', (w) => w.getBoundingClientRect().toJSON()).catch(() => ({}));
   check('a folder opens as a full-screen sheet', r.width === 390 && Math.abs(r.y) < 1, JSON.stringify(r));
   await page.screenshot({ path: '.shots/p3-phone-finder.png' });

@@ -179,7 +179,7 @@ export function initSound(): void {
   let hovered: Element | null = null;
   document.addEventListener('pointerover', (e) => {
     if (!soundOn() || !ctx) return;
-    const t = (e.target as Element).closest('[data-open-window], .gf-hit, .os-light, .file-card-open, .fp-card');
+    const t = (e.target as Element).closest('[data-open-window], .gf-hit, .os-light, .me-file-open, .me-tab, .fp-card');
     if (t && t !== hovered) sound.tick();
     hovered = t;
   });

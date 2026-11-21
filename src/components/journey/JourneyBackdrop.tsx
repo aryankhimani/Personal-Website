@@ -1,5 +1,6 @@
 // React Bits' Topography behind ~/journey: faint contour lines, cream on cream, drifting
-// slowly like a map of the road so far. Pauses off-screen; not in Lite mode.
+// slowly like a map of the road so far. One screen tall and sticky (not the whole 5000px
+// section), at 1x pixel ratio: the lines are soft anyway. Pauses off-screen; not in Lite mode.
 import { lazy, Suspense } from 'react';
 import { useLite } from '../../lib/device-tier';
 import GlGate from '../os/GlGate';
@@ -16,6 +17,7 @@ export default function JourneyBackdrop() {
         <Suspense fallback={null}>
           <Topography
             lightMode
+            dpr={1}
             color={cream['500']}
             opacity={0.55}
             lineCount={22}

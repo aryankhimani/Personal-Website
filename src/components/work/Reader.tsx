@@ -18,6 +18,21 @@ import { demoteHeadings, useDetail } from './WorkWindows';
 
 type Props = { meta: WindowMeta; win: WindowState; mobile: boolean; lite: boolean };
 
+/** A cover that fails to load (a dropped request, or the dev server still resizing it) gets
+ *  one more try after a moment instead of leaving its alt text on screen. */
+function retryOnce(e: React.SyntheticEvent<HTMLImageElement>) {
+  const img = e.currentTarget;
+  if (img.dataset.retried) return;
+  img.dataset.retried = '1';
+  const { src, srcset } = img;
+  window.setTimeout(() => {
+    img.srcset = '';
+    img.src = '';
+    img.srcset = srcset;
+    img.src = src;
+  }, 800);
+}
+
 export default function Reader({ meta, win, mobile, lite }: Props) {
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);
@@ -162,6 +177,7 @@ export default function Reader({ meta, win, mobile, lite }: Props) {
                       height={d.cover.height}
                       alt={d.cover.alt}
                       decoding="async"
+                      onError={retryOnce}
                     />
                   )}
                 </div>

@@ -183,22 +183,21 @@ const insideCanvas = (page) =>
   const ext = await page.$$eval('[data-writing] a', (els) => els.every((a) => a.target === '_blank' && a.rel.includes('noopener')));
   check('writing links open in a new tab, safely', ext);
 
-  check('me.md is a compact card: photo, heading, a few skill tags; no badge; three file cards incl. resume', (await page.$eval('#about h2', (e) => e.textContent)) === 'Hi, I’m Aryan.' && Boolean(await page.$('#about .me-photo img[alt]')) && (await page.$$('#about .me-tags li')).length <= 10 && !(await page.$('#about .desk-badge')) && (await page.$$('#about .file-card')).length === 3 && Boolean(await page.$('#about a.file-card-open')));
-  // Hologram orbit: real buttons, Enter brings a card to the front, Esc sends it back.
-  await page.evaluate(() => document.querySelector('[data-holo]').scrollIntoView({ block: 'center' }));
-  await sleep(600);
-  const t0 = await page.$eval('.holo-item:nth-child(2)', (e) => e.style.transform);
-  await sleep(500);
-  const t1 = await page.$eval('.holo-item:nth-child(2)', (e) => e.style.transform);
-  check('hologram cards orbit the core', (await page.$eval('[data-holo]', (e) => e.dataset.mode)) === 'orbit' && t0 !== t1 && Boolean(await page.$('.holo-core')));
-  await page.focus('.holo-item:nth-child(3) .holo-btn');
-  await page.keyboard.press('Enter');
-  await sleep(700);
-  const front = await page.evaluate(() => ({ exp: document.querySelector('.holo-item:nth-child(3) .holo-btn').getAttribute('aria-expanded'), front: document.querySelector('.holo-item:nth-child(3)').classList.contains('is-front'), lines: document.querySelectorAll('.holo-item:nth-child(3) .file-card-lines li').length }));
-  check('Enter brings honours.txt to the front with every line', front.exp === 'true' && front.front && front.lines === 6, JSON.stringify(front));
-  await page.keyboard.press('Escape');
-  await sleep(700);
-  check('Esc returns it to the orbit, focus stays on its button', await page.evaluate(() => !document.querySelector('.holo-item.is-front') && document.activeElement?.classList.contains('holo-btn')));
+  check('me.md is a compact card: photo, heading, a few skill tags; no badge; three file tabs incl. resume', (await page.$eval('#about h2', (e) => e.textContent)) === 'Hi, I’m Aryan.' && Boolean(await page.$('#about .me-photo img[alt]')) && (await page.$$('#about .me-tags li')).length <= 10 && !(await page.$('#about .desk-badge')) && (await page.$$('#about .me-tab')).length === 3 && Boolean(await page.$('#about a.me-file-open')));
+  // File tabs inside me.md: now.txt open by default; arrows switch; resume opens in a new tab.
+  await page.evaluate(() => document.querySelector('.me-tabs').scrollIntoView({ block: 'center' }));
+  await sleep(300);
+  const t0 = await page.evaluate(() => ({ sel: document.querySelector('.me-tab[aria-selected="true"]')?.textContent, vis: [...document.querySelectorAll('.me-panel')].filter((p) => !p.hidden).map((p) => p.id), inCard: !!document.querySelector('.me-window .me-tabs') }));
+  check('me.md has file tabs inside the card, now.txt open by default', t0.sel === 'now.txt' && t0.vis.join() === 'panel-now' && t0.inCard, JSON.stringify(t0));
+  await page.focus('#tab-now');
+  await page.keyboard.press('ArrowRight');
+  await sleep(100);
+  const t1 = await page.evaluate(() => ({ focus: document.activeElement?.id, sel: document.querySelector('#tab-resume').getAttribute('aria-selected'), link: document.querySelector('#panel-resume a.me-file-open')?.target, vis: !document.getElementById('panel-resume').hidden }));
+  check('ArrowRight moves to resume.pdf and shows its open link (new tab)', t1.focus === 'tab-resume' && t1.sel === 'true' && t1.link === '_blank' && t1.vis, JSON.stringify(t1));
+  await page.click('#tab-honours');
+  await sleep(100);
+  check('honours.txt shows all six lines', (await page.$$eval('#panel-honours li', (l) => l.length)) === 6 && !(await page.$eval('#panel-honours', (e) => e.hidden)));
+  check('no orbit left', !(await page.$('.holo, .holo-core')));
   check('no photo stack or folding resume in About', (await page.$('#about .card-swap, #about .bill-stage, #about [data-photo-slot]')) === null);
 
   // Compose: Send builds a mailto link from the fields.

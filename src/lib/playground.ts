@@ -100,7 +100,16 @@ export function initPlayground(root: HTMLElement): { setPace: (p: Pace) => void 
   }
 
   function showProps(rows: [string, string][]) {
-    props.innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+    // Built as text nodes, never parsed as HTML.
+    props.replaceChildren(
+      ...rows.flatMap(([k, v]) => {
+        const dt = document.createElement('dt');
+        dt.textContent = k;
+        const dd = document.createElement('dd');
+        dd.textContent = v;
+        return [dt, dd];
+      }),
+    );
   }
 
   const showLayer = (name: string) => layers.find((l) => l.dataset.layer === name)?.removeAttribute('hidden');

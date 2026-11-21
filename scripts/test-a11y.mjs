@@ -20,6 +20,8 @@ const browser = await puppeteer.launch({
 
 async function open(path, { motion = 'no-preference', width = 1440, height = 900, lite = false } = {}) {
   const page = await browser.newPage();
+  // axe is injected as a script tag, which the site's CSP (rightly) blocks.
+  await page.setBypassCSP(true);
   await page.setViewport({ width, height });
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: motion }]);
   await page.evaluateOnNewDocument((lite) => {

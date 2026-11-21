@@ -10,6 +10,7 @@
 // (bus.ts) once per change, so the line, HUD, lock-ons and sound all move together.
 
 import { SECTORS, emitSector, still } from './bus';
+import { scrollPos, viewHeight } from '../scroll';
 
 // Where each sector starts. Contact starts at the "Let's build something." block.
 const START: Record<string, string> = { contact: 'build' };
@@ -36,6 +37,7 @@ export function initChannel(): () => void {
   document.body.append(flash);
 
   let tops: number[] = [];
+  let heights: number[] = [];
   let sectorTops: number[] = [];
   let current = -1;
   let raf = 0;
@@ -43,6 +45,7 @@ export function initChannel(): () => void {
 
   const measure = () => {
     tops = sections.map(pageTop);
+    heights = sections.map((s) => s.offsetHeight);
     sectorTops = starts.map(pageTop);
   };
 
@@ -51,13 +54,15 @@ export function initChannel(): () => void {
     el.style.transformOrigin = '';
     el.style.opacity = '';
     el.style.clipPath = '';
+    el.style.willChange = '';
     touched.delete(el);
   };
 
   const frame = () => {
     raf = 0;
-    const vh = innerHeight;
-    const mid = scrollY + vh * 0.5;
+    const vh = viewHeight();
+    const y = scrollPos();
+    const mid = y + vh * 0.5;
 
     // Sector.
     let idx = 0;
@@ -81,13 +86,15 @@ export function initChannel(): () => void {
     let flashA = 0;
     let flashW = 1;
     for (let k = 1; k < sections.length; k++) {
-      const yv = tops[k] - scrollY; // the boundary's place on screen
+      const yv = tops[k] - y; // the boundary's place on screen
       const prevEl = sections[k - 1];
       const nextEl = sections[k];
       if (yv > 0 && yv < vh * OUT) {
         const e = ease(yv / (vh * OUT));
         const sY = 0.04 + 0.96 * e;
-        prevEl.style.transformOrigin = `50% ${prevEl.offsetHeight}px`;
+        prevEl.style.transformOrigin = `50% ${heights[k - 1]}px`;
+        // Its own layer while it collapses: scaling then costs no repaint.
+        prevEl.style.willChange = 'transform';
         prevEl.style.transform = `scaleY(${sY.toFixed(4)})`;
         prevEl.style.opacity = (0.3 + 0.7 * e).toFixed(3);
         live.add(prevEl);

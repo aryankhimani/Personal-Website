@@ -45,9 +45,14 @@
     0 -0.05em 0.1em rgba(0, 0, 0, 0.38) inset,
     0 calc(0.16em * var(--split-flap-lift, 1)) calc(0.38em * var(--split-flap-lift, 1))
       rgba(0, 0, 0, var(--split-flap-drop, 0.28));
+  isolation: isolate;
+}
+
+/* The 3D setup only while a flap is moving: a resting tile is flat, so ~90 tiles on the page
+   don't each keep their own compositor layers (that made every scroll frame slower). */
+.split-flap-text__tile:has(.split-flap-text__flap) {
   perspective: 10em;
   transform-style: preserve-3d;
-  isolation: isolate;
 }
 
 .split-flap-text__tile::before {
@@ -92,7 +97,6 @@
   overflow: hidden;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 34%), var(--split-flap-tile-color, #111827);
-  backface-visibility: hidden;
 }
 
 .split-flap-text__half--top,
@@ -138,6 +142,7 @@
 
 .split-flap-text__flap {
   z-index: 6;
+  backface-visibility: hidden;
   will-change: transform, filter;
   transform-style: preserve-3d;
 }

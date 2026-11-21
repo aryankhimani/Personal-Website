@@ -14,6 +14,8 @@ type CardFit = 'natural' | 'portrait' | 'square' | 'landscape';
 
 export interface FlexCarouselItem {
   src: string;
+  /** A ready-drawn card: used as the texture directly (no encode, decode or network). */
+  canvas?: HTMLCanvasElement;
   alt?: string;
   title?: string;
   subtitle?: string;
@@ -605,11 +607,12 @@ const FlexCarousel = ({
       const image = new Image();
       image.crossOrigin = 'anonymous';
       image.decoding = 'async';
-      image.onload = () => {
+      const source = item.canvas ?? image;
+      const onReady = () => {
         if (!alive || !slots.includes(slot)) return;
-        texture.image = image;
+        texture.image = source;
         texture.update();
-        slot.image = [image.naturalWidth || 1, image.naturalHeight || 1];
+        slot.image = item.canvas ? [item.canvas.width || 1, item.canvas.height || 1] : [image.naturalWidth || 1, image.naturalHeight || 1];
         slot.aspect = slot.image[0] / slot.image[1];
         try {
           const probe = document.createElement('canvas');
@@ -617,7 +620,7 @@ const FlexCarousel = ({
           probe.height = 8;
           const ctx = probe.getContext('2d', { willReadFrequently: true });
           if (ctx) {
-            ctx.drawImage(image, 0, 0, 8, 8);
+            ctx.drawImage(source, 0, 0, 8, 8);
             const data = ctx.getImageData(0, 0, 8, 8).data;
             const avg = [0, 0, 0];
             for (let i = 0; i < data.length; i += 4) {
@@ -634,14 +637,22 @@ const FlexCarousel = ({
         dirty = true;
         start();
       };
+      // Decode off the main thread first; uploading an undecoded image blocks a frame.
+      image.onload = () => void image.decode().catch(() => undefined).then(onReady);
       image.onerror = () => {
         if (!alive) return;
         slot.failed = true;
         dirty = true;
         start();
       };
-      image.src = item.src;
+      // Canvas cards upload one per idle slice, so 20 textures don't land in one frame.
+      let idleId = 0;
+      if (item.canvas) {
+        const idle = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 1));
+        idleId = idle(onReady, { timeout: 500 + index * 50 }) as number;
+      } else image.src = item.src;
       slot.dispose = () => {
+        (window.cancelIdleCallback ?? window.clearTimeout)(idleId);
         image.onload = null;
         image.onerror = null;
         gl.deleteTexture(texture.texture);

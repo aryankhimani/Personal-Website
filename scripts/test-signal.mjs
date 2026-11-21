@@ -37,37 +37,33 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
 {
   const { page, errors } = await open();
   const s = await page.evaluate(() => {
-    const cv = document.querySelector('.conduit-cv')?.getBoundingClientRect();
+    const cv = document.querySelector('.conduit')?.getBoundingClientRect();
     const workLeft = Math.min(...[...document.querySelectorAll('#work .gf-body, #work h2, #about .me-window')].map((e) => e.getBoundingClientRect().left));
     return {
       mode: document.querySelector('.conduit')?.dataset.mode,
-      right: cv?.right ?? 999,
+      right: cv ? cv.right + 8 : 999,
       workLeft,
-      old: document.querySelectorAll('.signal-layer, .signal-trace').length,
+      old: document.querySelectorAll('.signal-layer, .signal-trace, .conduit-cv, .conduit-spark, .sig-next').length,
       notches: document.querySelectorAll('.sig-hud-notch').length,
       sound: document.documentElement.dataset.sound,
       ac: window.__ac,
     };
   });
-  check('the conduit lives in the left gutter only (never over cards or text)', s.mode === 'wide' && s.right <= s.workLeft && s.old === 0, JSON.stringify(s));
+  check('the line lives in the left gutter only (never over cards or text); no head, sparks or label', s.mode === 'wide' && s.right <= s.workLeft && s.old === 0, JSON.stringify(s));
   check('HUD tracker has a notch per sector', s.notches === 7);
   check('sound is off by default and no AudioContext exists', s.sound === 'off' && s.ac === 0);
 
-  const next0 = await page.$eval('.sig-next-p', (e) => e.textContent);
+  const pos0 = await page.$eval('.conduit', (e) => JSON.stringify(e.getBoundingClientRect()));
   await page.evaluate(() => document.getElementById('journey').scrollIntoView());
-  await sleep(250);
-  const spark = await page.evaluate(() => !document.querySelector('.conduit-spark').hidden);
-  await sleep(1300);
+  await sleep(1500);
   const after = await page.evaluate(() => ({
-    next: document.querySelector('.sig-next-p').textContent,
+    pos: JSON.stringify(document.querySelector('.conduit').getBoundingClientRect()),
     num: document.querySelector('.sig-hud-num b').textContent,
     path: document.querySelector('.sig-hud-path').textContent,
     lock: !!document.querySelector('#journey .lock-box.on'),
     opacity: getComputedStyle(document.querySelector('.conduit')).opacity,
   }));
-  check('the NEXT label updates per sector', next0 === '~/me.md' && after.next === '~/playground.fig', `${next0} -> ${after.next}`);
-  check('a spark arcs into the arriving title', spark);
-  check('the conduit stays visible through channel changes', after.opacity === '1', after.opacity);
+  check('the line is static: scrolling does not move or blink it', after.pos === pos0 && after.opacity === '1', after.opacity);
   check('the HUD ticks to the Journey sector', after.num === '04' && after.path === '~/journey', `${after.num} ${after.path}`);
   check('the Journey title locks on', after.lock);
 
@@ -142,9 +138,9 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
   const r = await page.evaluate(() => ({
     off: parseFloat(document.querySelector('.signal-sig .signal-core').style.strokeDashoffset),
     end: document.querySelector('.signal-end').textContent,
-    spark: getComputedStyle(document.querySelector('.conduit-spark')).display,
+    shimmer: getComputedStyle(document.querySelector('.conduit'), '::after').display,
   }));
-  check('reduced motion: signature drawn, still, no sparks', r.off === 0 && r.end.length > 10 && r.spark === 'none', JSON.stringify(r));
+  check('reduced motion: signature drawn, still, no shimmer', r.off === 0 && r.end.length > 10 && r.shimmer === 'none', JSON.stringify(r));
   await page.evaluate(() => document.getElementById('writing').scrollIntoView());
   await sleep(800);
   const styled = await page.evaluate(() => [...document.querySelectorAll('main > section')].some((s) => s.style.transform || s.style.clipPath));
@@ -158,12 +154,12 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
   const { page, errors } = await open({ width: 390, height: 844, touch: true });
   const m = await page.evaluate(() => ({
     mode: document.querySelector('.conduit')?.dataset.mode,
-    w: document.querySelector('.conduit-cv').getBoundingClientRect().width,
-    label: document.querySelector('.sig-next').hidden,
+    w: document.querySelector('.conduit').getBoundingClientRect().width,
+    label: true,
     hud: getComputedStyle(document.querySelector('.sig-hud')).display,
     wide: document.documentElement.scrollWidth,
   }));
-  check('phone: thin progress conduit on the left edge, no label, no HUD, no sideways scroll', m.mode === 'thin' && m.w <= 14 && m.label && m.hud === 'none' && m.wide === 390, JSON.stringify(m));
+  check('phone: thin line on the left edge, no HUD, no sideways scroll', m.mode === 'thin' && m.w <= 2 && m.label && m.hud === 'none' && m.wide === 390, JSON.stringify(m));
   check('no console errors (phone)', errors.length === 0, errors.slice(0, 2).join(' | '));
   await page.close();
 }

@@ -23,14 +23,28 @@ function powerOn(tl: gsap.core.Timeline, el: HTMLElement, at: number, dur: numbe
   const nosig = el.querySelector('.jhud-nosig');
   const lock = el.querySelector('.jhud-lock');
   if (!pic) return;
+  // The "overexposed" glow is a cream layer over the photo fading out (opacity only), not a
+  // brightness() filter: a filter scrubbed on a big image repainted it on every scroll frame.
+  let flash = pic.parentElement!.querySelector<HTMLElement>(':scope > .crt-flash');
+  if (!flash) {
+    flash = document.createElement('i');
+    flash.className = 'crt-flash';
+    flash.setAttribute('aria-hidden', 'true');
+    pic.after(flash);
+  }
+  const both = [pic, flash];
   const t = (f: number) => at + dur * f;
-  tl.fromTo(pic, { scaleX: 0.04, scaleY: 0.008, opacity: 1, filter: 'brightness(4)' }, { scaleX: 1, duration: dur * 0.22, ease: 'power2.out' }, t(0));
-  tl.to(pic, { scaleY: 1, filter: 'brightness(1.7)', duration: dur * 0.3, ease: 'expo.out' }, t(0.22));
+  tl.fromTo(both, { scaleX: 0.04, scaleY: 0.008 }, { scaleX: 1, duration: dur * 0.22, ease: 'power2.out' }, t(0));
+  tl.fromTo(pic, { opacity: 1 }, { opacity: 1, duration: dur * 0.22 }, t(0));
+  tl.fromTo(flash, { opacity: 0.85 }, { opacity: 0.85, duration: dur * 0.22 }, t(0));
+  tl.to(both, { scaleY: 1, duration: dur * 0.3, ease: 'expo.out' }, t(0.22));
+  tl.to(flash, { opacity: 0.35, duration: dur * 0.3, ease: 'expo.out' }, t(0.22));
   // One flicker, then settle.
   tl.to(pic, { opacity: 0.45, duration: dur * 0.03 }, t(0.54));
   tl.to(pic, { opacity: 1, duration: dur * 0.03 }, t(0.57));
   tl.to(pic, { opacity: 0.75, duration: dur * 0.02 }, t(0.62));
-  tl.to(pic, { opacity: 1, filter: 'brightness(1)', duration: dur * 0.16 }, t(0.64));
+  tl.to(pic, { opacity: 1, duration: dur * 0.16 }, t(0.64));
+  tl.to(flash, { opacity: 0, duration: dur * 0.16 }, t(0.64));
   if (scan) tl.fromTo(scan, { opacity: 1 }, { opacity: 0, duration: dur * 0.35, ease: 'power1.in' }, t(0.55));
   if (brackets.length)
     tl.fromTo(brackets, { opacity: 0, scale: 1.8 }, { opacity: 1, scale: 1, duration: dur * 0.14, stagger: dur * 0.035, ease: 'back.out(2.2)' }, t(0.48));

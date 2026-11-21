@@ -71,7 +71,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 <section id="journey" class="journey" aria-labelledby="journey-title">
   <div class="journey-stage" data-journey-stage>
-    <JourneyBackdrop client:visible />
+    <JourneyBackdrop client:calm />
     <header class="journey-head">
       <p class="os-path">~/journey</p>
       <h2 id="journey-title" class="journey-heading">How I got here</h2>
@@ -142,8 +142,8 @@ const pad = (n: number) => String(n).padStart(2, '0');
 <script>
   import { isLite, onLiteChange } from '../../lib/device-tier';
 
-  // GSAP only loads when the scene is going to run: not in Lite mode, and not until the
-  // section is getting close.
+  // GSAP only loads when the scene is going to run: not in Lite mode, and either in idle time
+  // after load or when the section is getting close, whichever comes first.
   const section = document.getElementById('journey');
   let scene: { destroy: () => void } | null = null;
   let loading = false;
@@ -166,6 +166,11 @@ const pad = (n: number) => String(n).padStart(2, '0');
       { rootMargin: '1500px 0px' },
     );
     io.observe(section);
+    // Better still, build it while nothing else is happening, before the visitor gets there.
+    const whenIdle = () =>
+      window.setTimeout(() => (window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 1)))(() => void start(), { timeout: 4000 }), 1500);
+    if (document.readyState === 'complete') whenIdle();
+    else window.addEventListener('load', whenIdle, { once: true });
 
     onLiteChange(() => {
       if (isLite()) {

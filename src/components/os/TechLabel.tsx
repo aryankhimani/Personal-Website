@@ -13,6 +13,14 @@ export default function TechLabel({ text, tone = 'cream' }: { text: string; tone
   const lite = useLite();
   const [ready, setReady] = useState(false);
   const [run, setRun] = useState(0);
+  // The idle cursor sweep runs for a few seconds after each decode, then the canvas rests
+  // (a sweep on every visible label kept several canvases redrawing every frame).
+  const [sweep, setSweep] = useState(true);
+  useEffect(() => {
+    setSweep(true);
+    const t = window.setTimeout(() => setSweep(false), 5000);
+    return () => window.clearTimeout(t);
+  }, [run]);
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => setReady(!window.matchMedia('(prefers-reduced-motion: reduce)').matches), []);
   // Decode again when its section arrives (lib/signal/arrive.ts).
@@ -47,7 +55,7 @@ export default function TechLabel({ text, tone = 'cream' }: { text: string; tone
           selection={false}
           labels={false}
           draggable={false}
-          sweep
+          sweep={sweep}
           clickKick={false}
           intro="type"
           introDuration={1.2}

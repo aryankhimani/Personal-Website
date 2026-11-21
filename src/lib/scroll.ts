@@ -52,12 +52,56 @@ export function syncWithGsap(gsap: Gsap, ST: ST): void {
   if (gsapRef) return;
   gsapRef = { gsap, ST };
   cancelAnimationFrame(raf);
-  gsap.ticker.add(tick);
+  // First in the tick: Lenis scrolls (and ScrollTrigger reads the position) while layout is
+  // still clean, before GSAP writes this frame's tween styles. Otherwise both force a layout.
+  gsap.ticker.add(tick, false, true);
   gsap.ticker.lagSmoothing(0);
   lenis?.on('scroll', ST.update);
 }
 
+// Reading window.scrollY or scrollHeight inside an animation frame, after something else has
+// written styles in that frame, forces Chrome to lay the page out again synchronously. Scroll
+// effects read these instead: Lenis's own number, or values cached on the scroll event / resize.
+let cachedY = typeof window === 'undefined' ? 0 : window.scrollY;
+let cachedH = 0;
+let cachedVh = typeof window === 'undefined' ? 0 : window.innerHeight;
+
+/** Current scroll position without touching layout. */
+export const scrollPos = (): number => (lenis ? lenis.animatedScroll : cachedY);
+/** Page height, refreshed when the page resizes. */
+export const pageHeight = (): number => cachedH || (cachedH = document.documentElement.scrollHeight);
+/** Viewport height, refreshed on resize. */
+export const viewHeight = (): number => cachedVh;
+
+function cacheSizes() {
+  window.addEventListener('scroll', () => (cachedY = window.scrollY), { passive: true });
+  window.addEventListener('resize', () => (cachedVh = window.innerHeight), { passive: true });
+  new ResizeObserver(() => {
+    cachedH = document.documentElement.scrollHeight;
+  }).observe(document.body);
+}
+
+/** Marks <html data-scrolling> while the page moves, so costly glass can step down (colour.css). */
+function flagScrolling() {
+  const html = document.documentElement;
+  let t = 0;
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!t) html.setAttribute('data-scrolling', '');
+      else window.clearTimeout(t);
+      t = window.setTimeout(() => {
+        t = 0;
+        html.removeAttribute('data-scrolling');
+      }, 160);
+    },
+    { passive: true },
+  );
+}
+
 export function initScroll(): void {
+  cacheSizes();
+  flagScrolling();
   start();
   onLiteChange(() => (isLite() ? stop() : start()));
 }

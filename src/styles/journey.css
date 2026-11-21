@@ -200,7 +200,18 @@
 
 .chapter-photo-img picture {
   transform-origin: 50% 50%;
-  will-change: transform, filter, opacity;
+  will-change: transform, opacity;
+}
+
+/* The power-on glow (journey.ts): a cream layer that fades, instead of a brightness filter. */
+.crt-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--color-cream-50);
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 50% 50%;
 }
 
 .crt-scan {
@@ -484,6 +495,9 @@
 }
 
 .journey-backdrop > * {
+  position: sticky;
+  top: 0;
+  height: 100vh;
   pointer-events: auto;
 }
 

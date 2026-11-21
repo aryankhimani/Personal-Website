@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLite } from '../../lib/device-tier';
-import { scrollToSection } from '../../lib/scroll';
+import { pageHeight, scrollPos, scrollToSection, viewHeight } from '../../lib/scroll';
 import { openWindow, useWindows } from '../../lib/windows';
 import RbDock, { type DockItemData } from '../rb/Dock';
 import { Icon } from './Icon';
@@ -31,7 +31,10 @@ export default function Dock() {
   const { windows } = useWindows();
   const [mobile, setMobile] = useState(false);
   const [active, setActive] = useState('home');
-  const [hidden, setHidden] = useState(false);
+  // Hide/show is a plain attribute on the <nav> (CSS animates it), not React state: a state
+  // change re-rendered the whole magnifying dock on every scroll-direction flip.
+  const navRef = useRef<HTMLElement>(null);
+  const showDock = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)');
@@ -44,16 +47,24 @@ export default function Dock() {
   // Auto-hide: slide away while scrolling down, come back on scroll-up, when the mouse
   // nears the bottom edge, or near the end of the page.
   useEffect(() => {
-    let lastY = window.scrollY;
+    let lastY = scrollPos();
     let nearEdge = false;
     let raf = 0;
+    let hid = false;
+    const set = (h: boolean) => {
+      if (h === hid) return;
+      hid = h;
+      navRef.current?.toggleAttribute('data-hidden', h);
+    };
+    showDock.current = () => set(false);
     const update = () => {
       raf = 0;
-      const y = window.scrollY;
-      const atEnd = y + window.innerHeight >= document.documentElement.scrollHeight - 80;
-      if (y < 120 || atEnd || nearEdge) setHidden(false);
-      else if (y > lastY + 4) setHidden(true);
-      else if (y < lastY - 4) setHidden(false);
+      // No layout reads here: window.scrollY / scrollHeight in a scroll frame forced a layout.
+      const y = scrollPos();
+      const atEnd = y + viewHeight() >= pageHeight() - 80;
+      if (y < 120 || atEnd || nearEdge) set(false);
+      else if (y > lastY + 4) set(true);
+      else if (y < lastY - 4) set(false);
       if (Math.abs(y - lastY) > 4) lastY = y;
     };
     const onScroll = () => {
@@ -64,7 +75,7 @@ export default function Dock() {
       const near = e.clientY > window.innerHeight - 96;
       if (near !== nearEdge) {
         nearEdge = near;
-        if (near) setHidden(false);
+        if (near) set(false);
       }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -127,9 +138,9 @@ export default function Dock() {
 
   return (
     <nav
+      ref={navRef}
       aria-label="Sections"
-      data-hidden={hidden || undefined}
-      onFocus={() => setHidden(false)}
+      onFocus={() => showDock.current()}
       className="os-dock pointer-events-none fixed inset-x-0 bottom-0 z-40 h-24 print:hidden"
     >
       <RbDock
