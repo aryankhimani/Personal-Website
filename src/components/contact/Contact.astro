@@ -11,7 +11,7 @@ import DiscardDraft from './DiscardDraft';
 <section id="contact" class="contact" aria-labelledby="contact-title">
   <ContactBackdrop client:calm />
   <header class="section-head">
-    <div class="os-path-row"><TechLabel client:calm text="new_message.eml" tone="ember" /></div>
+    <div class="os-path-row"><TechLabel client:near text="new_message.eml" tone="ember" /></div>
     <h2 id="contact-title" class="section-heading">Say hi.</h2>
     <p class="section-lede">
       Questions about a project, a coffee chat, or something you&rsquo;re building. I read everything.
@@ -50,7 +50,7 @@ import DiscardDraft from './DiscardDraft';
         <Icon name="send" className="text-sm" />
         Send
       </button>
-      <DiscardDraft client:calm />
+      <DiscardDraft client:near />
       <p class="compose-note">Opens your email app with this filled in.</p>
       <span class="compose-elsewhere">
         <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">

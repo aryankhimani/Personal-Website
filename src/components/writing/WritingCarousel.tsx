@@ -114,6 +114,27 @@ function cover(p: Piece, i: number, im: HTMLImageElement | null): HTMLCanvasElem
 const yieldIdle = () =>
   new Promise<void>((r) => (window.requestIdleCallback ? window.requestIdleCallback(() => r(), { timeout: 200 }) : window.setTimeout(r, 16)));
 
+/** The static version: a row of cover cards, the same size as the carousel's. It's in the
+ *  server HTML, so the section never shows an empty gap while the WebGL strip loads; Lite
+ *  mode keeps it. The Finder list below is the accessible version, so this is hidden from
+ *  screen readers. */
+function Strip({ pieces }: { pieces: Piece[] }) {
+  const list = pieces.filter((p) => p.kind !== 'talk').slice(0, 9);
+  return (
+    <div className="writing-strip" aria-hidden="true">
+      {list.map((p, i) => (
+        <div className="writing-strip-card" key={p.href}>
+          <img src={p.img} alt="" width={600} height={400} loading="lazy" decoding="async" className={p.bp ? '' : 'is-photo'} />
+          <span className="writing-strip-kind">
+            {p.kind === 'article' ? 'article.md' : 'newsletter.txt'} · {String(i + 1).padStart(2, '0')}
+          </span>
+          <span className="writing-strip-title">{p.title}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function WritingCarousel({ pieces }: { pieces: Piece[] }) {
   const lite = useLite();
   const [items, setItems] = useState<(FlexCarouselItem & { href: string })[] | null>(null);
@@ -142,13 +163,17 @@ export default function WritingCarousel({ pieces }: { pieces: Piece[] }) {
     };
   }, [lite, pieces]);
 
-  if (lite) return null;
-  // An empty box until the covers are drawn: client:visible needs something to watch.
-  if (!items) return <div className="writing-carousel" />;
+  // Static cards until the covers are drawn (and always in Lite).
+  if (lite || !items)
+    return (
+      <div className="writing-carousel">
+        <Strip pieces={pieces} />
+      </div>
+    );
   return (
     <div className="writing-carousel">
-      <GlGate>
-        <Suspense fallback={null}>
+      <GlGate fallback={<Strip pieces={pieces} />}>
+        <Suspense fallback={<Strip pieces={pieces} />}>
           <FlexCarousel
             items={items}
             preset="liquid"

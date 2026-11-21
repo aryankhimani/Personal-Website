@@ -28,8 +28,18 @@
   max-width: 40rem;
 }
 
+/* Just the glyphs of "Aryan Khimani" from Bricolage (2.5 KB instead of 41 KB, weight axis
+   kept), so the biggest text on the page can paint as soon as possible.
+   Made by scripts/make-hero-font.sh; rerun it if the name or the font changes. */
+@font-face {
+  font-family: 'Bricolage Hero Name';
+  src: url('/fonts/hero-name.woff2') format('woff2');
+  font-weight: 200 800;
+  font-display: swap;
+}
+
 .hero-name {
-  font-family: var(--font-display);
+  font-family: 'Bricolage Hero Name', var(--font-display);
   font-size: clamp(3.25rem, 7.2vw, 7rem);
   font-variation-settings: 'wght' 300;
   line-height: 0.92;

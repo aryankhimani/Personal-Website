@@ -50,9 +50,9 @@ export default function Toys() {
       <li className="toy">
         <div className="toy-stage toy-stage-sticker">
           {lite ? (
-            <img src={STICKER} alt="" width={150} height={150} className="toy-sticker-still" />
+            <img src={STICKER} alt="" width={150} height={150} className="toy-sticker-still" loading="lazy" decoding="async" />
           ) : (
-            <Suspense fallback={<img src={STICKER} alt="" width={150} height={150} className="toy-sticker-still" />}>
+            <Suspense fallback={<img src={STICKER} alt="" width={150} height={150} className="toy-sticker-still" loading="lazy" decoding="async" />}>
               <StickerPeel imageSrc={STICKER} width={150} rotate={-8} finish="holo" draggable intro />
             </Suspense>
           )}

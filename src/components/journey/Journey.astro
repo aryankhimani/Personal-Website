@@ -142,8 +142,8 @@ const pad = (n: number) => String(n).padStart(2, '0');
 <script>
   import { isLite, onLiteChange } from '../../lib/device-tier';
 
-  // GSAP only loads when the scene is going to run: not in Lite mode, and either in idle time
-  // after load or when the section is getting close, whichever comes first.
+  // GSAP only loads when the scene is going to run: not in Lite mode, and not until the
+  // section is getting close.
   const section = document.getElementById('journey');
   let scene: { destroy: () => void } | null = null;
   let loading = false;
@@ -157,20 +157,36 @@ const pad = (n: number) => String(n).padStart(2, '0');
   }
 
   if (section) {
+    // Start about three screens early, in a pause between scrolls (building the scene is a
+    // 100+ ms task), so it's ready before the section arrives without a mid-scroll hitch.
+    let quiet = 0;
+    const whenQuiet = () => {
+      window.clearTimeout(quiet);
+      quiet = window.setTimeout(() => {
+        window.removeEventListener('scroll', whenQuiet);
+        (window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 1)))(() => void start(), { timeout: 1500 });
+      }, 220);
+    };
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         io.disconnect();
-        void start();
+        window.addEventListener('scroll', whenQuiet, { passive: true });
+        whenQuiet();
       },
-      { rootMargin: '1500px 0px' },
+      { rootMargin: '300% 0px' },
     );
     io.observe(section);
-    // Better still, build it while nothing else is happening, before the visitor gets there.
-    const whenIdle = () =>
-      window.setTimeout(() => (window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 1)))(() => void start(), { timeout: 4000 }), 1500);
-    if (document.readyState === 'complete') whenIdle();
-    else window.addEventListener('load', whenIdle, { once: true });
+    // No pause on the way in? Start anyway once it's half a screen away.
+    const close = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        close.disconnect();
+        void start();
+      },
+      { rootMargin: '50% 0px' },
+    );
+    close.observe(section);
 
     onLiteChange(() => {
       if (isLite()) {

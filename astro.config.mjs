@@ -21,12 +21,15 @@ const legacyRedirects = {
   '/illume.html': '/work/illume/',
 };
 
-// client:calm (src/directives/calm.ts): hydrate near the screen, but only once scrolling pauses.
+// Custom hydration (src/directives/*): client:near (2 screens ahead), client:calm (heavy
+// WebGL: 2 screens ahead but only when scrolling pauses), client:later (chrome, after load).
 const calmDirective = {
-  name: 'client-calm',
+  name: 'client-directives',
   hooks: {
     'astro:config:setup': ({ addClientDirective }) => {
       addClientDirective({ name: 'calm', entrypoint: './src/directives/calm.ts' });
+      addClientDirective({ name: 'near', entrypoint: './src/directives/near.ts' });
+      addClientDirective({ name: 'later', entrypoint: './src/directives/later.ts' });
     },
   },
 };

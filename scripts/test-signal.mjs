@@ -37,7 +37,8 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
 {
   const { page, errors } = await open();
   const s = await page.evaluate(() => {
-    const cv = document.querySelector('.conduit')?.getBoundingClientRect();
+    const segs = [...document.querySelectorAll('.conduit-seg')].map((e) => e.getBoundingClientRect());
+    const cv = segs.length ? { right: Math.max(...segs.map((r) => r.right)) } : null;
     const workLeft = Math.min(...[...document.querySelectorAll('#work .gf-body, #work h2, #about .me-window')].map((e) => e.getBoundingClientRect().left));
     return {
       mode: document.querySelector('.conduit')?.dataset.mode,
@@ -53,17 +54,27 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
   check('HUD tracker has a notch per sector', s.notches === 7);
   check('sound is off by default and no AudioContext exists', s.sound === 'off' && s.ac === 0);
 
-  const pos0 = await page.$eval('.conduit', (e) => JSON.stringify(e.getBoundingClientRect()));
+  // Full length: from the top of the hero down to the signature, in every section.
+  const cover = await page.evaluate(() => {
+    const segs = [...document.querySelectorAll('.conduit-seg')].map((e) => { const r = e.getBoundingClientRect(); return [r.top + scrollY, r.bottom + scrollY]; });
+    const missing = [...document.querySelectorAll('main > section[id]')]
+      .filter((sec) => { const r = sec.getBoundingClientRect(); const a = r.top + scrollY, b = r.bottom + scrollY; return r.height > 50 && !segs.some(([s0, s1]) => s1 > a + 10 && s0 < b - 10); })
+      .map((sec) => sec.id);
+    const sig = document.querySelector('.signal-sig .signal-core');
+    return { n: segs.length, top: Math.round(segs[0]?.[0] ?? -1), heroTop: Math.round(document.getElementById('home').getBoundingClientRect().top + scrollY), missing, sigDrawn: !!sig?.getAttribute('d') && !sig.style.strokeDashoffset };
+  });
+  check('the line runs the full page, hero to signature, in every section', cover.n > 0 && cover.top - cover.heroTop < 20 && cover.missing.length === 0 && cover.sigDrawn, JSON.stringify(cover));
+  const pos0 = await page.$eval('.conduit-seg', (e) => e.getBoundingClientRect().top + scrollY);
   await page.evaluate(() => document.getElementById('journey').scrollIntoView());
   await sleep(1500);
   const after = await page.evaluate(() => ({
-    pos: JSON.stringify(document.querySelector('.conduit').getBoundingClientRect()),
+    pos: document.querySelector('.conduit-seg').getBoundingClientRect().top + scrollY,
     num: document.querySelector('.sig-hud-num b').textContent,
     path: document.querySelector('.sig-hud-path').textContent,
     lock: !!document.querySelector('#journey .lock-box.on'),
     opacity: getComputedStyle(document.querySelector('.conduit')).opacity,
   }));
-  check('the line is static: scrolling does not move or blink it', after.pos === pos0 && after.opacity === '1', after.opacity);
+  check('the line is static: part of the page, scrolling does not move or blink it', Math.abs(after.pos - pos0) < 1 && after.opacity === '1', `${pos0} ${after.pos} ${after.opacity}`);
   check('the HUD ticks to the Journey sector', after.num === '04' && after.path === '~/journey', `${after.num} ${after.path}`);
   check('the Journey title locks on', after.lock);
 
@@ -125,7 +136,7 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
     off: parseFloat(document.querySelector('.signal-sig .signal-core').style.strokeDashoffset),
     text: document.querySelector('.signal-end').textContent,
   }));
-  check('at the bottom it signs Aryan and the end line types', end.off < 3 && end.text.startsWith('> end of transmission'), JSON.stringify(end));
+  check('at the bottom: the Aryan signature and the end line', !(end.off > 3) && end.text.startsWith('> end of transmission'), JSON.stringify(end));
   const up = await page.$eval('.systray-up', (e) => e.textContent);
   check('menu bar shows uptime', /^uptime \d\d:\d\d/.test(up), up);
   check('no console errors (desktop)', errors.length === 0, errors.slice(0, 2).join(' | '));
@@ -136,11 +147,11 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
 {
   const { page, errors } = await open({ motion: 'reduce' });
   const r = await page.evaluate(() => ({
-    off: parseFloat(document.querySelector('.signal-sig .signal-core').style.strokeDashoffset),
+    off: document.querySelector('.signal-sig .signal-core').style.strokeDashoffset,
     end: document.querySelector('.signal-end').textContent,
-    shimmer: getComputedStyle(document.querySelector('.conduit'), '::after').display,
+    glow: getComputedStyle(document.querySelector('.conduit-seg'), '::after').animationName,
   }));
-  check('reduced motion: signature drawn, still, no shimmer', r.off === 0 && r.end.length > 10 && r.shimmer === 'none', JSON.stringify(r));
+  check('reduced motion: signature drawn, still, no glow pulse', !r.off && r.end.length > 10 && r.glow === 'none', JSON.stringify(r));
   await page.evaluate(() => document.getElementById('writing').scrollIntoView());
   await sleep(800);
   const styled = await page.evaluate(() => [...document.querySelectorAll('main > section')].some((s) => s.style.transform || s.style.clipPath));
@@ -154,7 +165,7 @@ async function open({ width = 1440, height = 900, motion = 'no-preference', touc
   const { page, errors } = await open({ width: 390, height: 844, touch: true });
   const m = await page.evaluate(() => ({
     mode: document.querySelector('.conduit')?.dataset.mode,
-    w: document.querySelector('.conduit').getBoundingClientRect().width,
+    w: document.querySelector('.conduit-seg')?.getBoundingClientRect().width ?? 9,
     label: true,
     hud: getComputedStyle(document.querySelector('.sig-hud')).display,
     wide: document.documentElement.scrollWidth,

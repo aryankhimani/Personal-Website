@@ -45,7 +45,7 @@ export default function RefineToy() {
         color={cream['100']}
         labels={{ queued: 'rough draft', generating: 'blocking it out', refining: 'refining', complete: 'shipped' }}
       >
-        <img src="/playground/hero-design.jpg" alt="This site's hero: the AK logo in chrome beside Aryan's name" width={960} height={600} />
+        <img src="/playground/hero-design.jpg" alt="This site's hero: the AK logo in chrome beside Aryan's name" width={960} height={600} loading="lazy" decoding="async" />
       </RefineFrame>
       <button type="button" className="toy-button" onClick={run} disabled={status !== 'complete'}>
         Refine again

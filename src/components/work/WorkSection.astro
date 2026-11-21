@@ -22,9 +22,9 @@ const folders = FOLDERS.map((f) => ({
 ---
 
 <section id="work" class="work" aria-labelledby="work-title">
-  <WorkCursor client:idle />
+  <WorkCursor client:later />
   <header class="work-head">
-    <div class="os-path-row"><TechLabel client:calm text="~/work" tone="cream" /></div>
+    <div class="os-path-row"><TechLabel client:near text="~/work" tone="cream" /></div>
     <h2 id="work-title" class="work-heading">Labs, startups and things I built.</h2>
     <p class="work-lede">Four I&rsquo;d show you first. Everything else is in the folders below.</p>
   </header>
@@ -63,7 +63,7 @@ const folders = FOLDERS.map((f) => ({
                   </div>
                 </div>
                 <div class:list={['fcard-cover', d.cover ? `pw-cover-${d.coverFit}` : 'fcard-cover-empty']} data-bp={d.cover?.format === 'svg' ? '' : undefined}>
-                  <FlipCover client:calm title={d.title}>
+                  <FlipCover client:near title={d.title}>
                     <div slot="front" class="fcard-face">
                       {d.cover ? (
                         <Picture
@@ -105,7 +105,7 @@ const folders = FOLDERS.map((f) => ({
 
   <div class="desk" aria-labelledby="desk-title">
     <h3 id="desk-title" class="os-path">~/work/ <span class="desk-count">{FOLDERS.length} folders, {all.length} files</span></h3>
-    <FolderDesk client:calm folders={folders} />
+    <FolderDesk client:near folders={folders} />
 
     <details class="work-all">
       <summary>

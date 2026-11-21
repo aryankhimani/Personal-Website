@@ -8,7 +8,6 @@ import BootTitle from '../components/os/BootTitle';
 import CommandPalette from '../components/os/CommandPalette';
 import { getProjects, toIndexEntry } from '../lib/projects';
 import { INDEX_ELEMENT_ID } from '../lib/work';
-import heroFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
 
 interface Props {
   title?: string;
@@ -74,7 +73,7 @@ const ogImage = new URL('/og.jpg', Astro.site).href;
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap.xml" />
-    <link rel="preload" as="font" type="font/woff2" href={heroFont} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/hero-name.woff2" crossorigin />
     <title>{title}</title>
 
     <!-- Decide Lite mode before first paint so the heavy version never flashes.
@@ -168,14 +167,14 @@ const ogImage = new URL('/og.jpg', Astro.site).href;
     >
       Skip to content
     </a>
-    <MenuBar client:idle />
+    <MenuBar client:later />
     <main id="main" class="pt-(--menubar-h)">
       <slot />
     </main>
     <Footer bare={bareFoot} />
-    <WindowManager client:idle />
-    <Dock client:idle />
-    <CommandPalette client:idle />
+    <WindowManager client:later />
+    <Dock client:later />
+    <CommandPalette client:later />
     <script type="application/json" id={INDEX_ELEMENT_ID} set:html={workIndex} />
 
     <script>

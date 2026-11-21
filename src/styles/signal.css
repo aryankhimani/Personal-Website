@@ -1,70 +1,77 @@
 /* The scroll journey (lib/signal/*): the Signal line, channel flash,
    HUD tracker, title lock-ons, and the end line. All pointer-transparent except the HUD. */
 
-/* ---------- Signal conduit (line.ts): a static electric line in the left gutter ---------- */
+/* ---------- Signal (line.ts): a static line down the left gutter of the whole page ---------- */
 
-/* Fixed, under every overlay (and hidden while one is open). Doesn't react to scrolling. */
+/* A zero-size anchor at the top-left of the page; its segments are placed in page
+   coordinates, so the line scrolls with the content like any other part of the page. */
 .conduit {
-  position: fixed;
-  top: var(--menubar-h, 2rem);
-  bottom: 0;
+  position: absolute;
+  top: 0;
   left: 40px;
   z-index: 25;
-  width: 1.5px;
-  overflow: hidden;
+  width: 0;
+  height: 0;
   pointer-events: none;
-  border-radius: 2px;
-  background: linear-gradient(to bottom, rgb(250 246 239 / 0.25), rgb(250 246 239 / 0.85) 18%, rgb(250 246 239 / 0.85) 82%, rgb(250 246 239 / 0.3));
-  /* Navy casing keeps it visible on cream sections; ember glow on navy ones. */
-  box-shadow:
-    0 0 0 1px rgb(11 20 48 / 0.35),
-    0 0 6px 1px rgb(255 74 43 / 0.45),
-    0 0 16px 2px rgb(255 74 43 / 0.16);
-  contain: strict;
-  transition: opacity 160ms ease, visibility 0s linear 0s;
 }
 
-.conduit[data-mode='thin'] {
+.conduit[data-off],
+.signal-sig[data-off],
+.signal-end[data-off] {
+  visibility: hidden;
+}
+
+.conduit-seg {
+  position: absolute;
+  left: 0;
+  width: 1.5px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, rgb(250 246 239 / 0.35), rgb(250 246 239 / 0.9) 3rem, rgb(250 246 239 / 0.9) calc(100% - 3rem), rgb(250 246 239 / 0.35));
+  /* Navy casing keeps it visible on cream sections. */
+  box-shadow: 0 0 0 1px rgb(11 20 48 / 0.3);
+}
+
+/* The ember glow on its own layer, breathing slowly (opacity only: no repaint). */
+.conduit-seg::after {
+  content: '';
+  position: absolute;
+  inset: 0 -1px;
+  border-radius: inherit;
+  box-shadow:
+    0 0 6px 1px rgb(255 74 43 / 0.5),
+    0 0 16px 2px rgb(255 74 43 / 0.18);
+  opacity: 0.75;
+  animation: conduit-breathe 7s ease-in-out infinite;
+  will-change: opacity;
+}
+
+@keyframes conduit-breathe {
+  50% { opacity: 1; }
+}
+
+.conduit[data-mode='thin'] .conduit-seg {
   width: 1px;
-  box-shadow: 0 0 4px rgb(255 74 43 / 0.4);
+  box-shadow: none;
   opacity: 0.6;
 }
 
-.conduit[data-off] {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 120ms ease, visibility 0s linear 120ms;
+.conduit[data-mode='thin'] .conduit-seg::after {
+  box-shadow: 0 0 4px rgb(255 74 43 / 0.4);
+  animation: none;
 }
 
-/* The slow idle shimmer: one soft bright band drifting down the line. */
-.conduit::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 22vh;
-  background: linear-gradient(to bottom, transparent, rgb(255 255 255 / 0.95), transparent);
-  transform: translateY(-25vh);
-  animation: conduit-shimmer 9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-  will-change: transform;
-}
-
-@keyframes conduit-shimmer {
-  0% { transform: translateY(-25vh); opacity: 0; }
-  10% { opacity: 1; }
-  70% { transform: translateY(105vh); opacity: 1; }
-  100% { transform: translateY(105vh); opacity: 0; }
+.conduit[data-still] .conduit-seg::after {
+  animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .conduit::after {
-    display: none;
+  .conduit-seg::after {
+    animation: none;
   }
 }
 
-[data-lite='true'] .conduit::after {
-  display: none;
+[data-lite='true'] .conduit-seg::after {
+  animation: none;
 }
 
 .signal-sig {
@@ -82,10 +89,6 @@
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-.signal-sig.draw path {
-  transition: stroke-dashoffset 1500ms cubic-bezier(0.45, 0, 0.3, 1);
 }
 
 .signal-glow {
