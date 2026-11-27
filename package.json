@@ -35,6 +35,6 @@
     "@astrojs/check": "^0.9.12",
     "@types/three": "^0.187.0",
     "puppeteer-core": "^25.17.0",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   }
 }
