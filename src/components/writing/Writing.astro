@@ -1,0 +1,142 @@
+---
+import TechLabel from '../os/TechLabel';
+// ~/writing: every article, newsletter and talk as a Finder list, AI and tech first, with filters.
+// Dates come from the Medium and Substack feeds and YouTube; the two oldest Medium dates
+// come from LinkedIn.
+// Each piece has an image: its own header image (photo:<file> in src/assets/photos) or, when
+// there isn't one, a blueprint drawing of the topic (bp:<id>, scripts/make-blueprints.mjs).
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+import writing from '../../data/writing.json';
+import { Icon } from '../os/Icon';
+import WritingCarousel from './WritingCarousel';
+
+type Kind = 'article' | 'newsletter' | 'talk';
+type Raw = { title: string; kind: Kind; date: string; where: string; href: string; image: string; topic?: 'ai' | 'tech' };
+const TIER = { ai: 0, tech: 1, other: 2 };
+
+const photos = import.meta.glob<{ default: ImageMetadata }>('../../assets/photos/*.{jpg,JPG,jpeg,png}', { eager: true });
+const blueprints = import.meta.glob<{ default: ImageMetadata }>('../../assets/blueprints/*.svg', { eager: true });
+async function resolve(key: string) {
+  const [kind, name] = key.split(':');
+  const src =
+    kind === 'photo' ? photos[`../../assets/photos/${name}`]?.default : blueprints[`../../assets/blueprints/${name}.svg`]?.default;
+  if (!src) throw new Error(`writing.json: no image for ${key}`);
+  const [big, small] = await Promise.all([
+    getImage({ src, width: 640, format: 'webp' }),
+    getImage({ src, width: 160, format: 'webp' }),
+  ]);
+  return { img: big.src, thumb: small.src, bp: kind === 'bp' };
+}
+
+const items = await Promise.all(
+  (writing as Raw[])
+    // AI first, then other tech, then the rest; newest first within each.
+    .toSorted((a, b) => TIER[a.topic ?? 'other'] - TIER[b.topic ?? 'other'] || b.date.localeCompare(a.date))
+    .map(async (it) => ({ ...it, ...(await resolve(it.image)) })),
+);
+
+const KINDS: { id: Kind | 'all'; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'article', label: 'Articles' },
+  { id: 'newsletter', label: 'Newsletters' },
+  { id: 'talk', label: 'Talks' },
+];
+const EXT: Record<Kind, string> = { article: '.md', newsletter: '.txt', talk: '.mov' };
+const KIND_LABEL: Record<Kind, string> = { article: 'Article', newsletter: 'Newsletter', talk: 'Talk' };
+const count = (k: Kind | 'all') => (k === 'all' ? items.length : items.filter((i) => i.kind === k).length);
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const fmt = (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${d.slice(0, 4)}`;
+---
+
+<section id="writing" class="writing" aria-labelledby="writing-title">
+  <header class="writing-head">
+    <div class="os-path-row"><TechLabel client:near text="~/writing" tone="cream" /></div>
+    <h2 id="writing-title" class="section-heading">Things I wrote and said out loud.</h2>
+    <p class="section-lede">
+      AI and tech first: neural networks, NLP, blockchain. Then gene editing, a high school newsletter and two talks.
+    </p>
+  </header>
+
+  <WritingCarousel client:near pieces={items} />
+
+  <div class="finder-window" data-writing>
+    <div class="wp-bar">
+      <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="wp-file">~/writing</span>
+    </div>
+
+    <div class="writing-toolbar">
+      <div class="writing-chips" role="group" aria-label="Show">
+        {
+          KINDS.map((k) => (
+            <button type="button" class="writing-chip" data-filter={k.id} aria-pressed={k.id === 'all' ? 'true' : 'false'}>
+              {k.label}
+              <span class="writing-chip-count">{count(k.id)}</span>
+            </button>
+          ))
+        }
+      </div>
+      <p class="writing-status" role="status" data-writing-status>{items.length} items</p>
+    </div>
+
+    <table class="writing-list">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col" class="writing-col-kind">Kind</th>
+          <th scope="col" class="writing-col-where">Where</th>
+          <th scope="col">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          items.map((it) => (
+            <tr data-kind={it.kind} data-topic={it.topic}>
+              <td>
+                <a href={it.href} target="_blank" rel="noopener noreferrer" class="writing-link">
+                  <span class="writing-thumb" data-bp={it.bp ? '' : undefined} aria-hidden="true">
+                    <img src={it.thumb} alt="" width="80" height="54" loading="lazy" decoding="async" />
+                  </span>
+                  <Icon name={it.kind === 'talk' ? 'play' : it.kind === 'newsletter' ? 'mail' : 'file-text'} className="writing-icon" />
+                  <span>
+                    {it.title}
+                    <span class="writing-ext">{EXT[it.kind]}</span>
+                  </span>
+                  <span class="sr-only">(opens in a new tab)</span>
+                </a>
+              </td>
+              <td class="writing-col-kind">{KIND_LABEL[it.kind]}</td>
+              <td class="writing-col-where">{it.where}</td>
+              <td class="writing-date">
+                <time datetime={it.date}>{fmt(it.date)}</time>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-writing]');
+  if (root) {
+    const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const rows = [...root.querySelectorAll<HTMLTableRowElement>('tbody tr')];
+    const status = root.querySelector<HTMLElement>('[data-writing-status]');
+    for (const chip of chips) {
+      chip.addEventListener('click', () => {
+        const kind = chip.dataset.filter;
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        let shown = 0;
+        for (const row of rows) {
+          row.hidden = kind !== 'all' && row.dataset.kind !== kind;
+          if (!row.hidden) shown++;
+        }
+        if (status) status.textContent = `${shown} ${shown === 1 ? 'item' : 'items'}`;
+      });
+    }
+  }
+</script>

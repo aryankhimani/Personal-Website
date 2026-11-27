@@ -1,0 +1,209 @@
+---
+// ~/journey: how I got here, one chapter per step.
+// The markup is a plain timeline. Outside Lite mode, journey.css stacks the chapters into one
+// screen-high stage and lib/journey.ts pins it and scrubs through them as you scroll.
+import { Picture } from 'astro:assets';
+import JourneyBackdrop from './JourneyBackdrop';
+import type { ImageMetadata } from 'astro';
+import tks from '../../assets/photos/TKS_Hackathon.jpg';
+import cnn from '../../assets/photos/CNN.png';
+import joeyhelps from '../../assets/photos/joeyhelps/image013.jpg';
+import youreka from '../../assets/photos/youreka/83B76B52-8185-4602-84E2-E349E2BDC824 (3).jpg';
+import teded from '../../assets/photos/teded/IMG_8389.jpg';
+import okamoto from '../../assets/photos/Okamoto.jpg';
+
+type Chapter = {
+  year: string;
+  /** Present tense, one sentence or two. Facts only (see src/content/projects). */
+  line: string;
+  /** Project window to open. */
+  project: string;
+  /** Shown in the photo's place when there isn't one. */
+  term?: string;
+  photo?: { src: ImageMetadata; alt: string; file: string };
+};
+
+const chapters: Chapter[] = [
+  {
+    year: '2020',
+    line: 'I join The Knowledge Society and fall down two rabbit holes: AI and gene editing.',
+    project: 'tks',
+    photo: { src: tks, alt: 'A group selfie at my first TKS hackathon', file: 'hackathon.jpg' },
+  },
+  {
+    year: '2021',
+    line: 'I train my first neural network. It learns to tell four kinds of white blood cells apart.',
+    project: 'cnn-blood-cells',
+    photo: { src: cnn, alt: 'Four microscope views of stained white blood cells', file: 'cells.png' },
+  },
+  {
+    year: '2022',
+    line: 'I co-found JoeyHelps and lead product. People use it, and it makes $2,645.',
+    project: 'joeyhelps',
+    photo: { src: joeyhelps, alt: 'The JoeyHelps team in front of the Google sign at the Google office', file: 'pitch-day.jpg' },
+  },
+  {
+    year: '2023',
+    line: 'I dig through gene expression data in R. Our Youreka team makes the national finals.',
+    project: 'youreka',
+    photo: { src: youreka, alt: 'Presenting our research in front of a projected slide at regionals', file: 'regionals.jpg' },
+  },
+  {
+    year: '2024',
+    line: 'I give a TED-Ed talk in Vancouver: Did Curiosity Actually Kill the Cat?',
+    project: 'teded',
+    photo: { src: teded, alt: 'Me on stage giving my TED-Ed talk, with my slide behind me', file: 'on-stage.jpg' },
+  },
+  {
+    year: '2024',
+    line: 'At Mount Sinai I build an AI tool, end to end. It tracks mice through 75+ experiment videos.',
+    project: 'okamoto-lab',
+    photo: { src: okamoto, alt: 'Me at a lab bench in a white coat and gloves', file: 'bench.jpg' },
+  },
+  {
+    // TODO: add a photo from Western (campus, Western AI or a WFN event).
+    year: '2025',
+    line: 'I start CS + Ivey HBA at Western. At WFN, I co-organize a competition where 200+ students solve a live open-banking case.',
+    project: 'western-founders-network',
+    term: '> cd ~/western\n> ls\ncs+hba  wfn  western-ai\n> _',
+  },
+  {
+    year: 'Now',
+    line: 'I build AI. At Western AI I wrote TruthLens’s backend, training pipeline and Chrome extension.',
+    project: 'truthlens',
+    term: '> whoami\naryan, ai builder\n> run truthlens\n> _',
+  },
+];
+
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<section id="journey" class="journey" aria-labelledby="journey-title">
+  <div class="journey-stage" data-journey-stage>
+    <JourneyBackdrop client:calm />
+    <header class="journey-head">
+      <p class="os-path">~/journey</p>
+      <h2 id="journey-title" class="journey-heading">How I got here</h2>
+    </header>
+
+    <ol class="journey-chapters">
+      {
+        chapters.map((c, i) => (
+          <li class="chapter" data-chapter>
+            <div class="chapter-text">
+              <p class="chapter-mark">
+                <span class="chapter-num">{pad(i + 1)}</span>
+                <span class="chapter-year">{c.year}</span>
+              </p>
+              <p class="chapter-line" data-chapter-line>
+                {c.line}
+              </p>
+              <a href={`/work/${c.project}/`} data-open-window={c.project} class="chapter-link" aria-haspopup="dialog">
+                Open {c.project}.md
+              </a>
+            </div>
+            {c.photo ? (
+              <figure class="chapter-photo">
+                <div class="wp-bar">
+                  <span class="wp-lights" aria-hidden="true">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  <span class="wp-file">{c.photo.file}</span>
+                </div>
+                <div class="chapter-photo-img" data-chapter-photo>
+                  <Picture
+                    src={c.photo.src}
+                    alt={c.photo.alt}
+                    widths={[480, 800, 1200]}
+                    width={1200}
+                    sizes="(max-width: 767px) 100vw, 55vw"
+                    formats={['avif', 'webp']}
+                    fallbackFormat="jpg"
+                  />
+                  <span class="crt-scan" aria-hidden="true" />
+                  <span class="jhud-br jhud-br-tl" aria-hidden="true" />
+                  <span class="jhud-br jhud-br-tr" aria-hidden="true" />
+                  <span class="jhud-br jhud-br-bl" aria-hidden="true" />
+                  <span class="jhud-br jhud-br-br" aria-hidden="true" />
+                  <span class="jhud-read" aria-hidden="true">
+                    IMG_{String(i + 1).padStart(2, '0')} · {c.year} · <span class="jhud-state"><b class="jhud-nosig">NO SIGNAL</b><b class="jhud-lock">SIGNAL LOCK</b></span>
+                  </span>
+                </div>
+              </figure>
+            ) : (
+              <div class="chapter-photo chapter-here" aria-hidden="true">
+                <pre>{c.term}</pre>
+              </div>
+            )}
+          </li>
+        ))
+      }
+    </ol>
+
+    <ol class="journey-rail" aria-hidden="true" data-journey-rail>
+      {chapters.map((c, i) => <li data-active={i === 0 ? '' : undefined}>{c.year}</li>)}
+    </ol>
+  </div>
+</section>
+
+<script>
+  import { isLite, onLiteChange } from '../../lib/device-tier';
+
+  // GSAP only loads when the scene is going to run: not in Lite mode, and not until the
+  // section is getting close.
+  const section = document.getElementById('journey');
+  let scene: { destroy: () => void } | null = null;
+  let loading = false;
+
+  async function start() {
+    if (!section || scene || loading || isLite()) return;
+    loading = true;
+    const { createJourney } = await import('../../lib/journey');
+    loading = false;
+    if (!isLite() && !scene) scene = createJourney(section);
+  }
+
+  if (section) {
+    // Start about three screens early, in a pause between scrolls (building the scene is a
+    // 100+ ms task), so it's ready before the section arrives without a mid-scroll hitch.
+    let quiet = 0;
+    const whenQuiet = () => {
+      window.clearTimeout(quiet);
+      quiet = window.setTimeout(() => {
+        window.removeEventListener('scroll', whenQuiet);
+        (window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 1)))(() => void start(), { timeout: 1500 });
+      }, 220);
+    };
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        window.addEventListener('scroll', whenQuiet, { passive: true });
+        whenQuiet();
+      },
+      { rootMargin: '300% 0px' },
+    );
+    io.observe(section);
+    // No pause on the way in? Start anyway once it's half a screen away.
+    const close = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        close.disconnect();
+        void start();
+      },
+      { rootMargin: '50% 0px' },
+    );
+    close.observe(section);
+
+    onLiteChange(() => {
+      if (isLite()) {
+        scene?.destroy();
+        scene = null;
+      } else {
+        void start();
+      }
+    });
+  }
+</script>

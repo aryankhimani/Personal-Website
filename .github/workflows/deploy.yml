@@ -1,0 +1,45 @@
+# Builds the Astro site and publishes it to GitHub Pages.
+# Runs only for main, so work on other branches never touches the live site.
+# Actions are pinned to full commit SHAs (a moved tag can't change what runs); Dependabot
+# (.github/dependabot.yml) proposes updates. Each job gets only the permissions it needs.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Nothing by default; each job asks for what it needs below.
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Runs `npm ci` + `npm run build` (astro build, then scripts/harden-dist.mjs writes the
+      # CSP and fails on source maps / private files) and uploads dist/ as the Pages artifact.
+      - uses: withastro/action@a8b97df764791eb61fbf3338ef713b0e61ae05c5 # v6.1.4
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

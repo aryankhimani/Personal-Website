@@ -1,0 +1,31 @@
+---
+// On every page: the signature strip (build date, source, Lite switch).
+// Pages other than the homepage also get the CRT "Let's build something." block above it
+// (FootCrt.astro); the homepage places that block itself, after Writing.
+import LiteToggle from './LiteToggle';
+import FootCrt from './FootCrt.astro';
+
+interface Props {
+  /** Leave out the CRT block (the homepage shows it earlier in the page). */
+  bare?: boolean;
+}
+const { bare = false } = Astro.props;
+const built = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Toronto' });
+
+---
+
+<footer class="site-foot site-foot-strip">
+  {!bare && <FootCrt />}
+
+  <div class="site-foot-inner">
+    <div class="site-foot-meta">
+      <p>Built by Aryan with Astro. Last updated {built}.</p>
+      <p>
+        <a href="https://github.com/aryankhimani/Personal-Website" target="_blank" rel="noopener noreferrer">
+          View the source<span class="sr-only"> (opens in a new tab)</span>
+        </a>
+      </p>
+      <LiteToggle client:later />
+    </div>
+  </div>
+</footer>

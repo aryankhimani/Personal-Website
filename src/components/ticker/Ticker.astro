@@ -1,0 +1,33 @@
+---
+// The red-orange strip under the hero: a split-flap board, then skills and places scrolling by.
+// Facts only: skills from me.md, programs from ~/work.
+import TickerFlap from './TickerFlap';
+
+const ITEMS = [
+  'Python', 'Western AI', 'PyTorch', 'TruthLens', 'TypeScript', 'Western University', 'React', 'Mount Sinai',
+  'FastAPI', 'Ivey HBA', 'Hugging Face', 'OpenCV', 'SQL', 'Docker', 'Western Founders Network', 'TED-Ed', 'SHAD',
+];
+---
+
+<div class="ticker" data-ticker aria-label="Skills and places" role="region">
+  <div class="ticker-flap" aria-hidden="true">
+    <span class="ticker-flap-label">I do</span>
+    <TickerFlap client:near />
+  </div>
+  <div class="ticker-track" aria-hidden="true">
+    {[0, 1].map(() => (
+      <ul class="ticker-run">
+        {ITEMS.map((t) => <li>{t}</li>)}
+      </ul>
+    ))}
+  </div>
+  <p class="sr-only">{ITEMS.join(', ')}</p>
+</div>
+
+<script>
+  // The ticker only moves while it's on screen.
+  const ticker = document.querySelector<HTMLElement>('[data-ticker]');
+  if (ticker) {
+    new IntersectionObserver(([e]) => ticker.toggleAttribute('data-running', e.isIntersecting)).observe(ticker);
+  }
+</script>

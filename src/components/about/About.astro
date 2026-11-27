@@ -1,0 +1,146 @@
+---
+import { Image } from 'astro:assets';
+import TechLabel from '../os/TechLabel';
+import { RESUME_URL } from '../os/nav';
+import { EMAIL } from '../hero/links';
+// me.md: photo, three short lines, skill tags in four groups, then three file tabs inside the same
+// card (now.txt, resume.pdf, honours.txt). now.txt is open by default. Facts from the resume, LinkedIn and answers.
+// TODO: this is the clearest portrait in the repo (SHAD, suit, looking away). Swap in a
+// smiling-at-the-camera headshot when I have one: replace the import below.
+import portrait from '../../assets/photos/shad/IMG_3240.jpg';
+
+// Grouped as on the newest resume (Nov 2026).
+const SKILLS: [string, string[]][] = [
+  ['Languages', ['Python', 'SQL', 'TypeScript', 'JavaScript', 'Java', 'R']],
+  ['AI / ML', ['PyTorch', 'Hugging Face', 'LoRA', 'scikit-learn', 'TensorFlow', 'OpenCV']],
+  ['Web', ['FastAPI', 'React', 'Node.js', 'Flask', 'MongoDB']],
+  ['Tools', ['Git', 'Docker', 'GitHub Actions', 'pytest', 'Azure']],
+];
+
+const NOW = [
+  'Building TruthLens with Western AI',
+  'Industry Director at the Western Founders Network',
+  'CS + Ivey HBA at Western, expected 2029',
+];
+
+const HONOURS = [
+  'Harvard Prize Book Award, one of three winners in the Greater Toronto Area (2024)',
+  'Western Scholarship of Distinction',
+  'Won two TKS hackathons',
+  '3rd place, W5 Catalyst Case Competition (Manulife case)',
+  'Best Delegate, OxfordMUN Canada (2024)',
+  'JA Extra Mile Award (2023)',
+];
+---
+
+<section id="about" class="about" aria-labelledby="about-title">
+  <div class="os-path-row"><TechLabel client:near text="~/me.md" tone="cream" /></div>
+
+  <article class="me-window" data-crt-in>
+    <div class="wp-bar">
+      <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="wp-file">me.md</span>
+    </div>
+
+    <div class="me-card">
+      <figure class="me-photo">
+        <Image
+          src={portrait}
+          widths={[220, 440]}
+          sizes="(min-width: 768px) 220px, 140px"
+          alt="Aryan Khimani in a dark suit, standing in front of a wood-panelled wall"
+          loading="lazy"
+        />
+        <figcaption aria-hidden="true">IMG_3240 · SHAD</figcaption>
+      </figure>
+
+      <div class="me-text">
+        <h2 id="about-title" class="me-heading">Hi, I&rsquo;m Aryan.</h2>
+        <ul class="me-lines">
+          <li>I study Computer Science at Western and business at Ivey (dual degree, expected 2029).</li>
+          <li>
+            I build AI tools and ship them: TruthLens, which flags misinformation, and a pose tracker for memory
+            research at Mount Sinai.
+          </li>
+          <!-- TODO: confirm roles and term. -->
+          <li>I&rsquo;m looking for a Summer 2027 internship in software or AI.</li>
+        </ul>
+        <dl class="me-skills">
+          {
+            SKILLS.map(([group, skills]) => (
+              <div>
+                <dt>{group}</dt>
+                <dd>
+                  <ul class="work-tags me-tags" aria-label={`${group} skills`}>
+                    {skills.map((s) => <li>{s}</li>)}
+                  </ul>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+    <div class="me-files">
+      <div class="me-tabs" role="tablist" aria-label="Files">
+        <button type="button" role="tab" class="me-tab" id="tab-now" aria-controls="panel-now" aria-selected="true">now.txt</button>
+        <button type="button" role="tab" class="me-tab" id="tab-resume" aria-controls="panel-resume" aria-selected="false" tabindex="-1">resume.pdf</button>
+        <button type="button" role="tab" class="me-tab" id="tab-honours" aria-controls="panel-honours" aria-selected="false" tabindex="-1">honours.txt</button>
+      </div>
+      <div class="me-panel" role="tabpanel" id="panel-now" aria-labelledby="tab-now">
+        <ul class="me-file-lines">
+          {NOW.map((n) => <li>{n}</li>)}
+          <li>Reach me at <a href={`mailto:${EMAIL}`}>{EMAIL}</a></li>
+        </ul>
+      </div>
+      <div class="me-panel" role="tabpanel" id="panel-resume" aria-labelledby="tab-resume" hidden>
+        <p class="me-file-meta">One page, PDF. Updated November 2026.</p>
+        <a class="me-file-open" href={RESUME_URL} target="_blank" rel="noopener noreferrer">
+          Open resume.pdf <span aria-hidden="true">↗</span>
+          <span class="sr-only">(opens in a new tab)</span>
+        </a>
+      </div>
+      <div class="me-panel" role="tabpanel" id="panel-honours" aria-labelledby="tab-honours" hidden>
+        <ul class="me-file-lines">
+          {HONOURS.map((h) => <li>{h}</li>)}
+        </ul>
+      </div>
+    </div>
+  </article>
+
+</section>
+
+<script>
+  // File tabs (WAI-ARIA tabs): click or arrow keys switch; the panel scans in like a CRT.
+  const list = document.querySelector<HTMLElement>('.me-tabs');
+  if (list) {
+    const tabs = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (tab: HTMLButtonElement, focus = false) => {
+      for (const t of tabs) {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(t.getAttribute('aria-controls')!)!;
+        panel.hidden = !on;
+        if (on) {
+          panel.classList.remove('scan');
+          void panel.offsetWidth;
+          panel.classList.add('scan');
+        }
+      }
+      if (focus) tab.focus();
+    };
+    list.addEventListener('click', (e) => {
+      const tab = (e.target as Element).closest<HTMLButtonElement>('[role="tab"]');
+      if (tab) select(tab);
+    });
+    list.addEventListener('keydown', (e) => {
+      const i = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      if (i < 0) return;
+      const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (to === undefined) return;
+      e.preventDefault();
+      select(tabs[(to + tabs.length) % tabs.length], true);
+    });
+  }
+</script>

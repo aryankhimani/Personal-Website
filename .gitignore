@@ -1,0 +1,43 @@
+.DS_Store
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables and keys
+.env
+.env.*
+*.pem
+*.key
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+
+# local screenshots
+.shots/
+
+# private notes, resume, LinkedIn export (never commit)
+_private/
+
+# local throwaway scripts
+.scratch/
+
+# Old site, kept locally only (removed from the repo at launch)
+_legacy/
+iGEM.html
+
+# Local review notes (mention private things; the repo is public)
+CONTENT-CHANGES.md

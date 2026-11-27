@@ -1,0 +1,129 @@
+---
+// Not found: a classic system error dialog on the desk. GitHub Pages serves this for any
+// missing path; the path itself is filled in by the browser.
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="File not found — Aryan OS" noindex>
+  <section class="err-desk">
+    <div class="err-dialog" role="alertdialog" aria-labelledby="err-title" aria-describedby="err-text">
+      <div class="err-bar">
+        <span class="wp-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="err-bar-title">Aryan OS</span>
+      </div>
+      <div class="err-body">
+        <div class="err-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="48" height="48">
+            <path d="M24 4 46 44H2z" fill="var(--color-ember-500)" stroke="var(--color-navy-950)" stroke-width="2" />
+            <rect x="22" y="17" width="4" height="15" fill="var(--color-navy-950)" />
+            <rect x="22" y="35" width="4" height="4" fill="var(--color-navy-950)" />
+          </svg>
+        </div>
+        <div>
+          <h1 id="err-title" class="err-title">The file couldn&rsquo;t be found.</h1>
+          <p id="err-text" class="err-text">
+            <code data-err-path>this page</code> isn&rsquo;t on this machine. It may have moved when the site was
+            rebuilt.
+          </p>
+          <p class="err-code">error 404 · ENOENT</p>
+        </div>
+      </div>
+      <div class="err-actions">
+        <a href="/#work" class="err-btn">Open ~/work</a>
+        <a href="/" class="err-btn err-btn-default" data-err-home>Go to the desktop</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const path = document.querySelector('[data-err-path]');
+  if (path) path.textContent = decodeURIComponent(location.pathname);
+  document.querySelector<HTMLAnchorElement>('[data-err-home]')?.focus();
+</script>
+
+<style>
+  .err-desk {
+    display: grid;
+    place-items: center;
+    min-height: calc(100dvh - var(--menubar-h) - 8rem);
+    padding: 3rem 1rem 8rem;
+  }
+  .err-dialog {
+    width: min(100%, 30rem);
+    overflow: hidden;
+    border: 1px solid rgb(11 20 48 / 0.5);
+    border-radius: var(--radius-window);
+    background: var(--color-window);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-window);
+  }
+  .err-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 2.25rem;
+    padding: 0 0.75rem;
+    background: linear-gradient(180deg, var(--color-slate-50), var(--color-slate-200) 46%, var(--color-slate-300) 54%, var(--color-slate-100));
+    font-size: 0.75rem;
+  }
+  .err-bar-title {
+    position: absolute;
+    inset-inline: 0;
+    text-align: center;
+  }
+  .err-body {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  .err-icon {
+    flex: none;
+  }
+  .err-title {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-variation-settings: 'wght' 450;
+    line-height: 1.15;
+  }
+  .err-text {
+    margin-top: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+  .err-text code {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--color-accent-ink);
+    word-break: break-all;
+  }
+  .err-code {
+    margin-top: 0.75rem;
+    font-size: 0.6875rem;
+    color: var(--color-ink-2);
+  }
+  .err-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.625rem;
+    padding: 0 1.5rem 1.25rem;
+  }
+  .err-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0 1rem;
+    border-radius: 6px;
+    background: var(--color-cream-200);
+    box-shadow: inset 0 0 0 1px rgb(11 20 48 / 0.2);
+    font-size: 0.8125rem;
+  }
+  .err-btn-default {
+    background: var(--color-navy-950);
+    color: var(--color-cream-50);
+    box-shadow: 0 0 0 2px var(--color-window), 0 0 0 4px var(--color-navy-700);
+  }
+</style>

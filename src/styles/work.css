@@ -1,0 +1,1858 @@
+/* ~/work: featured windows, the folder desk, Finder and project windows, project pages. */
+
+.os-path {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+/* ---------- Section ---------- */
+
+.work {
+  border-top: 1px solid var(--color-hairline);
+  padding: 5rem 1rem 3rem; /* Journey follows straight on: keep the navy gap short */
+}
+
+@media (min-width: 640px) {
+  .work {
+    padding-inline: 1.5rem;
+  }
+}
+
+.work-head,
+.stack,
+.desk {
+  max-width: 75rem;
+  margin-inline: auto;
+}
+
+.work-heading {
+  margin-top: 0.75rem;
+  max-width: 14ch;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.6vw, 4.75rem);
+  font-variation-settings: 'wght' 300;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  color: var(--color-chrome-4);
+  text-wrap: balance;
+}
+
+.work-lede {
+  margin-top: 1.25rem;
+  max-width: 38ch;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--color-chrome-3);
+}
+
+/* ---------- Featured stack ---------- */
+
+.stack {
+  --stack-top: calc(var(--menubar-h) + 1.25rem);
+  --stack-step: 14px;
+  margin-top: 3.5rem;
+  /* Room for the whole pile to sit still before the section scrolls on. */
+  padding-bottom: 4rem;
+}
+
+.stack-slot {
+  position: sticky;
+  top: calc(var(--stack-top) + var(--i) * var(--stack-step));
+  /* Each card leaves the screen in step with the ones above it. */
+  margin-bottom: calc((var(--stack-count) - 1 - var(--i)) * var(--stack-step));
+}
+
+.stack-slot + .stack-slot {
+  margin-top: 5rem;
+}
+
+.fcard {
+  position: relative;
+  transform-origin: 50% 0;
+  overflow: hidden;
+  border: 1px solid rgb(11 20 48 / 0.4);
+  border-radius: var(--radius-window);
+  background: var(--color-window);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-window);
+  will-change: transform;
+}
+
+/* Darkens a card as others pile on top (set by scroll-stack.ts). */
+.fcard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--color-navy-950);
+  opacity: var(--stack-dim, 0);
+}
+
+.fcard-bar,
+.wp-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 2.25rem;
+  padding-inline: 0.75rem;
+  border-bottom: 1px solid rgb(11 20 48 / 0.2);
+  background: var(--color-titlebar);
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.fcard-file,
+.wp-file {
+  position: absolute;
+  inset-inline: 5rem;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Decorative traffic lights for windows that are really just pages. */
+.wp-lights {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wp-lights i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-cream-400);
+  box-shadow: inset 0 0 0 1px rgb(11 20 48 / 0.18);
+}
+
+.fcard-body {
+  display: grid;
+}
+
+@media (min-width: 768px) {
+  .fcard-body {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    height: min(31rem, calc(100dvh - var(--stack-top) - 6rem));
+  }
+}
+
+.fcard-text {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 1.25rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .fcard-text {
+    padding: 2rem 2.25rem;
+  }
+}
+
+.pw-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.work-folder {
+  color: var(--color-navy);
+}
+
+.fcard-title {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.4vw, 3rem);
+  font-variation-settings: 'wght' 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.fcard-summary {
+  margin-top: 0.75rem;
+  max-width: 40ch;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+/* The one real result is the loudest thing on the card. */
+.fcard-result {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2vw, 1.75rem);
+  font-variation-settings: 'wght' 600;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--color-navy);
+  text-wrap: balance;
+}
+
+.fcard-role {
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+.fcard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.btn-ink {
+  display: inline-flex;
+  align-items: center;
+  height: 2.5rem;
+  padding-inline: 1rem;
+  border-radius: 6px;
+  background: var(--color-ink);
+  color: var(--color-window);
+  font-size: 0.8125rem;
+  transition: background-color 150ms var(--ease-out);
+}
+
+.btn-ink:hover {
+  background: var(--color-navy);
+}
+
+.btn-quiet {
+  font-size: 0.8125rem;
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.btn-quiet:hover {
+  text-decoration-thickness: 2px;
+}
+
+.fcard :focus-visible,
+.wp-window :focus-visible {
+  outline-color: var(--color-navy);
+}
+
+.fcard-cover {
+  position: relative;
+  order: -1;
+  height: 11rem;
+  overflow: hidden;
+  border-bottom: 1px solid rgb(11 20 48 / 0.15);
+  background: var(--color-titlebar);
+}
+
+@media (min-width: 768px) {
+  .fcard-cover {
+    order: 0;
+    height: auto;
+    border-bottom: 0;
+    border-left: 1px solid rgb(11 20 48 / 0.15);
+  }
+}
+
+.fcard-cover picture,
+.fcard-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pw-cover-cover img {
+  object-fit: cover;
+}
+
+.pw-cover-contain img {
+  object-fit: contain;
+  padding: 1.5rem;
+}
+
+/* No photo yet: the stack itself, set large on a blueprint. */
+.fcard-cover-empty {
+  display: flex;
+  align-items: flex-end;
+  padding: 1.25rem;
+  background-color: var(--color-navy);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.fcard-tags-big {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+  font-family: var(--font-mono);
+  font-size: clamp(1.25rem, 2.6vw, 2.25rem);
+  line-height: 1.25;
+  color: var(--color-window);
+}
+
+/* ---------- Folder desk ---------- */
+
+.desk {
+  margin-top: 2rem;
+  padding: 1.5rem 1rem 1rem;
+  border: 1px solid var(--color-hairline);
+  border-radius: 12px;
+  background-color: var(--color-desk-2);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size:
+    24px 24px,
+    24px 24px,
+    120px 120px,
+    120px 120px;
+}
+
+@media (min-width: 768px) {
+  .desk {
+    padding: 2rem 2rem 1.25rem;
+  }
+}
+
+.desk-count {
+  margin-left: 0.5rem;
+  color: var(--color-muted);
+}
+
+/* ---------- Liquid-glass folders (FolderDesk.tsx) ---------- */
+
+.gfolders {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(13rem, 1fr);
+  gap: 1.25rem;
+  margin: 0.5rem -1rem 0;
+  /* Room above and at the sides for the papers to fan into; sideways scroll when five
+     don't fit. */
+  padding: 4rem 1rem 0.75rem;
+  scroll-padding-inline: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .gfolders {
+    margin-inline: -2rem;
+    padding-inline: 2rem;
+    scroll-padding-inline: 2rem;
+  }
+}
+
+.gf {
+  scroll-snap-align: start;
+}
+
+.gf-body {
+  --tx: 0;
+  --ty: 0;
+  position: relative;
+  aspect-ratio: 5 / 4;
+  transform: perspective(900px) rotateX(calc(var(--ty) * -5deg)) rotateY(calc(var(--tx) * 7deg));
+  transition: transform 300ms var(--ease-out);
+}
+
+.gf-hit {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  outline: none;
+}
+
+.gf-back {
+  position: absolute;
+  inset: 12% 0 0;
+  z-index: 1;
+  border-radius: 4px 12px 12px 12px;
+  background: linear-gradient(180deg, var(--color-navy-600), var(--color-navy-800));
+  box-shadow: inset 0 1px 0 rgb(242 235 221 / 0.14);
+}
+
+.gf-back::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 42%;
+  height: 0.75rem;
+  border-radius: 8px 10px 0 0;
+  background: var(--color-navy-600);
+}
+
+/* Papers: the top picks fan out in front (best in the middle), the rest wait behind. */
+.gf-paper {
+  --o: 0; /* -1 left, 0 centre, 1 right */
+  --d: 0; /* 1 for the side papers */
+  position: absolute;
+  top: 5%;
+  left: 18%;
+  z-index: calc(6 - var(--d));
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 64%;
+  height: 62%;
+  padding: 0.625rem 0.75rem;
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 1.15rem, rgb(11 20 48 / 0.06) 1.15rem calc(1.15rem + 1px)) 0 2.6rem / 100% 100% no-repeat,
+    var(--color-cream-100);
+  color: var(--color-navy-950);
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgb(5 9 26 / 0.35);
+  transform: translate(calc(var(--o) * 16%), calc(var(--d) * 8px)) rotate(calc(var(--o) * 6deg));
+  transition: transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.gf-paper-file {
+  font-size: 0.625rem;
+  color: var(--color-slate-500, #5b6584);
+}
+
+.gf-paper-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.gf-paper:focus-visible {
+  outline: 2px solid var(--color-ember-500);
+  outline-offset: 2px;
+}
+
+.gf-paper-behind {
+  z-index: 2;
+  pointer-events: none;
+  background: var(--color-cream-300);
+  opacity: 0.45;
+  filter: blur(2.5px);
+  transform: translate(calc((var(--i) - 1) * 24%), -16%) rotate(calc((var(--i) - 1) * -8deg)) scale(0.9);
+}
+
+.gf:hover .gf-paper,
+.gf:focus-within .gf-paper {
+  transform: translate(calc(var(--o) * 52%), calc(-36% + var(--d) * 14px)) rotate(calc(var(--o) * 10deg));
+}
+
+.gf:hover .gf-paper-behind,
+.gf:focus-within .gf-paper-behind {
+  transform: translate(calc((var(--i) - 1) * 30%), -40%) rotate(calc((var(--i) - 1) * -10deg)) scale(0.88);
+}
+
+/* The glass front: frosted (it really blurs the papers behind it), an edge highlight, and
+   a sheen that slides as the folder tilts. */
+.gf-front {
+  position: absolute;
+  inset: 40% 0 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: end;
+  column-gap: 0.75rem;
+  padding: 0.875rem 0.875rem 0.875rem 1rem;
+  overflow: hidden;
+  border: 1px solid rgb(242 235 221 / 0.22);
+  border-radius: 6px 6px 12px 12px;
+  background:
+    linear-gradient(165deg, rgb(242 235 221 / 0.2), rgb(242 235 221 / 0.06) 45%, rgb(242 235 221 / 0.03)),
+    rgb(22 34 74 / 0.32);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgb(242 235 221 / 0.45),
+    inset 0 -14px 28px -10px rgb(5 9 26 / 0.45),
+    0 22px 32px -18px rgb(5 9 26 / 0.85);
+  transform-origin: 50% 100%;
+  transition: transform 300ms var(--ease-out);
+}
+
+.gf-front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgb(242 235 221 / 0.16) 45%, transparent 60%);
+  transform: translateX(calc(var(--tx) * 35%));
+  transition: transform 300ms var(--ease-out);
+}
+
+.gf:hover .gf-front,
+.gf:focus-within .gf-front {
+  transform: perspective(500px) rotateX(-9deg);
+}
+
+.gf-hit:focus-visible .gf-front {
+  outline: 2px solid var(--color-ember-500);
+  outline-offset: 3px;
+}
+
+.gf-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-variation-settings: 'wght' 420;
+  line-height: 1.1;
+  color: var(--color-cream-50);
+}
+
+.gf-count {
+  grid-column: 1;
+  font-size: 0.6875rem;
+  color: rgb(242 235 221 / 0.65);
+}
+
+.gf-arrow {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: end;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: var(--color-cream-100);
+}
+
+.gf-arrow svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  fill: none;
+  stroke: var(--color-navy-950);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gf-note {
+  margin-top: 0.875rem;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+[data-lite='true'] .gf-body,
+[data-lite='true'] .gf-paper,
+[data-lite='true'] .gf-front,
+[data-lite='true'] .gf-front::after {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gf-body,
+  .gf-paper,
+  .gf-front,
+  .gf-front::after {
+    transition: none;
+  }
+}
+
+/* ---------- A folder as a full page (FolderPage.tsx) ---------- */
+
+.fp-head {
+  width: min(100% - 2.5rem, 64rem);
+  margin: 2.25rem auto 0;
+}
+
+.fp-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-variation-settings: 'wght' 350;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.fp-note {
+  margin-top: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  color: var(--color-ink-2);
+}
+
+.fp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1.25rem;
+  width: min(100% - 2.5rem, 64rem);
+  margin: 2rem auto 3rem;
+  list-style: none;
+}
+
+.fp-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(11 20 48 / 0.14);
+  border-radius: 10px;
+  background: var(--color-cream-50);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 220ms var(--ease-out),
+    box-shadow 220ms var(--ease-out);
+}
+
+.fp-card:hover,
+.fp-card:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px -16px rgb(11 20 48 / 0.6);
+}
+
+.fp-card:focus-visible {
+  outline: 2px solid var(--color-ember-500);
+  outline-offset: 2px;
+}
+
+.fp-cover {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--color-titlebar);
+}
+
+.fp-cover img {
+  width: 100%;
+  height: 100%;
+}
+
+.fp-cover-cover {
+  object-fit: cover;
+}
+
+.fp-cover-contain {
+  object-fit: contain;
+}
+
+.fp-cover-file {
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.fp-text {
+  display: grid;
+  gap: 0.375rem;
+  padding: 0.875rem 1rem 1.125rem;
+}
+
+.fp-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.6875rem;
+  color: var(--color-ink-2);
+}
+
+.fp-pin {
+  color: var(--color-ember-600, #d93a1f);
+}
+
+.fp-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-variation-settings: 'wght' 450;
+  line-height: 1.15;
+}
+
+.fp-summary {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-ink-2, inherit);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fp-card {
+    transition: none;
+  }
+}
+
+/* ---------- Everything as a list ---------- */
+
+.work-all {
+  margin-top: 2rem;
+  border-top: 1px solid var(--color-hairline);
+  padding-top: 0.75rem;
+}
+
+.work-all summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--color-chrome-3);
+  cursor: pointer;
+  list-style: none;
+}
+
+.work-all summary::-webkit-details-marker {
+  display: none;
+}
+
+.work-all-chevron {
+  transition: transform 150ms var(--ease-out);
+}
+
+.work-all[open] .work-all-chevron {
+  transform: rotate(90deg);
+}
+
+.work-all table {
+  width: 100%;
+  margin-top: 0.75rem;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.work-all th {
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  text-align: left;
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.work-all td {
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  border-top: 1px solid var(--color-hairline);
+  color: var(--color-muted);
+  vertical-align: top;
+}
+
+.work-all td:first-child {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+}
+
+.work-all td a {
+  color: var(--color-chrome-4);
+}
+
+.work-all td a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 639px) {
+  .work-all th:nth-child(2),
+  .work-all td:nth-child(2) {
+    display: none;
+  }
+}
+
+/* ---------- Finder window ---------- */
+
+.finder {
+  font-size: 0.8125rem;
+}
+
+.finder-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid rgb(11 20 48 / 0.12);
+  background: var(--color-window);
+  color: var(--color-ink-2);
+}
+
+.finder-path strong {
+  font-weight: 400;
+  color: var(--color-ink);
+}
+
+.finder-note {
+  padding: 0.75rem 1rem 0.25rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-ink-2);
+}
+
+.finder-list {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.finder-list th {
+  padding: 0.5rem 1rem;
+  text-align: left;
+  font-weight: 400;
+  color: var(--color-ink-2);
+}
+
+.finder-list td {
+  border-top: 1px solid rgb(11 20 48 / 0.08);
+}
+
+.finder-list tbody tr:nth-child(odd) {
+  background: rgb(11 20 48 / 0.025);
+}
+
+.finder-list tbody tr:hover {
+  background: var(--color-navy);
+  color: var(--color-chrome-4);
+}
+
+.finder-list tbody tr:hover .finder-title,
+.finder-list tbody tr:hover .finder-when {
+  color: var(--color-chrome-3);
+}
+
+.finder-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.625rem;
+  padding: 0.5rem 1rem;
+}
+
+.finder-icon {
+  grid-row: span 2;
+  padding-top: 0.125rem;
+  font-size: 1rem;
+}
+
+.finder-title {
+  font-family: var(--font-body);
+  color: var(--color-ink-2);
+}
+
+.finder-when {
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+  vertical-align: top;
+  color: var(--color-ink-2);
+}
+
+/* ---------- Project window ---------- */
+
+.pw-loading {
+  display: flex;
+  gap: 0.25rem;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-ink-2);
+}
+
+.pw-loading-dots::after {
+  content: '...';
+  animation: pw-dots 900ms steps(4) infinite;
+  display: inline-block;
+  overflow: hidden;
+  width: 0;
+  vertical-align: bottom;
+}
+
+@keyframes pw-dots {
+  to {
+    width: 3ch;
+  }
+}
+
+.pw-cover {
+  height: clamp(10rem, 34vh, 17rem);
+  overflow: hidden;
+  border-bottom: 1px solid rgb(11 20 48 / 0.12);
+  background: var(--color-titlebar);
+}
+
+.pw-cover img,
+.pw-cover video,
+.wp-cover video,
+.wp-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Photos of people are usually framed high; keep heads in the crop. */
+.pw-cover-cover img {
+  object-position: 50% 30%;
+}
+
+.pw-body {
+  padding: 1.25rem 1.5rem 2rem;
+}
+
+.pw-title {
+  margin-top: 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-variation-settings: 'wght' 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+.pw-summary,
+.wp-summary {
+  margin-top: 0.625rem;
+  max-width: 52ch;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+.work-facts {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding: 0.875rem 1rem;
+  border-left: 3px solid var(--color-navy);
+  background: rgb(44 59 107 / 0.06);
+}
+
+.work-facts dt {
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.work-facts dd {
+  margin-top: 0.125rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--color-ink);
+}
+
+/* Markdown body inside windows and pages. */
+.work-prose {
+  max-width: 64ch;
+  padding: 0;
+  margin-top: 1.5rem;
+}
+
+.work-prose h2,
+.work-prose h4 {
+  margin-top: 1.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-ink);
+}
+
+.work-prose h2:first-child,
+.work-prose h4:first-child {
+  margin-top: 0;
+}
+
+.work-prose li + li {
+  margin-top: 0.375rem;
+}
+
+.pw-photos ul,
+.wp-photos ul {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+}
+
+.pw-photos li {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.pw-photos img {
+  display: block;
+  width: auto;
+  height: 170px;
+  border-radius: 6px;
+  background: var(--color-titlebar);
+}
+
+figcaption {
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.work-links {
+  margin-top: 1.75rem;
+}
+
+.work-links h2,
+.work-links h4 {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.work-links ul {
+  margin-top: 0.5rem;
+}
+
+.work-links li + li {
+  margin-top: 0.25rem;
+}
+
+.work-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding-block: 0.25rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pw-full {
+  display: inline-block;
+  margin-top: 2rem;
+  font-size: 0.8125rem;
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---------- Project page ---------- */
+
+.wp {
+  max-width: 57rem;
+  margin-inline: auto;
+  padding: 2rem 1rem 4rem;
+}
+
+.wp-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0;
+  font-size: 0.8125rem;
+  color: var(--color-chrome-3);
+}
+
+.wp-back:hover {
+  color: var(--color-chrome-4);
+}
+
+.wp-back-icon {
+  transform: rotate(180deg);
+}
+
+.wp-window {
+  margin-top: 1rem;
+  overflow: hidden;
+  border: 1px solid rgb(11 20 48 / 0.4);
+  border-radius: var(--radius-window);
+  background: var(--color-window);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-window);
+}
+
+.wp-cover {
+  height: clamp(13rem, 46vw, 26rem);
+  overflow: hidden;
+  border-bottom: 1px solid rgb(11 20 48 / 0.12);
+  background: var(--color-titlebar);
+}
+
+.wp-cover picture {
+  display: block;
+  height: 100%;
+}
+
+.wp-body {
+  padding: 1.5rem 1.25rem 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .wp-body {
+    padding: 2.5rem 3rem 3rem;
+  }
+}
+
+.wp-title {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-variation-settings: 'wght' 350;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.wp-photos ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: visible;
+}
+
+@media (min-width: 768px) {
+  .wp-photos ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.wp-photos img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--color-titlebar);
+}
+
+.work-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.work-tags li {
+  padding: 0.25rem 0.625rem;
+  border: 1px solid rgb(11 20 48 / 0.18);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.wp-next {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.wp-next a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-width: 48%;
+  padding: 0.5rem 0;
+  font-family: var(--font-body);
+  color: var(--color-chrome-3);
+}
+
+.wp-next a:hover {
+  color: var(--color-chrome-4);
+}
+
+.wp-next span {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.wp-next-older {
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ---------- Menu divider ---------- */
+
+.os-menu-divider {
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--color-hairline);
+}
+
+/* ---------- Lite and reduced motion ---------- */
+
+[data-lite='true'] .btn-ink,
+[data-lite='true'] .work-all-chevron {
+  transition: none;
+}
+
+[data-lite='true'] .fcard {
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-ink,
+  .work-all-chevron {
+    transition: none;
+  }
+
+  .pw-loading-dots::after {
+    animation: none;
+    width: 3ch;
+  }
+}
+
+/* ---------- Phones: a featured card has to fit between the menu bar and the dock ---------- */
+
+@media (max-width: 767px) {
+  .stack {
+    --stack-top: calc(var(--menubar-h) + 0.75rem);
+    --stack-step: 10px;
+  }
+
+  .stack-slot + .stack-slot {
+    margin-top: 3rem;
+  }
+
+  .fcard-cover {
+    height: 8.5rem;
+  }
+
+  .fcard-text {
+    padding: 1rem 1rem 1.25rem;
+  }
+
+  .fcard-title {
+    margin-top: 0.5rem;
+    font-size: 1.875rem;
+  }
+
+  .fcard-summary {
+    font-size: 0.9375rem;
+  }
+
+  .fcard-result {
+    padding-top: 1rem;
+    font-size: 1.25rem;
+  }
+
+  /* The role is in the window and on the full page. */
+  .fcard-role {
+    display: none;
+  }
+
+  .fcard-tags-big {
+    font-size: 1.125rem;
+  }
+}
+
+.fcard-cover.pw-cover-cover img {
+  object-position: 50% 50%;
+}
+
+/* ---------- Reader (focus mode) ---------- */
+
+.reader-veil {
+  position: absolute;
+  inset: 0;
+  background: rgb(5 9 26 / 0.62);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  backdrop-filter: blur(6px) saturate(120%);
+}
+
+.reader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(92vw, 1100px);
+  height: min(90%, 60rem);
+  margin: auto;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--color-window);
+  color: var(--color-ink);
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgb(11 20 48 / 0.5),
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 40px 90px -30px rgb(5 9 26 / 0.85);
+  transform-origin: 50% 50%;
+}
+
+.reader-sheet {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.reader-bar {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 1rem;
+  height: 2.5rem;
+  padding: 0 0.875rem;
+  border-bottom: 1px solid rgb(11 20 48 / 0.18);
+  font-size: 0.75rem;
+}
+
+.reader .os-titlebar {
+  background: linear-gradient(180deg, var(--color-slate-50) 0%, var(--color-slate-200) 46%, var(--color-slate-300) 54%, var(--color-slate-100) 100%);
+  color: var(--color-ink);
+}
+
+.reader .os-light-close {
+  background: var(--color-ember-500);
+}
+.reader .os-light-minimize {
+  background: var(--color-tag-amber);
+}
+.reader .os-light-zoom {
+  background: #5fa86c;
+}
+
+.reader-file {
+  position: absolute;
+  inset-inline: 6rem;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.reader-file strong {
+  font-weight: 400;
+}
+
+.reader-count {
+  margin-left: auto;
+  color: var(--color-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.reader-close-text {
+  min-height: 2.5rem;
+  padding: 0 0.25rem;
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.reader-sheet .reader-bar {
+  height: 3rem;
+}
+
+.reader-sheet .reader-count {
+  display: none;
+}
+
+.reader-sheet .reader-close-text {
+  margin-left: auto;
+}
+
+.reader-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.reader-cover {
+  height: clamp(14rem, 46vh, 30rem);
+  overflow: hidden;
+  background: var(--color-titlebar);
+}
+
+.reader-cover img,
+.reader-cover video {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.reader-col {
+  width: min(100% - 2.5rem, 42rem);
+  margin-inline: auto;
+}
+
+.reader-meta {
+  margin-top: 2.25rem;
+}
+
+.reader-title {
+  margin-top: 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-variation-settings: 'wght' 350;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.reader-summary {
+  margin-top: 1rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.1875rem, 1.6vw, 1.375rem);
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+.reader-facts {
+  margin-top: 1.75rem;
+}
+
+.reader-facts dd {
+  font-size: 1.0625rem;
+}
+
+.reader-prose {
+  margin-top: 2rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.125rem, 1.25vw, 1.25rem);
+  line-height: 1.7;
+  color: var(--color-ink);
+}
+
+.reader-prose p + p,
+.reader-prose ul,
+.reader-prose ol,
+.reader-prose p + ul {
+  margin-top: 1em;
+}
+
+.reader-prose h4 {
+  margin-top: 2.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-accent-ink);
+}
+
+.reader-prose ul li {
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.reader-prose ul li::before {
+  content: '-';
+  position: absolute;
+  left: 0.25rem;
+}
+
+.reader-prose li + li {
+  margin-top: 0.5rem;
+}
+
+.reader-prose a {
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reader-photos {
+  margin-top: 2.75rem;
+}
+
+.reader-photos ul {
+  display: flex;
+  gap: 1rem;
+  padding: 0 max(1.25rem, calc((100% - 42rem) / 2)) 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: max(1.25rem, calc((100% - 42rem) / 2));
+}
+
+.reader-photos li {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.reader-photos img {
+  display: block;
+  width: auto;
+  height: clamp(14rem, 34vh, 22rem);
+  border-radius: 8px;
+  background: var(--color-titlebar);
+}
+
+.reader-links {
+  margin-top: 2.25rem;
+}
+
+.reader-links h3 {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.reader-links a {
+  font-size: 1.0625rem;
+}
+
+.reader-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  width: min(100% - 2.5rem, 42rem);
+  margin: 3.5rem auto 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(11 20 48 / 0.15);
+}
+
+.reader-step {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.reader-step:hover {
+  background: rgb(44 59 107 / 0.07);
+}
+
+.reader-step-next {
+  text-align: right;
+}
+
+.reader-step-dir {
+  font-size: 0.75rem;
+  color: var(--color-accent-ink);
+}
+
+.reader-step-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-variation-settings: 'wght' 400;
+  line-height: 1.2;
+}
+
+/* ---------- Flip covers (featured cards) ---------- */
+
+.fcard-cover .flip-card,
+.fcard-cover > astro-island {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fcard-cover .flip-card {
+  --fc-w: 100%;
+  --fc-h: 100%;
+}
+
+.fcard-face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.fcard-cover-empty .fcard-face {
+  display: flex;
+  align-items: flex-end;
+  padding: 1.25rem;
+}
+
+.fcard-flip-hint {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: rgb(11 20 48 / 0.72);
+  color: var(--color-cream-100);
+  font-size: 0.6875rem;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.fcard-back {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: var(--color-navy-900);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--color-cream-100);
+}
+
+.fcard-back-path {
+  font-size: 0.75rem;
+  color: var(--color-ember-400);
+}
+
+.fcard-back dl {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.fcard-back dt {
+  font-size: 0.6875rem;
+  color: var(--color-navy-300);
+}
+
+.fcard-back dd {
+  margin-top: 0.125rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* The flip card fills the cover; its faces carry their own padding. */
+.fcard-cover-empty {
+  display: block;
+  padding: 0;
+}
+
+.fcard-back dl,
+.fcard-back p {
+  align-self: stretch;
+  text-align: left;
+}
+
+.reader-cover {
+  position: relative;
+}
+
+/* One-time scan-in when the reader opens: a cream beam draws the cover top to bottom,
+   leaving faint scanlines that fade out. Photos stay full colour throughout. */
+[data-lite='false'] .reader-cover img {
+  animation: reader-scan-img 0.7s 0.18s cubic-bezier(0.3, 0.6, 0.3, 1) backwards;
+}
+
+[data-lite='false'] .reader-cover::before,
+[data-lite='false'] .reader-cover::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  pointer-events: none;
+}
+
+[data-lite='false'] .reader-cover::before {
+  inset-block: 0;
+  background: repeating-linear-gradient(to bottom, rgb(11 20 48 / 0.28) 0 1px, transparent 1px 3px);
+  opacity: 0;
+  animation: reader-scan-lines 1.2s 0.18s ease-out;
+}
+
+[data-lite='false'] .reader-cover::after {
+  top: 0;
+  height: 2px;
+  background: var(--color-cream-100, #f2ebdd);
+  box-shadow: 0 0 12px 2px rgb(255 106 61 / 0.55);
+  opacity: 0;
+  animation: reader-scan-beam 0.7s 0.18s cubic-bezier(0.3, 0.6, 0.3, 1);
+}
+
+@keyframes reader-scan-img {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes reader-scan-beam {
+  0% { top: 0; opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: calc(100% - 2px); opacity: 0; }
+}
+
+@keyframes reader-scan-lines {
+  0%, 50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-lite='false'] .reader-cover img,
+  [data-lite='false'] .reader-cover::before,
+  [data-lite='false'] .reader-cover::after {
+    animation: none;
+  }
+}
+
+/* ---------- Reader typography ----------
+   TL;DR box up top (what / my role), the result as a pull-quote, real section headings,
+   ~65ch measure, numbers and list lead-ins in bold (lib/prose.ts). Same on /work/<slug>/. */
+
+.tldr {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem 1.25rem;
+  border: 1px solid rgb(11 20 48 / 0.16);
+  border-radius: 10px;
+  background: var(--color-window-2);
+}
+
+.tldr-tag {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  background: var(--color-navy-950);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-cream-50);
+}
+
+.tldr dl {
+  display: grid;
+  gap: 0.625rem;
+  margin-top: 0.875rem;
+}
+
+.tldr dl > div {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.tldr dt {
+  padding-top: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+}
+
+.tldr dd {
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--color-ink);
+}
+
+@media (max-width: 479px) {
+  .tldr dl > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.125rem;
+  }
+}
+
+.pull {
+  margin-top: 1.25rem;
+  padding: 0.25rem 0 0.25rem 1.125rem;
+  border-left: 3px solid var(--color-accent);
+}
+
+.pull blockquote p {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+  font-variation-settings: 'wght' 420;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+.pull figcaption {
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-accent-ink);
+}
+
+.reader-prose {
+  max-width: 65ch;
+  margin-top: 2.25rem;
+}
+
+.reader-prose p {
+  max-width: 65ch;
+}
+
+.reader-prose h4,
+.work-prose.reader-prose h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(11 20 48 / 0.14);
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2vw, 1.625rem);
+  font-weight: 400;
+  font-variation-settings: 'wght' 480;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+.reader-prose h4:first-child,
+.work-prose.reader-prose h2:first-child {
+  margin-top: 0;
+}
+
+.reader-prose h4 + *,
+.work-prose.reader-prose h2 + * {
+  margin-top: 0.75rem;
+}
+
+.reader-prose strong {
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.reader-prose ul li::before {
+  content: '';
+  top: 0.75em;
+  left: 0.125rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 1px;
+  background: var(--color-navy-600);
+}
+
+.wp-body .reader-prose {
+  font-size: clamp(1.125rem, 1.25vw, 1.25rem);
+  line-height: 1.7;
+}
+
+/* Blueprint thumbnails: photos on cards read as navy/cream duotone with a faint grid, so the
+   set matches the blueprint drawings. Hover or focus brings the colour back; the reader and
+   the project pages always show full colour. */
+.fcard-cover:not([data-bp]) picture,
+.fp-cover:not([data-bp]):has(img) {
+  position: relative;
+  isolation: isolate;
+  background: var(--color-cream-100);
+}
+
+.fcard-cover:not([data-bp]) picture img,
+.fp-cover:not([data-bp]) img {
+  filter: grayscale(1) contrast(1.08);
+  mix-blend-mode: multiply;
+  transition: filter 400ms ease;
+}
+
+.fcard-cover:not([data-bp]) picture::after,
+.fp-cover:not([data-bp]):has(img)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgb(242 235 221 / 0.1) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgb(242 235 221 / 0.1) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--color-navy-900);
+  mix-blend-mode: lighten;
+  transition: opacity 400ms ease;
+}
+
+.fcard:hover .fcard-cover picture::after,
+.fcard:focus-within .fcard-cover picture::after,
+.fp-card:hover .fp-cover::after,
+.fp-card:focus-visible .fp-cover::after {
+  opacity: 0;
+}
+
+.fcard:hover .fcard-cover picture img,
+.fcard:focus-within .fcard-cover picture img,
+.fp-card:hover .fp-cover img,
+.fp-card:focus-visible .fp-cover img {
+  filter: none;
+  mix-blend-mode: normal;
+}

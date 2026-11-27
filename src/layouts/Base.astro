@@ -1,0 +1,221 @@
+---
+import '../styles/global.css';
+import Dock from '../components/os/Dock';
+import Footer from '../components/os/Footer.astro';
+import MenuBar from '../components/os/MenuBar';
+import WindowManager from '../components/os/WindowManager';
+import BootTitle from '../components/os/BootTitle';
+import CommandPalette from '../components/os/CommandPalette';
+import { EMAIL, GITHUB_URL, LINKEDIN_URL } from '../components/hero/links';
+import { getProjects, toIndexEntry } from '../lib/projects';
+import { INDEX_ELEMENT_ID } from '../lib/work';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Show the boot sequence on a visitor's first page of the session. */
+  boot?: boolean;
+  noindex?: boolean;
+  /** The page places the CRT "Let's build something." block itself (the homepage). */
+  bareFoot?: boolean;
+}
+
+const {
+  title = 'Aryan Khimani — AI & software developer, Western University',
+  description = 'Aryan Khimani builds AI tools and ships them. CS + Ivey HBA at Western University, looking for Summer 2027 internships in software and AI. See TruthLens, AI research at Mount Sinai and more.',
+  boot = false,
+  noindex = false,
+  bareFoot = false,
+} = Astro.props;
+
+// Who this is, for search engines. JSON-LD is data, not script, so the CSP doesn't apply to it.
+const person = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Aryan Khimani',
+  url: new URL('/', Astro.site).href,
+  image: new URL('/og.jpg', Astro.site).href,
+  email: `mailto:${EMAIL}`,
+  jobTitle: 'AI & software developer',
+  description: 'Computer Science + Ivey HBA student at Western University who builds AI tools.',
+  affiliation: [
+    { '@type': 'CollegeOrUniversity', name: 'Western University', url: 'https://www.uwo.ca/' },
+    { '@type': 'CollegeOrUniversity', name: 'Ivey Business School', url: 'https://www.ivey.uwo.ca/' },
+  ],
+  knowsAbout: ['Machine learning', 'Python', 'PyTorch', 'FastAPI', 'React', 'TypeScript'],
+  sameAs: [LINKEDIN_URL, GITHUB_URL],
+}).replaceAll('<', '\\u003c');
+
+// Every project's id, title, folders and dates (about 2 KB), so windows, menus and shared
+// links like /#tks work on any page before the full project data is fetched.
+const workIndex = JSON.stringify((await getProjects()).map(toIndexEntry)).replaceAll('<', '\\u003c');
+
+const projectCount = (await getProjects()).length;
+
+// Link previews (iMessage, LinkedIn, Slack) need absolute URLs.
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL('/og.jpg', Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en" data-wants-boot={boot ? '' : undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <!-- Clickjacking guard: GitHub Pages can't send frame-ancestors / X-Frame-Options, so if
+         another site loads this page in a frame, try to break out of it, and either way don't
+         show anything inside the frame (browsers often refuse the break-out silently). -->
+    <script is:inline>
+      if (window.top !== window.self) {
+        document.documentElement.style.display = 'none';
+        try {
+          window.top.location.replace(window.location.href);
+        } catch (e) {}
+      }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {!noindex && <link rel="canonical" href={canonical} />}
+    <meta name="theme-color" content="#0B1430" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Aryan Khimani" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The liquid-metal AK logo next to Aryan Khimani: I build AI tools and ship them" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/hero-name.woff2" crossorigin />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <title>{title}</title>
+    {!noindex && <script is:inline type="application/ld+json" set:html={person} />}
+
+    <!-- Decide Lite mode before first paint so the heavy version never flashes.
+         Keep the storage key in sync with LITE_STORAGE_KEY in src/lib/device-tier.ts. -->
+    <script is:inline>
+      (function () {
+        var lite = false;
+        var saved = null;
+        try {
+          saved = localStorage.getItem('aryan-os:lite');
+        } catch (e) {}
+        if (saved === 'on' || saved === 'off') {
+          lite = saved === 'on';
+        } else {
+          var gl = null;
+          try {
+            var canvas = document.createElement('canvas');
+            gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+          } catch (e) {}
+          var conn = navigator.connection;
+          lite =
+            matchMedia('(prefers-reduced-motion: reduce)').matches ||
+            !!(conn && conn.saveData) ||
+            (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4) ||
+            (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4) ||
+            !gl;
+        }
+        var root = document.documentElement;
+        root.dataset.lite = String(lite);
+        try {
+          if (localStorage.getItem('aryan-os:crt') === 'off') root.dataset.crt = 'off';
+        } catch (e) {}
+
+        // Boot sequence: first page of the session only, never on a shared window link.
+        // Full sequence ~4.5s; Lite / reduced motion get a 0.5s fade. The timers are hard
+        // caps so it can never block the page, even if the boot script fails to run.
+        if (root.hasAttribute('data-wants-boot') && !location.hash) {
+          try {
+            if (!sessionStorage.getItem('aryan-os:booted')) {
+              sessionStorage.setItem('aryan-os:booted', '1');
+              var quick = lite || matchMedia('(prefers-reduced-motion: reduce)').matches;
+              root.dataset.boot = quick ? 'lite' : 'full';
+              setTimeout(function () {
+                if (!root.dataset.boot) return;
+                delete root.dataset.boot;
+                window.dispatchEvent(new Event('aryan-os:boot-done'));
+              }, quick ? 500 : 5000);
+            }
+          } catch (e) {}
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    {
+      boot && (
+        <div id="boot" aria-hidden="true">
+          <div class="boot-crt">
+            <svg class="boot-hud" viewBox="-500 -500 1000 1000">
+              <circle class="boot-ring boot-ring-outer" r="440" pathLength="1" />
+              <circle class="boot-ticks" r="412" pathLength="360" />
+              <circle class="boot-ticks boot-ticks-major" r="404" pathLength="360" />
+              <g class="boot-spin">
+                <circle class="boot-arc" r="468" pathLength="100" />
+              </g>
+              <g class="boot-spin boot-spin-back">
+                <circle class="boot-arc boot-arc-cream" r="380" pathLength="100" />
+              </g>
+              <circle class="boot-ring boot-ring-inner" r="150" pathLength="1" />
+              <path class="boot-cross" d="M0-500v40M0 460v40M-500 0h40M460 0h40" />
+            </svg>
+            <div class="boot-logo">
+              <img src="/logo.svg" alt="" width="96" height="96" />
+            </div>
+            <div class="boot-title"><BootTitle client:load /><i class="boot-sweep" /></div>
+            <pre id="boot-log" data-projects={projectCount} />
+            <p class="boot-read"><span>AK/OS · BOOT</span><span id="boot-clock">T+0.00</span></p>
+            <div class="boot-progress">
+              <span class="boot-progress-track"><i id="boot-bar" /></span>
+              <span id="boot-pct">0%</span>
+            </div>
+            <p class="boot-skip">Scroll to enter <span class="boot-dim">· any key to skip</span></p>
+            <i class="boot-roll" />
+          </div>
+        </div>
+      )
+    }
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:rounded focus:bg-window focus:px-3 focus:py-2 focus:text-sm focus:text-ink"
+    >
+      Skip to content
+    </a>
+    <MenuBar client:later />
+    <main id="main" class="pt-(--menubar-h)">
+      <slot />
+    </main>
+    <Footer bare={bareFoot} />
+    <WindowManager client:later />
+    <Dock client:later />
+    <CommandPalette client:later />
+    <script type="application/json" id={INDEX_ELEMENT_ID} set:html={workIndex} />
+
+    <script>
+      import { initScroll } from '../lib/scroll';
+      import { runBoot } from '../lib/boot';
+      import { bindWindowLinks } from '../lib/windows';
+      import { initMotion } from '../lib/motion';
+      import { initEasterEgg } from '../lib/easter';
+      import { initSound } from '../lib/sound';
+      import '../components/os/window-list';
+      initSound();
+      initScroll();
+      initMotion();
+      initEasterEgg();
+      runBoot();
+      bindWindowLinks();
+      // The scroll journey (Signal line, channel changes, HUD, lock-ons) loads when the page is idle.
+      const idle = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 600));
+      idle(() => void import('../lib/signal').then((m) => m.initSignal()));
+    </script>
+  </body>
+</html>

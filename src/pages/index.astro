@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/hero/Hero';
+import About from '../components/about/About.astro';
+import Contact from '../components/contact/Contact.astro';
+import Journey from '../components/journey/Journey.astro';
+import Memories from '../components/memories/Memories.astro';
+import Playground from '../components/playground/Playground.astro';
+import ToysSection from '../components/playground/ToysSection.astro';
+import WorkSection from '../components/work/WorkSection.astro';
+import Writing from '../components/writing/Writing.astro';
+import Ticker from '../components/ticker/Ticker.astro';
+import FootCrt from '../components/os/FootCrt.astro';
+---
+
+<Base boot bareFoot>
+  <section id="home" class="relative">
+    <Hero client:load />
+  </section>
+  <Ticker />
+  <About />
+
+  <WorkSection />
+  <Journey />
+  <Memories />
+  <Playground />
+  <Writing />
+  <FootCrt />
+  <Contact />
+  <ToysSection />
+</Base>
